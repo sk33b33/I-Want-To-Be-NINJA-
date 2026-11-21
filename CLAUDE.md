@@ -38,6 +38,10 @@ You are the lead game-development assistant for **I want to be NINJA**, a 3D jun
 - Tests: dependency-free runner `project/tests/run_tests.gd` (base class `TestCase`). Add new suites to its `SUITES` list.
 - Tunable values live in `project/data/**.tres` Resources (`PlayerMovementConfig`, `CameraRigConfig`).
 - Physics layers: 1 = world, 2 = player.
+- World is procedural: `BiomeTerrain` (heightmap + collision), `FloraScatter`, `FaunaSpawner`, `BiomeAtmosphere`, driven by `project/data/biomes/*.tres`. Shaders in `project/shaders/` must stay `gl_compatibility`-safe (no screen/depth texture reads).
+- `QualityProfile.is_low()` = phone tier (auto on Android, `-- --low-quality` on PC). New heavy features must scale down on LOW.
+- Player model: `project/assets/models/ninja/ninja.glb` (Mixamo). Clip mapping in `data/player/ninja_animations.tres`. It has **no Idle clip** (a pose is generated); Roll/Combo/Death clips are reserved for Phase 4.
+- Scenes were produced by `tools/generate_phase1_scaffold.gd` then `tools/generate_visual_pass.gd`; re-running a generator overwrites hand edits.
 - Concept art for the four jungles is in `docs/concept-art/` (reference only, not in-game assets):
   `verdant_canopy.jpg`, `emberwild.jpg`, `moonfen.jpg`, `stormcrag.jpg`.
 

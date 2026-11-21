@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/water.gdshader" id="1_5efp1"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_ripples_normal.tres" id="2_nxw41"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_5efp1")
+shader_parameter/ripple_noise = ExtResource("2_nxw41")
+shader_parameter/deep = null
+shader_parameter/shallow = null
+shader_parameter/flow_speed = null
+shader_parameter/flow_dir = null
+shader_parameter/alpha = null
+shader_parameter/glow = null

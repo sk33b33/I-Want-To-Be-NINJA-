@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="FloraConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/flora_config.gd" id="1_hak8w"]
+
+[resource]
+script = ExtResource("1_hak8w")

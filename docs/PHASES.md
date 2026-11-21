@@ -85,3 +85,5 @@ Claude must update this section only after evidence of completed work.
 | 1 — Movement + camera | **Implemented, automated checks pass; gate NOT yet passed** | 19/19 headless tests (movement, jump, fall recovery, camera blend/collision, scripted run of the full graybox route). Gate still needs the **10-minute human playtest** on PC and on an Android phone. |
 | 2–13 | Not started | — |
 
+Note: at the owner's request a **visual pass** (gloomy Verdant Canopy, procedural terrain/flora/fauna, Mixamo ninja) was done ahead of Phase 6/11. It is placeholder-quality procedural art; it does not complete Phase 6 or Phase 11. 33/33 automated tests pass.
+

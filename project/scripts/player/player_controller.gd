@@ -25,6 +25,7 @@ var _was_on_floor: bool = false
 
 
 func _ready() -> void:
+	add_to_group("player")
 	_camera_rig = get_node_or_null(camera_rig_path) as CameraRig
 	_last_safe_position = global_position
 

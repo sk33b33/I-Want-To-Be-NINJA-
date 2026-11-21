@@ -9,6 +9,7 @@ Not yet implemented: dodge, attacks, lock-on, interact.
 | Camera | Mouse | Right stick | Right side: drag |
 | Jump | Space | A / Cross | JUMP button |
 | Sprint (dash-run, hold) | Shift | Left-stick click | DASH button |
+| Sprint-jump (front flip) | Shift + Space | L3 + A | DASH + JUMP |
 | Dodge | Shift (tap, planned) | B / Circle | — (Phase 4) |
 | Light attack | Left mouse | X / Square | — (Phase 4) |
 | Heavy attack | Right mouse | Y / Triangle | — (Phase 4) |

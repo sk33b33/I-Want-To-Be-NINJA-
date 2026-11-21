@@ -1,0 +1,267 @@
+[gd_scene load_steps=29 format=3]
+
+[ext_resource type="Material" path="res://data/materials/sky_gloom.tres" id="1_2rbqx"]
+[ext_resource type="Script" path="res://scripts/world/biome_terrain.gd" id="2_q15il"]
+[ext_resource type="Resource" path="res://data/biomes/verdant_canopy_terrain.tres" id="3_qm4mg"]
+[ext_resource type="Material" path="res://data/materials/terrain.tres" id="4_f15ys"]
+[ext_resource type="Script" path="res://scripts/world/flora_scatter.gd" id="5_msjkj"]
+[ext_resource type="Resource" path="res://data/biomes/verdant_canopy_flora.tres" id="6_w88ro"]
+[ext_resource type="Material" path="res://data/materials/foliage_grass.tres" id="7_7hso3"]
+[ext_resource type="Material" path="res://data/materials/foliage_leaf.tres" id="8_as0mt"]
+[ext_resource type="Material" path="res://data/materials/foliage_vine.tres" id="9_klh7u"]
+[ext_resource type="Material" path="res://data/materials/bark_vertex.tres" id="10_ro6b8"]
+[ext_resource type="Material" path="res://data/materials/glow_fungus.tres" id="11_hilan"]
+[ext_resource type="Material" path="res://data/materials/rock_vertex.tres" id="12_ihnio"]
+[ext_resource type="Material" path="res://data/materials/stone.tres" id="13_yle8u"]
+[ext_resource type="Script" path="res://scripts/world/fauna/fauna_spawner.gd" id="14_b0jry"]
+[ext_resource type="Resource" path="res://data/biomes/verdant_canopy_fauna.tres" id="15_ktxoi"]
+[ext_resource type="Material" path="res://data/materials/bat.tres" id="16_6r7wv"]
+[ext_resource type="Material" path="res://data/materials/frog.tres" id="17_lnlw7"]
+[ext_resource type="Material" path="res://data/materials/lurker_eyes.tres" id="18_rwb66"]
+[ext_resource type="Material" path="res://data/materials/firefly.tres" id="19_wq654"]
+[ext_resource type="Script" path="res://scripts/world/biome_atmosphere.gd" id="20_4soh6"]
+[ext_resource type="Material" path="res://data/materials/mist.tres" id="21_h6cn4"]
+[ext_resource type="Material" path="res://data/materials/light_shaft.tres" id="22_lrewo"]
+[ext_resource type="Material" path="res://data/materials/waterfall.tres" id="23_ktm4t"]
+[ext_resource type="Material" path="res://data/materials/water.tres" id="24_co3lu"]
+[ext_resource type="Material" path="res://data/materials/dark_wood.tres" id="25_tsqvj"]
+[ext_resource type="Material" path="res://data/materials/gate_stone.tres" id="26_kqqjd"]
+
+[sub_resource type="Sky" id="Sky_jx04a"]
+sky_material = ExtResource("1_2rbqx")
+
+[sub_resource type="Environment" id="Environment_sdyj0"]
+background_mode = 2
+sky = SubResource("Sky_jx04a")
+ambient_light_source = 2
+ambient_light_color = Color(0.24, 0.3, 0.32, 1)
+ambient_light_energy = 3.5
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 1.35
+glow_enabled = true
+glow_intensity = 0.9
+glow_bloom = 0.04
+glow_blend_mode = 0
+glow_hdr_threshold = 0.85
+fog_enabled = true
+fog_light_color = Color(0.15, 0.19, 0.21, 1)
+fog_density = 0.016
+fog_sky_affect = 0.3
+fog_height = 0.5
+fog_height_density = 0.04
+adjustment_enabled = true
+adjustment_contrast = 1.12
+adjustment_saturation = 0.85
+
+[node name="VerdantCanopy" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sdyj0")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.81915206, -0.35312894, 0.45198444, 0, 0.7880108, 0.6156615, -0.57357645, -0.5043204, 0.64550066, 0, 0, 0)
+light_color = Color(0.55, 0.64, 0.82, 1)
+light_energy = 1.2
+shadow_enabled = true
+shadow_opacity = 0.7
+directional_shadow_mode = 1
+directional_shadow_max_distance = 55.0
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("2_q15il")
+config = ExtResource("3_qm4mg")
+material = ExtResource("4_f15ys")
+
+[node name="Flora" type="Node3D" parent="."]
+script = ExtResource("5_msjkj")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("6_w88ro")
+grass_material = ExtResource("7_7hso3")
+leaf_material = ExtResource("8_as0mt")
+vine_material = ExtResource("9_klh7u")
+bark_material = ExtResource("10_ro6b8")
+fungus_material = ExtResource("11_hilan")
+rock_material = ExtResource("12_ihnio")
+stone_material = ExtResource("13_yle8u")
+
+[node name="Fauna" type="Node3D" parent="."]
+script = ExtResource("14_b0jry")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("15_ktxoi")
+bat_material = ExtResource("16_6r7wv")
+frog_material = ExtResource("17_lnlw7")
+eye_material = ExtResource("18_rwb66")
+firefly_material = ExtResource("19_wq654")
+
+[node name="Atmosphere" type="Node3D" parent="."]
+script = ExtResource("20_4soh6")
+terrain_path = NodePath("../Terrain")
+sun_path = NodePath("../Moonlight")
+environment_path = NodePath("../WorldEnvironment")
+mist_material = ExtResource("21_h6cn4")
+shaft_material = ExtResource("22_lrewo")
+waterfall_material = ExtResource("23_ktm4t")
+water_material = ExtResource("24_co3lu")
+
+[node name="RouteGeometry" type="Node3D" parent="."]
+
+[node name="StepLow" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.25, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 0.5, 3)
+material = ExtResource("13_yle8u")
+
+[node name="StepMid" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.5, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 1, 3)
+material = ExtResource("13_yle8u")
+
+[node name="StepHigh" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.8, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 1.6, 3)
+material = ExtResource("13_yle8u")
+
+[node name="Ramp" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 0.95105654, -0.309017, 0, 0.309017, 0.95105654, 10, 1.6, -12)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 0.5, 10)
+material = ExtResource("25_tsqvj")
+
+[node name="RaisedLedge" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.6, -21)
+use_collision = true
+collision_mask = 0
+size = Vector3(8, 3.2, 8)
+material = ExtResource("13_yle8u")
+
+[node name="RuinWall" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, -32)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 6, 20)
+material = ExtResource("13_yle8u")
+
+[node name="TunnelRoof" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.2, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(6, 1, 6)
+material = ExtResource("13_yle8u")
+
+[node name="TunnelLeft" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.35, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 2.7, 6)
+material = ExtResource("13_yle8u")
+
+[node name="TunnelRight" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.35, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 2.7, 6)
+material = ExtResource("13_yle8u")
+
+[node name="GapPlatform1" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -54)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = ExtResource("13_yle8u")
+
+[node name="GapPlatform2" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.2, -60.5)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = ExtResource("13_yle8u")
+
+[node name="GapPlatform3" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -67)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = ExtResource("13_yle8u")
+
+[node name="GapColumn1" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, -54)
+use_collision = true
+collision_mask = 0
+radius = 1.3
+height = 22.0
+sides = 10
+material = ExtResource("13_yle8u")
+
+[node name="GapColumn2" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -11.7, -60.5)
+use_collision = true
+collision_mask = 0
+radius = 1.3
+height = 22.0
+sides = 10
+material = ExtResource("13_yle8u")
+
+[node name="GapColumn3" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -11.4, -67)
+use_collision = true
+collision_mask = 0
+radius = 1.3
+height = 22.0
+sides = 10
+material = ExtResource("13_yle8u")
+
+[node name="GatePillarL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("26_kqqjd")
+
+[node name="GatePillarR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("26_kqqjd")
+
+[node name="GateLintel" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(11, 1.4, 2)
+material = ExtResource("26_kqqjd")
+
+[node name="GateCrown" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.8, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(5, 1.2, 1.6)
+material = ExtResource("26_kqqjd")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+[node name="GateGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -91)
+light_color = Color(1, 0.2, 0.08, 1)
+light_energy = 2.5
+omni_range = 16.0
+
+[node name="ShrineGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.5, -8)
+light_color = Color(0.2, 0.9, 0.8, 1)
+light_energy = 1.2
+omni_range = 9.0
+
+[node name="GorgeGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, -60)
+light_color = Color(0.15, 0.6, 0.7, 1)
+light_energy = 2.0
+omni_range = 22.0

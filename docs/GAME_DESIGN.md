@@ -9,7 +9,7 @@ Android phones and PC (Windows/Linux) from one Godot project. Phones use on-scre
 ## Concept art (owner-supplied mood references)
 | Biome | Reference | Key takeaways |
 |---|---|---|
-| Verdant Canopy | `docs/concept-art/verdant_canopy.jpg` | Overgrown stone ruins and towers wrapped in roots, tiered waterfalls into a turquoise pool, warm sun shafts, glowing teal/orange fungi. |
+| Verdant Canopy | `docs/concept-art/verdant_canopy.jpg` + **owner direction (2026-11-21): darker, gloomy and ominous** | Overgrown stone ruins and towers wrapped in roots, tiered waterfalls into a turquoise pool, warm sun shafts, glowing teal/orange fungi. |
 | Emberwild | `docs/concept-art/emberwild.jpg` | Jagged black spires, a lake of cracked lava, red-orange glow through smoke, a lush jungle edge with waterfalls framing the view. |
 | Moonfen | `docs/concept-art/moonfen.jpg` | Night swamp in violet/indigo, magenta and cyan bioluminescent plants, glowing pools along a dark stream, hanging vines, giant mushroom silhouette. |
 | Stormcrag | `docs/concept-art/stormcrag.jpg` | Stepped temple pyramid in the mountains, lightning storm overhead, many waterfalls and terraced fields, turquoise river, inhabited and festive. |

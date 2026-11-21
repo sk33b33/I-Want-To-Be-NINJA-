@@ -14,7 +14,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	text = "I want to be NINJA - Phase 1 graybox\nCamera: %s   FPS: %d\n%s" % [
+	text = "I want to be NINJA - Phase 1 prototype (Verdant Canopy, placeholder art)\nCamera: %s   FPS: %d\n%s" % [
 		_mode_text, Engine.get_frames_per_second(), _hint()]
 
 

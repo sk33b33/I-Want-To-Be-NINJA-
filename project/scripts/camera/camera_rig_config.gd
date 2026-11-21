@@ -16,7 +16,7 @@ extends Resource
 @export var tp_max_pitch_deg: float = 35.0
 
 @export_group("Top down")
-@export var td_distance: float = 16.0
+@export var td_distance: float = 13.0
 @export var td_min_distance: float = 8.0
 @export var td_max_distance: float = 28.0
 @export var td_pitch_deg: float = -62.0

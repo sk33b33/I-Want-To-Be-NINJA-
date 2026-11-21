@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://shaders/terrain.gdshader" id="1_4sr1y"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_oi0st"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_macro.tres" id="3_6a0qj"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_4sr1y")
+shader_parameter/detail_noise = ExtResource("2_oi0st")
+shader_parameter/macro_noise = ExtResource("3_6a0qj")
+shader_parameter/moss_dark = null
+shader_parameter/moss_light = null
+shader_parameter/mud = null
+shader_parameter/rock = null
+shader_parameter/rock_dark = null
+shader_parameter/detail_scale = null
+shader_parameter/macro_scale = null

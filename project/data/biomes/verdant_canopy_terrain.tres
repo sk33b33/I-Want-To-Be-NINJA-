@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="TerrainConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/terrain_config.gd" id="1_joal5"]
+
+[resource]
+script = ExtResource("1_joal5")
+route_points = PackedVector2Array(0, 30, 0, -50, 0, -71, 0, -110)

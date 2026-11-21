@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/sky_gloom.gdshader" id="1_3nmag"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_clouds.tres" id="2_xjy6u"]
+
+[resource]
+shader = ExtResource("1_3nmag")
+shader_parameter/cloud_noise = ExtResource("2_xjy6u")
+shader_parameter/zenith = null
+shader_parameter/horizon = null
+shader_parameter/glow_tint = null
+shader_parameter/ground = null
+shader_parameter/moon_dir = null
+shader_parameter/flash_color = null
+shader_parameter/flash = null
+shader_parameter/cloud_speed = null

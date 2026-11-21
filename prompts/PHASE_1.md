@@ -1,0 +1,2 @@
+# Claude prompt — Phase 1
+Read the project instructions and current phase. Implement Phase 1 only: a graybox player controller with third-person camera, camera collision, run, jump, fall recovery, and a smooth top-down camera toggle. Use placeholder shapes. Do not add combat, bosses, inventory, or polished assets. Run parse/import checks if Godot is available, provide a manual test checklist, and update phase status only if the gate passes.

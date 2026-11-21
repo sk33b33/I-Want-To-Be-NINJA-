@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_6q06x"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/verdant_canopy_graybox.tscn" id="2_ow5a4"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_hujxm"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="4_yyfjg"]
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="5_b1x3f"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_6q06x")
+
+[node name="Level" parent="." instance=ExtResource("2_ow5a4")]
+
+[node name="Player" parent="." instance=ExtResource("3_hujxm")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="DebugHud" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 16.0
+offset_bottom = 12.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+script = ExtResource("4_yyfjg")
+camera_rig_path = NodePath("../../Player/CameraRig")
+
+[node name="TouchControls" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("5_b1x3f")

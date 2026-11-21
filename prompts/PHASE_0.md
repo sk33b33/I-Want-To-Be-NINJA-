@@ -1,0 +1,2 @@
+# Claude prompt — Phase 0
+Read `CLAUDE.md`, `docs/GAME_DESIGN.md`, `docs/ARCHITECTURE.md`, and `docs/PHASES.md`. Inspect the current directory. Execute Phase 0 only: validate the Godot 4 setup, create a minimal project skeleton and one bootable empty test scene, establish project conventions, and report any environment blockers. Do not start gameplay systems. Keep all changes small and runnable. Update the phase status only if its gate passes.

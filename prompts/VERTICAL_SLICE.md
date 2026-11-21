@@ -1,0 +1,2 @@
+# Claude prompt — first vertical slice
+Read all core docs and check the current phase status. Build the smallest complete hunt loop: Verdant Canopy graybox, traversal route, 45-minute expedition timer, arena entry timer stop/hide, one original boss, one telegraphed attack, one breakable part, reward material, one craftable item, and results screen. Use placeholder art and data-driven definitions. Keep scope limited; run checks and list remaining gaps. Do not claim visual polish until real assets/materials/VFX are implemented.

@@ -1,0 +1,346 @@
+[gd_scene load_steps=12 format=3]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nf11u"]
+sky_top_color = Color(0.22, 0.42, 0.62, 1)
+sky_horizon_color = Color(0.62, 0.72, 0.66, 1)
+ground_bottom_color = Color(0.15, 0.22, 0.15, 1)
+ground_horizon_color = Color(0.5, 0.6, 0.5, 1)
+
+[sub_resource type="Sky" id="Sky_gf3lc"]
+sky_material = SubResource("ProceduralSkyMaterial_nf11u")
+
+[sub_resource type="Environment" id="Environment_0wtqh"]
+background_mode = 2
+sky = SubResource("Sky_gf3lc")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.55
+ambient_light_energy = 0.7
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.62, 0.74, 0.66, 1)
+fog_density = 0.012
+fog_sky_affect = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d70q6"]
+albedo_color = Color(0.24, 0.42, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mh6hx"]
+albedo_color = Color(0.42, 0.4, 0.33, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t2scl"]
+albedo_color = Color(0.45, 0.3, 0.17, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enguq"]
+albedo_color = Color(0.33, 0.35, 0.33, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y4mk0"]
+albedo_color = Color(0.1, 0.55, 0.55, 1)
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a5odn"]
+albedo_color = Color(0.2, 0.6, 0.55, 1)
+roughness = 0.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dgtg"]
+albedo_color = Color(0.3, 0.22, 0.14, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_acut4"]
+albedo_color = Color(0.12, 0.35, 0.15, 1)
+roughness = 0.9
+
+[node name="GrayboxRoute" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0wtqh")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.81915206, 0.43938506, -0.36868784, 0, 0.64278764, 0.76604444, 0.57357645, -0.62750685, 0.5265408, 0, 0, 0)
+light_color = Color(1, 0.95, 0.85, 1)
+shadow_enabled = true
+directional_shadow_max_distance = 60.0
+
+[node name="Geometry" type="Node3D" parent="."]
+
+[node name="JungleFloor" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -20)
+use_collision = true
+collision_mask = 0
+size = Vector3(60, 1, 60)
+material = SubResource("StandardMaterial3D_d70q6")
+
+[node name="StepLow" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.25, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 0.5, 3)
+material = SubResource("StandardMaterial3D_mh6hx")
+
+[node name="StepMid" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0.5, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 1, 3)
+material = SubResource("StandardMaterial3D_mh6hx")
+
+[node name="StepHigh" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.8, -8)
+use_collision = true
+collision_mask = 0
+size = Vector3(3, 1.6, 3)
+material = SubResource("StandardMaterial3D_mh6hx")
+
+[node name="Ramp" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 0.95105654, -0.309017, 0, 0.309017, 0.95105654, 10, 1.6, -12)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 0.5, 10)
+material = SubResource("StandardMaterial3D_t2scl")
+
+[node name="RaisedLedge" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 1.6, -21)
+use_collision = true
+collision_mask = 0
+size = Vector3(8, 3.2, 8)
+material = SubResource("StandardMaterial3D_enguq")
+
+[node name="CameraWall" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, -32)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 6, 20)
+material = SubResource("StandardMaterial3D_enguq")
+
+[node name="TunnelRoof" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.2, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(6, 1, 6)
+material = SubResource("StandardMaterial3D_enguq")
+
+[node name="TunnelLeft" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.35, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 2.7, 6)
+material = SubResource("StandardMaterial3D_enguq")
+
+[node name="TunnelRight" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.35, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(1, 2.7, 6)
+material = SubResource("StandardMaterial3D_enguq")
+
+[node name="Stream" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -40)
+use_collision = true
+collision_mask = 0
+size = Vector3(60, 0.05, 3)
+material = SubResource("StandardMaterial3D_y4mk0")
+
+[node name="GapPlatform1" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -54)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = SubResource("StandardMaterial3D_t2scl")
+
+[node name="GapPlatform2" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.2, -60.5)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = SubResource("StandardMaterial3D_t2scl")
+
+[node name="GapPlatform3" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -67)
+use_collision = true
+collision_mask = 0
+size = Vector3(4, 1, 4)
+material = SubResource("StandardMaterial3D_t2scl")
+
+[node name="GateClearing" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -81)
+use_collision = true
+collision_mask = 0
+size = Vector3(24, 1, 20)
+material = SubResource("StandardMaterial3D_d70q6")
+
+[node name="GatePillarL" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.5, -88)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.5, 7, 1.5)
+material = SubResource("StandardMaterial3D_a5odn")
+
+[node name="GatePillarR" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.5, -88)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.5, 7, 1.5)
+material = SubResource("StandardMaterial3D_a5odn")
+
+[node name="GateLintel" type="CSGBox3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.6, -88)
+use_collision = true
+collision_mask = 0
+size = Vector3(10, 1.2, 1.8)
+material = SubResource("StandardMaterial3D_a5odn")
+
+[node name="Tree0" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3.5, -2)
+use_collision = true
+collision_mask = 0
+radius = 0.6
+height = 7.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree0Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 7.9, -2)
+radius = 1.92
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree1" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.75, 2)
+use_collision = true
+collision_mask = 0
+radius = 0.85
+height = 9.5
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree1Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 10.775, 2)
+radius = 2.72
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree2" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 6, -18)
+use_collision = true
+collision_mask = 0
+radius = 0.6
+height = 12.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree2Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 12.9, -18)
+radius = 1.92
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree3" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3.5, -30)
+use_collision = true
+collision_mask = 0
+radius = 0.85
+height = 7.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree3Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 8.275, -30)
+radius = 2.72
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree4" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.75, -42)
+use_collision = true
+collision_mask = 0
+radius = 0.6
+height = 9.5
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree4Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 10.4, -42)
+radius = 1.92
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree5" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 6, -45)
+use_collision = true
+collision_mask = 0
+radius = 0.85
+height = 12.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree5Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 13.275, -45)
+radius = 2.72
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree6" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 3.5, -30)
+use_collision = true
+collision_mask = 0
+radius = 0.6
+height = 7.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree6Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 7.9, -30)
+radius = 1.92
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree7" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.75, -10)
+use_collision = true
+collision_mask = 0
+radius = 0.85
+height = 9.5
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree7Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 10.775, -10)
+radius = 2.72
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree8" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 6, -80)
+use_collision = true
+collision_mask = 0
+radius = 0.6
+height = 12.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree8Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 12.9, -80)
+radius = 1.92
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="Tree9" type="CSGCylinder3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 3.5, -78)
+use_collision = true
+collision_mask = 0
+radius = 0.85
+height = 7.0
+sides = 10
+material = SubResource("StandardMaterial3D_7dgtg")
+
+[node name="Tree9Crown" type="CSGSphere3D" parent="Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 8.275, -78)
+radius = 2.72
+radial_segments = 10
+material = SubResource("StandardMaterial3D_acut4")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)

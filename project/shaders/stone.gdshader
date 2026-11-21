@@ -42,10 +42,10 @@ void fragment() {
 		vec2 g = vec2(dot(world_pos.xz, normalize(vec2(world_normal.z, -world_normal.x) + 0.0001)), world_pos.y);
 		vec2 cell = vec2(g.x * 1.4 + floor(g.y * 1.6) * 0.5, g.y * 1.6);
 		vec2 f = fract(cell) - 0.5;
-		float notch = (1.0 - smoothstep(0.12, 0.2, abs(f.y))) * (1.0 - smoothstep(0.22, 0.32, abs(f.x)));
+		float notch = (1.0 - smoothstep(0.06, 0.1, abs(f.y))) * (1.0 - smoothstep(0.12, 0.18, abs(f.x)));
 		notch *= side * climb_marks;
-		col = mix(col, stone_dark * 0.35, notch * 0.8);
-		EMISSION = climb_glow * notch * 0.35;
+		col = mix(col, stone_dark * 0.4, notch * 0.7);
+		EMISSION = climb_glow * notch * 0.12;
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.9;

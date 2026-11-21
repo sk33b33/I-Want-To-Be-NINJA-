@@ -1,10 +1,10 @@
 class_name NinjaAnimator
 extends Node
 ## Drives the ninja model's AnimationPlayer from PlayerController state (presentation only:
-## it never changes movement). States: IDLE, RUN, SPRINT, AIR, LAND.
+## it never changes movement). States: IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE.
 ## Implements docs/PHASES.md Phase 1 player feedback using assets/models/ninja/ninja.glb.
 
-enum State { IDLE, RUN, SPRINT, AIR, LAND }
+enum State { IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE }
 
 @export var player_path: NodePath = ^".."
 @export var animation_player_path: NodePath
@@ -29,10 +29,17 @@ func _ready() -> void:
 	_prepare_clips()
 	_player.jumped.connect(_on_jumped)
 	_player.landed.connect(_on_landed)
+	if _player.traversal:
+		_player.traversal.state_changed.connect(_on_traversal_state)
 	_play(_idle_name)
 
 
 func _physics_process(delta: float) -> void:
+	if _player.traversal and _player.traversal.state != TraversalComponent.State.NONE:
+		if state == State.CLIMB:
+			var climb_speed := _player.traversal.get_climb_velocity().length()
+			_anim.speed_scale = clampf(climb_speed / config.climb_reference_speed, 0.0, 1.5)
+		return
 	var speed := _player.get_horizontal_speed()
 	var on_floor := _player.is_on_floor()
 	match state:
@@ -73,6 +80,29 @@ func _set_state(new_state: State, clip: StringName, speed_scale: float) -> void:
 	if state != new_state or _anim.current_animation != clip:
 		state = new_state
 		_play(clip)
+
+
+func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
+	_anim.speed_scale = 1.0
+	match traversal_state:
+		TraversalComponent.State.CLIMB:
+			state = State.CLIMB
+			if _anim.has_animation(config.climb_clip):
+				_anim.get_animation(config.climb_clip).loop_mode = Animation.LOOP_LINEAR
+			_play(config.climb_clip, 0.1)
+		TraversalComponent.State.HANG:
+			state = State.HANG
+			_play(config.hang_clip, 0.08)
+			_anim.seek(config.hang_pose_time, true)
+			_anim.pause()
+		TraversalComponent.State.MANTLE:
+			state = State.MANTLE
+			_play(config.mantle_clip, 0.08)
+			_anim.seek(config.mantle_start_time, true)
+		TraversalComponent.State.NONE:
+			if state != State.AIR:  # A wall jump already switched to AIR.
+				state = State.AIR
+				_start_fall()
 
 
 func _on_jumped() -> void:

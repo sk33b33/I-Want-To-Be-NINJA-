@@ -37,7 +37,8 @@ You are the lead game-development assistant for **I want to be NINJA**, a 3D jun
 - Godot project lives in `project/`. Run all checks with `GODOT=/path/to/godot tools/check.sh`.
 - Tests: dependency-free runner `project/tests/run_tests.gd` (base class `TestCase`). Add new suites to its `SUITES` list.
 - Tunable values live in `project/data/**.tres` Resources (`PlayerMovementConfig`, `CameraRigConfig`).
-- Physics layers: 1 = world, 2 = player.
+- Physics layers: 1 = world, 2 = player, 3 = climbable (put climbable walls on layers 1 + 3 and use `climb_stone.tres` so players can see them).
+- Traversal lives in `TraversalComponent` (tuning: `data/player/traversal.tres`); checkpoints are `scenes/world/checkpoint.tscn`.
 - World is procedural: `BiomeTerrain` (heightmap + collision), `FloraScatter`, `FaunaSpawner`, `BiomeAtmosphere`, driven by `project/data/biomes/*.tres`. Shaders in `project/shaders/` must stay `gl_compatibility`-safe (no screen/depth texture reads).
 - `QualityProfile.is_low()` = phone tier (auto on Android, `-- --low-quality` on PC). New heavy features must scale down on LOW.
 - Player model: `project/assets/models/ninja/ninja.glb` (Mixamo). Clip mapping in `data/player/ninja_animations.tres`. It has **no Idle clip** (a pose is generated); Roll/Combo/Death clips are reserved for Phase 4.

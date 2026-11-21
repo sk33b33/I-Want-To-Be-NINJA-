@@ -1,13 +1,15 @@
 class_name PlayerController
 extends CharacterBody3D
-## Phase 1 ninja locomotion: camera-relative run/sprint, jump (coyote time, jump buffer,
-## variable height) and fall recovery to the last safe ground.
-## Implements docs/PHASES.md "Phase 1". Reads input actions only, so keyboard, gamepad and
+## Ninja locomotion: camera-relative run/sprint, jump (coyote time, jump buffer, variable
+## height), fall recovery, and checkpoints. Traversal (climb, ledge grab, mantle) lives in the
+## optional child TraversalComponent "Traversal" (Phase 2).
+## Implements docs/PHASES.md Phases 1-2. Reads input actions only, so keyboard, gamepad and
 ## TouchControls all drive it the same way. All tuning lives in PlayerMovementConfig.
 
 signal jumped
 signal landed
 signal respawned(at: Vector3)
+signal checkpoint_reached(at: Transform3D)
 
 @export var config: PlayerMovementConfig
 @export var camera_rig_path: NodePath = ^"CameraRig"
@@ -20,8 +22,11 @@ var _jump_buffer_timer: float = 0.0
 var _safe_timer: float = 0.0
 var _last_safe_position: Vector3
 var _was_on_floor: bool = false
+var _checkpoint: Transform3D
+var _has_checkpoint: bool = false
 
 @onready var _visual: Node3D = $Visual
+@onready var traversal: TraversalComponent = get_node_or_null("Traversal") as TraversalComponent
 
 
 func _ready() -> void:
@@ -43,15 +48,30 @@ func _physics_process(delta: float) -> void:
 		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var wish := _input_to_world(input)
 
+	if traversal and traversal.physics_update(delta, input, wish):
+		_was_on_floor = false
+		_after_move(delta)
+		return
+
 	_update_horizontal(wish, on_floor, delta)
 	_update_vertical(on_floor, delta)
 	move_and_slide()
 	_after_move(delta)
 
 
-## Teleport to the last safe ground (or `at`) with no momentum.
-func respawn(at: Vector3 = _last_safe_position) -> void:
-	global_position = at + Vector3.UP * config.respawn_height_offset
+## Teleport with no momentum: to `at` if given, else the last checkpoint, else the last safe ground.
+func respawn(at: Variant = null) -> void:
+	var target: Vector3 = _last_safe_position
+	if at is Vector3:
+		target = at
+	elif _has_checkpoint:
+		target = _checkpoint.origin
+		face_direction(-_checkpoint.basis.z)
+		if _camera_rig:
+			_camera_rig.set_yaw(_checkpoint.basis.get_euler().y)
+	if traversal:
+		traversal.reset()
+	global_position = target + Vector3.UP * config.respawn_height_offset
 	velocity = Vector3.ZERO
 	_coyote_timer = 0.0
 	_jump_buffer_timer = 0.0
@@ -68,6 +88,49 @@ func set_safe_position(at: Vector3) -> void:
 
 func get_safe_position() -> Vector3:
 	return _last_safe_position
+
+
+## Called by Checkpoint shrines. Falls respawn here from now on.
+func set_checkpoint(at: Transform3D) -> void:
+	_checkpoint = at
+	_has_checkpoint = true
+	_last_safe_position = at.origin
+	checkpoint_reached.emit(at)
+
+
+func has_checkpoint() -> bool:
+	return _has_checkpoint
+
+
+func get_checkpoint() -> Transform3D:
+	return _checkpoint
+
+
+## Turn the body visual to face `dir` instantly (used by traversal).
+func face_direction(dir: Vector3) -> void:
+	var flat := Vector3(dir.x, 0.0, dir.z)
+	if flat.length() > 0.001:
+		_visual.rotation.y = atan2(-flat.x, -flat.z)
+
+
+## Returns true once per buffered jump press, consuming it (used by traversal).
+func consume_jump() -> bool:
+	if _jump_buffer_timer > 0.0:
+		_jump_buffer_timer = 0.0
+		return true
+	return false
+
+
+## Emit `jumped` for jumps started outside the controller (wall jumps).
+func notify_jumped() -> void:
+	_coyote_timer = 0.0
+	jumped.emit()
+
+
+## Forget coyote time / jump buffer (after letting go of a wall so no free ground jump fires).
+func clear_air_timers() -> void:
+	_coyote_timer = 0.0
+	_jump_buffer_timer = 0.0
 
 
 func get_horizontal_speed() -> float:

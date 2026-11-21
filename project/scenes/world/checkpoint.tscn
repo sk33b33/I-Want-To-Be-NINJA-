@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/checkpoint.gd" id="1_df3pq"]
+[ext_resource type="Material" path="res://data/materials/stone.tres" id="2_euyj4"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="3_2bxlw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_prlwq"]
+size = Vector3(13, 4, 3)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2ap0c"]
+material = ExtResource("2_euyj4")
+top_radius = 0.35
+height = 1.3
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_2b8tt"]
+material = ExtResource("2_euyj4")
+size = Vector3(1.1, 0.18, 1.1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_vv6qb"]
+material = ExtResource("3_2bxlw")
+size = Vector2(0.55, 0.9)
+
+[node name="Checkpoint" type="Area3D"]
+script = ExtResource("1_df3pq")
+
+[node name="Trigger" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 2, 0)
+shape = SubResource("BoxShape3D_prlwq")
+
+[node name="ShrineBase" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+mesh = SubResource("CylinderMesh_2ap0c")
+
+[node name="ShrineCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mesh = SubResource("BoxMesh_2b8tt")
+
+[node name="Flame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_vv6qb")
+
+[node name="FlameLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+omni_range = 7.0

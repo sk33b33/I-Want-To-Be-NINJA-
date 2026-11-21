@@ -14,3 +14,5 @@ shader_parameter/scale = null
 shader_parameter/moss_amount = 0.35
 shader_parameter/rune_color = Color(1, 0.12, 0.05, 1)
 shader_parameter/rune_strength = 3.5
+shader_parameter/climb_marks = null
+shader_parameter/climb_glow = null

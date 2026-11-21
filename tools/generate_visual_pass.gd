@@ -1,6 +1,6 @@
 extends SceneTree
 ## One-off generator for the "gloomy Verdant Canopy" visual pass: materials, data resources,
-## the player scene (Mixamo ninja model) and the level scene. Re-running OVERWRITES
+## the player scene (Mixamo ninja model), the checkpoint scene and the level scene (incl. Phase 2 route). Re-running OVERWRITES
 ## data/materials/*, scenes/player/player.tscn, scenes/biomes/verdant_canopy.tscn and scenes/main/main.tscn.
 ## Usage (repo root): godot --headless --path project -s ../tools/generate_visual_pass.gd
 
@@ -13,6 +13,7 @@ func _initialize() -> void:
 	_materials()
 	_data()
 	_player_scene()
+	_checkpoint_scene()
 	_level_scene()
 	_main_scene()
 	print("GENERATED")
@@ -77,6 +78,8 @@ func _materials() -> void:
 	_save(_shader_mat("creature", {"glow_color": Color(1.0, 0.12, 0.03), "glow_energy": 2.5}), MAT + "lurker_eyes.tres")
 	_save(_shader_mat("firefly", {}), MAT + "firefly.tres")
 	_save(_shader_mat("ring_marker", {}), MAT + "ring_marker.tres")
+	_save(_shader_mat("stone", {"detail_noise": detail, "climb_marks": 1.0}), MAT + "climb_stone.tres")
+	_save(_shader_mat("spirit_flame", {}), MAT + "spirit_flame.tres")
 	_save(_shader_mat("sky_gloom", {"cloud_noise": clouds}), MAT + "sky_gloom.tres")
 
 	var bark := StandardMaterial3D.new()
@@ -100,6 +103,7 @@ func _data() -> void:
 	_save(load("res://scripts/world/flora_config.gd").new(), "res://data/biomes/verdant_canopy_flora.tres")
 	_save(load("res://scripts/world/fauna/fauna_config.gd").new(), "res://data/biomes/verdant_canopy_fauna.tres")
 	_save(load("res://scripts/player/ninja_animation_config.gd").new(), "res://data/player/ninja_animations.tres")
+	_save(load("res://scripts/traversal/traversal_config.gd").new(), "res://data/player/traversal.tres")
 
 
 func _own(node: Node, owner: Node) -> void:
@@ -167,6 +171,12 @@ func _player_scene() -> void:
 	ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	p.add_child(ring)
 
+	var traversal := Node.new()
+	traversal.name = "Traversal"
+	traversal.set_script(load("res://scripts/traversal/traversal_component.gd"))
+	traversal.set("config", load("res://data/player/traversal.tres"))
+	p.add_child(traversal)
+
 	var animator := Node.new()
 	animator.name = "NinjaAnimator"
 	animator.set_script(load("res://scripts/player/ninja_animator.gd"))
@@ -198,7 +208,83 @@ func _player_scene() -> void:
 	_pack(p, "res://scenes/player/player.tscn")
 
 
+func _checkpoint_scene() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/world")
+	var area := Area3D.new()
+	area.name = "Checkpoint"
+	area.set_script(load("res://scripts/world/checkpoint.gd"))
+	var col := CollisionShape3D.new()
+	col.name = "Trigger"
+	var box := BoxShape3D.new()
+	box.size = Vector3(13, 4, 3)
+	col.shape = box
+	col.position = Vector3(4.5, 2, 0)  # The shrine sits at the left edge of the route.
+	area.add_child(col)
+	var stone: Material = load(MAT + "stone.tres")
+	var base := MeshInstance3D.new()
+	base.name = "ShrineBase"
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.35
+	cyl.bottom_radius = 0.5
+	cyl.height = 1.3
+	cyl.radial_segments = 8
+	cyl.material = stone
+	base.mesh = cyl
+	base.position.y = 0.65
+	area.add_child(base)
+	var cap := MeshInstance3D.new()
+	cap.name = "ShrineCap"
+	var cap_mesh := BoxMesh.new()
+	cap_mesh.size = Vector3(1.1, 0.18, 1.1)
+	cap_mesh.material = stone
+	cap.mesh = cap_mesh
+	cap.position.y = 1.38
+	area.add_child(cap)
+	var flame := MeshInstance3D.new()
+	flame.name = "Flame"
+	var q := QuadMesh.new()
+	q.size = Vector2(0.55, 0.9)
+	q.material = load(MAT + "spirit_flame.tres")
+	flame.mesh = q
+	flame.position.y = 1.9
+	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	area.add_child(flame)
+	var light := OmniLight3D.new()
+	light.name = "FlameLight"
+	light.position.y = 2.0
+	light.omni_range = 7.0
+	area.add_child(light)
+	_pack(area, "res://scenes/world/checkpoint.tscn")
+
+
 var _root: Node3D
+
+
+func _climb_box(node_name: String, size: Vector3, pos: Vector3) -> CSGBox3D:
+	var b := _box(node_name, size, pos, "climb_stone")
+	b.collision_layer = 1 | 4  # world + climbable
+	return b
+
+
+func _boulder(node_name: String, pos: Vector3, radius: float) -> void:
+	var s := CSGSphere3D.new()
+	s.name = node_name
+	s.radius = radius
+	s.radial_segments = 10
+	s.rings = 7
+	s.position = pos
+	s.scale = Vector3(1.0, 0.75, 1.1)
+	s.use_collision = true
+	s.collision_mask = 0
+	s.material = load(MAT + "stone.tres")
+	_root.get_node("RouteGeometry").add_child(s)
+
+
+func _checkpoint(node_name: String, pos: Vector3) -> void:
+	var cp: Node3D = (load("res://scenes/world/checkpoint.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	cp.name = node_name
+	cp.position = pos
+	_root.get_node("Checkpoints").add_child(cp)
 
 
 func _box(node_name: String, size: Vector3, pos: Vector3, mat: String, rot_deg: Vector3 = Vector3.ZERO) -> CSGBox3D:
@@ -341,8 +427,8 @@ func _level_scene() -> void:
 	_box("StepMid", Vector3(3, 1.0, 3), Vector3(-9, 0.5, -8), "stone")
 	_box("StepHigh", Vector3(3, 1.6, 3), Vector3(-12, 0.8, -8), "stone")
 	_box("Ramp", Vector3(4, 0.5, 10), Vector3(10, 1.6, -12), "dark_wood", Vector3(18, 0, 0))
-	_box("RaisedLedge", Vector3(8, 3.2, 8), Vector3(10, 1.6, -21), "stone")
-	_box("RuinWall", Vector3(1, 6, 20), Vector3(4, 3, -32), "stone")
+	_climb_box("RaisedLedge", Vector3(8, 3.2, 8), Vector3(10, 1.6, -21))
+	_climb_box("RuinWall", Vector3(1, 6, 20), Vector3(4, 3, -32))
 	_box("TunnelRoof", Vector3(6, 1, 6), Vector3(-4, 3.2, -30), "stone")
 	_box("TunnelLeft", Vector3(1, 2.7, 6), Vector3(-6.5, 1.35, -30), "stone")
 	_box("TunnelRight", Vector3(1, 2.7, 6), Vector3(-1.5, 1.35, -30), "stone")
@@ -358,6 +444,32 @@ func _level_scene() -> void:
 	_box("GatePillarR", Vector3(1.6, 8, 1.6), Vector3(4.2, 4, -94), "gate_stone")
 	_box("GateLintel", Vector3(11, 1.4, 2.0), Vector3(0, 8.5, -94), "gate_stone")
 	_box("GateCrown", Vector3(5, 1.2, 1.6), Vector3(0, 9.8, -94), "gate_stone")
+
+	# Phase 2 traversal route.
+	# Rampart: climbable ruined wall across the route before the gorge (top at y 4).
+	_climb_box("Rampart", Vector3(40, 5, 2), Vector3(0, 1.5, -45.5))
+	# Optional high route: raised ledge -> broken stone bridge (jump the gap) -> rampart top.
+	_box("BridgeA", Vector3(1.6, 0.3, 8), Vector3(10, 3.05, -29), "stone")
+	_box("BridgeB", Vector3(1.6, 0.3, 9), Vector3(10, 3.85, -40), "stone")
+	_column("BridgeColumnA1", Vector3(10, 2.9, -27.5), 0.35, 4.0)
+	_column("BridgeColumnA2", Vector3(10, 2.9, -32.0), 0.35, 4.0)
+	_column("BridgeColumnB1", Vector3(10, 3.7, -37.0), 0.35, 5.0)
+	_column("BridgeColumnB2", Vector3(10, 3.7, -43.0), 0.35, 5.0)
+	# Far bank of the gorge: a sheer stone wall 1.9 m above the last stepping stone.
+	# Too high to jump onto: catch the ledge and pull up.
+	_box("FarBankWall", Vector3(30, 22.5, 3), Vector3(0, -8.75, -72.5), "stone")
+	# Boulders to weave around.
+	_boulder("Boulder1", Vector3(3.2, 0.4, -6), 1.1)
+	_boulder("Boulder2", Vector3(-3.3, 0.3, -15), 1.0)
+	_boulder("Boulder3", Vector3(-2.9, 0.2, -36.5), 0.9)
+	_boulder("Boulder4", Vector3(3.0, 0.3, -86), 1.2)
+	# Checkpoint shrines (spawn is also a checkpoint, set by main.gd).
+	var cps := Node3D.new()
+	cps.name = "Checkpoints"
+	_root.add_child(cps)
+	_checkpoint("CheckpointSpawn", Vector3(-4.5, 0, 1))
+	_checkpoint("CheckpointGorge", Vector3(-4.5, 0, -48))
+	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
 
 	_omni("GateGlow", Vector3(0, 4, -91), Color(1.0, 0.2, 0.08), 2.5, 16.0)
 	_omni("ShrineGlow", Vector3(-9, 2.5, -8), Color(0.2, 0.9, 0.8), 1.2, 9.0)

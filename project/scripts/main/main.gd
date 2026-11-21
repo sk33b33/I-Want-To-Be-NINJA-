@@ -12,6 +12,7 @@ func _ready() -> void:
 	if spawn:
 		player.global_position = spawn.global_position
 		player.set_safe_position(spawn.global_position)
+		player.set_checkpoint(spawn.global_transform)
 	var rig := player.get_node(player.camera_rig_path) as CameraRig
 	if spawn:
 		rig.set_yaw(spawn.global_rotation.y)

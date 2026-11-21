@@ -83,7 +83,8 @@ Claude must update this section only after evidence of completed work.
 |---|---|---|
 | 0 — Setup | **Gate passed** (2026-11-21) | Godot 4.5.1 headless import clean; `scenes/tests/boot_test.tscn` prints `BOOT_OK`; conventions in `CLAUDE.md`. |
 | 1 — Movement + camera | **Implemented, automated checks pass; gate NOT yet passed** | 19/19 headless tests (movement, jump, fall recovery, camera blend/collision, scripted run of the full graybox route). Gate still needs the **10-minute human playtest** on PC and on an Android phone. |
-| 2–13 | Not started | — |
+| 2 — Traversal vertical slice | **Implemented, automated checks pass; gate NOT yet passed** | Bot completes the Verdant Canopy route spawn → boss gate in **both** camera modes (climbs rampart, crosses gorge, grabs far-bank ledge, no falls). 42/42 tests incl. 7 traversal tests. Needs a human run of the route on PC and phone. |
+| 3–13 | Not started | — |
 
 Note: at the owner's request a **visual pass** (gloomy Verdant Canopy, procedural terrain/flora/fauna, Mixamo ninja) was done ahead of Phase 6/11. It is placeholder-quality procedural art; it does not complete Phase 6 or Phase 11. 33/33 automated tests pass.
 

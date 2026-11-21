@@ -10,6 +10,9 @@ uniform float moss_amount = 0.6;
 // Optional glowing carved runes (used on the boss gate).
 uniform vec3 rune_color : source_color = vec3(0.0);
 uniform float rune_strength = 0.0;
+// Climbable surfaces: rows of carved handholds with a faint glow (1 = on).
+uniform float climb_marks = 0.0;
+uniform vec3 climb_glow : source_color = vec3(0.25, 0.85, 0.8);
 
 varying vec3 world_pos;
 varying vec3 world_normal;
@@ -33,6 +36,17 @@ void fragment() {
 	float moss_w = smoothstep(0.35, 0.85, world_normal.y + big * 0.6 - 0.3) * moss_amount;
 	moss_w = max(moss_w, smoothstep(0.65, 0.9, big) * moss_amount * 0.7);
 	col = mix(col, moss * (0.6 + n * 0.8), moss_w);
+	if (climb_marks > 0.0) {
+		// Staggered handhold notches on vertical faces only.
+		float side = 1.0 - w.y;
+		vec2 g = vec2(dot(world_pos.xz, normalize(vec2(world_normal.z, -world_normal.x) + 0.0001)), world_pos.y);
+		vec2 cell = vec2(g.x * 1.4 + floor(g.y * 1.6) * 0.5, g.y * 1.6);
+		vec2 f = fract(cell) - 0.5;
+		float notch = (1.0 - smoothstep(0.12, 0.2, abs(f.y))) * (1.0 - smoothstep(0.22, 0.32, abs(f.x)));
+		notch *= side * climb_marks;
+		col = mix(col, stone_dark * 0.35, notch * 0.8);
+		EMISSION = climb_glow * notch * 0.35;
+	}
 	ALBEDO = col;
 	ROUGHNESS = 0.9;
 	if (rune_strength > 0.0) {

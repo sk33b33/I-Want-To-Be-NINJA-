@@ -24,3 +24,11 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - `QualityProfile`: phones automatically use a LOW tier (fewer plants, shorter draw distances, one shadow cascade, half the mist). Preview on PC with `-- --low-quality`.
 - Tests: 33 (was 19) — terrain, flora, fauna and animation suites added.
 - All art is still placeholder-quality procedural geometry, not final assets.
+
+## 2026-11-21 — Phase 2: traversal vertical slice
+- `TraversalComponent` (child "Traversal" of the player): wall climbing on the new physics layer 3 "climbable", climb over the top (auto mantle), ledge grab on any solid ledge, ledge shimmy, pull-up, drop, wall jump. No new buttons: everything works the same on touch, gamepad and keyboard.
+- Climbable surfaces use `climb_stone.tres` (carved handholds with a faint teal glow) so they read in the dark.
+- `Checkpoint` shrines (`scenes/world/checkpoint.tscn`): spirit flame turns from red to teal; falls respawn at the latest lit shrine (spawn counts as the first).
+- Route: climbable rampart across the path, optional high route (raised ledge → broken bridge with a jump → rampart top), far-bank wall over the gorge that must be ledge-grabbed, boulders, three shrines.
+- Animator: CLIMB / HANG / MANTLE states using stand-in clips (Crouch_Walk, Jump poses) until real Mixamo climbing clips are added.
+- Tests: 42 (was 33). Phase 2 gate bot run passes in third-person and top-down.

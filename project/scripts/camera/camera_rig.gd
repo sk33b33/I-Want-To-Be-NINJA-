@@ -131,6 +131,8 @@ func set_lock_target(target: Node3D, point: Callable = Callable()) -> void:
 
 ## Add camera shake (0..1 "trauma"; decays quickly). Gentle by design.
 func add_shake(trauma: float) -> void:
+	if not GameSettings.screen_shake:
+		return  # Comfort option (pause menu).
 	_shake = clampf(_shake + trauma, 0.0, 1.0)
 
 

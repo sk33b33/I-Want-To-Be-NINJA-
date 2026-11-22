@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_qkrjj"]
+
+[resource]
+script = ExtResource("1_qkrjj")
+id = &"storm_charm"
+display_name = "Storm Charm"
+description = "Three ember crystals strung around a rune shard; they crackle when they touch. Talismans strike as lightning."
+slot = 2
+color = Color(0.75, 0.8, 1, 1)
+skill_cooldown_reduction = 0.5
+skill_element = &"lightning"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_dmhxc"]
+
+[resource]
+script = ExtResource("1_dmhxc")
+id = &"lantern_pearl"
+display_name = "Lantern Pearl"
+description = "The glowing lure of Nami's brow. It still pulls at the eye."
+color = Color(0.6, 0.95, 1, 1)
+rarity = 1

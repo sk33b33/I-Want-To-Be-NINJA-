@@ -6,7 +6,7 @@ extends Node3D
 @export var speed: float = 22.0
 @export var lifetime: float = 1.2
 
-const ELEMENT_COLORS := {&"fire": Color(1.0, 0.45, 0.1), &"water": Color(0.2, 0.6, 1.0)}
+const ELEMENT_COLORS := {&"fire": Color(1.0, 0.45, 0.1), &"water": Color(0.2, 0.6, 1.0), &"lightning": Color(0.75, 0.8, 1.0)}
 
 var direction: Vector3 = Vector3.FORWARD
 var _t: float = 0.0

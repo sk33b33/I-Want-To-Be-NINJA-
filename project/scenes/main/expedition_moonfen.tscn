@@ -1,0 +1,101 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_bga2d"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/moonfen.tscn" id="2_sk7gv"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_sod3t"]
+[ext_resource type="Script" path="res://scripts/expedition/expedition_manager.gd" id="4_4h7fe"]
+[ext_resource type="Resource" path="res://data/hunts/nami.tres" id="5_58pib"]
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="6_2h6hp"]
+[ext_resource type="Resource" path="res://data/crafting/catalog.tres" id="7_leaqu"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="8_70jlq"]
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="9_k2qv3"]
+[ext_resource type="Script" path="res://scripts/ui/player_hud.gd" id="10_o5n2f"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_hud.gd" id="11_fn1v2"]
+[ext_resource type="Script" path="res://scripts/ui/boss_hud.gd" id="12_qd7ta"]
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="13_8ercw"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_results.gd" id="14_fdppw"]
+[ext_resource type="Script" path="res://scripts/combat/combat_fx.gd" id="15_ni12h"]
+[ext_resource type="Material" path="res://data/materials/firefly.tres" id="16_xls1y"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_bga2d")
+
+[node name="Level" parent="." instance=ExtResource("2_sk7gv")]
+
+[node name="Player" parent="." instance=ExtResource("3_sod3t")]
+
+[node name="Expedition" type="Node" parent="."]
+script = ExtResource("4_4h7fe")
+hunt = ExtResource("5_58pib")
+default_config = ExtResource("6_2h6hp")
+crafting = ExtResource("7_leaqu")
+scene_path = "res://scenes/main/expedition_moonfen.tscn"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="DebugHud" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 16.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(0.85, 0.85, 0.8, 0.85)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+script = ExtResource("8_70jlq")
+camera_rig_path = NodePath("../../Player/CameraRig")
+
+[node name="TouchControls" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("9_k2qv3")
+
+[node name="PlayerHud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("10_o5n2f")
+player_path = NodePath("../../Player")
+
+[node name="ExpeditionHud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("11_fn1v2")
+manager_path = NodePath("../../Expedition")
+
+[node name="BossHud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("12_qd7ta")
+manager_path = NodePath("../../Expedition")
+
+[node name="PauseMenu" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("13_8ercw")
+manager_path = NodePath("../../Expedition")
+
+[node name="ExpeditionResults" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("14_fdppw")
+manager_path = NodePath("../../Expedition")
+
+[node name="CombatFx" type="Node3D" parent="."]
+script = ExtResource("15_ni12h")
+spark_material = ExtResource("16_xls1y")

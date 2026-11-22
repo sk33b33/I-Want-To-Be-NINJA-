@@ -1,0 +1,656 @@
+[gd_scene load_steps=69 format=3]
+
+[ext_resource type="Material" path="res://data/materials/sky_moon.tres" id="1_vwjt7"]
+[ext_resource type="Script" path="res://scripts/world/biome_terrain.gd" id="2_3py1v"]
+[ext_resource type="Resource" path="res://data/biomes/moonfen_terrain.tres" id="3_8dreg"]
+[ext_resource type="Material" path="res://data/materials/terrain_fen.tres" id="4_5vman"]
+[ext_resource type="Script" path="res://scripts/world/flora_scatter.gd" id="5_feirp"]
+[ext_resource type="Resource" path="res://data/biomes/moonfen_flora.tres" id="6_euy36"]
+[ext_resource type="Material" path="res://data/materials/foliage_fen.tres" id="7_6e5kj"]
+[ext_resource type="Material" path="res://data/materials/leaf_fen.tres" id="8_jku8e"]
+[ext_resource type="Material" path="res://data/materials/bark_vertex.tres" id="9_str26"]
+[ext_resource type="Material" path="res://data/materials/glow_fungus.tres" id="10_pa282"]
+[ext_resource type="Material" path="res://data/materials/rock_vertex.tres" id="11_vknqk"]
+[ext_resource type="Material" path="res://data/materials/stone.tres" id="12_vsf5g"]
+[ext_resource type="Script" path="res://scripts/world/fauna/fauna_spawner.gd" id="13_nqow3"]
+[ext_resource type="Resource" path="res://data/biomes/moonfen_fauna.tres" id="14_5pldw"]
+[ext_resource type="Material" path="res://data/materials/bat.tres" id="15_i2flq"]
+[ext_resource type="Material" path="res://data/materials/frog.tres" id="16_ti2ke"]
+[ext_resource type="Material" path="res://data/materials/lurker_eyes.tres" id="17_wtbia"]
+[ext_resource type="Material" path="res://data/materials/firefly.tres" id="18_ejuay"]
+[ext_resource type="Script" path="res://scripts/world/biome_atmosphere.gd" id="19_13nu3"]
+[ext_resource type="Material" path="res://data/materials/mist_fen.tres" id="20_78uep"]
+[ext_resource type="Material" path="res://data/materials/shaft_moon.tres" id="21_a4u7g"]
+[ext_resource type="Material" path="res://data/materials/waterfall.tres" id="22_53m6x"]
+[ext_resource type="Material" path="res://data/materials/bog_water.tres" id="23_62sxd"]
+[ext_resource type="Material" path="res://data/materials/dark_wood.tres" id="24_7g0f4"]
+[ext_resource type="Material" path="res://data/materials/climb_stone.tres" id="25_3sej3"]
+[ext_resource type="Material" path="res://data/materials/gate_stone.tres" id="26_71yqi"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="27_0ay7e"]
+[ext_resource type="Script" path="res://scripts/world/hazards/surface_zone.gd" id="28_3h63v"]
+[ext_resource type="Material" path="res://data/materials/mud.tres" id="29_mlv7d"]
+[ext_resource type="Material" path="res://data/materials/poison.tres" id="30_jwruf"]
+[ext_resource type="Material" path="res://data/materials/poison_warning.tres" id="31_djh4t"]
+[ext_resource type="Script" path="res://scripts/world/hazards/fog_zone.gd" id="32_jchic"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="33_3nksr"]
+[ext_resource type="Script" path="res://scripts/world/instance_tint.gd" id="34_3g3dd"]
+[ext_resource type="PackedScene" path="res://scenes/world/sinking_raft.tscn" id="35_molej"]
+[ext_resource type="Script" path="res://scripts/world/hazards/lava_zone.gd" id="36_b773i"]
+[ext_resource type="Script" path="res://scripts/world/boss_arena_trigger.gd" id="37_r72rm"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/nami.tscn" id="38_4d80m"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/thornling.tscn" id="39_toko1"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_spirit_moss.tscn" id="40_ffmdh"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_ruin_shard.tscn" id="41_4kv4a"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_glowcap.tscn" id="42_h1lgo"]
+[ext_resource type="PackedScene" path="res://scenes/world/lore_stone.tscn" id="43_5a2rt"]
+
+[sub_resource type="Sky" id="Sky_0y3cg"]
+sky_material = ExtResource("1_vwjt7")
+
+[sub_resource type="Environment" id="Environment_msna1"]
+background_mode = 2
+sky = SubResource("Sky_0y3cg")
+ambient_light_source = 2
+ambient_light_color = Color(0.24, 0.22, 0.34, 1)
+ambient_light_energy = 4.0
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 1.5
+glow_enabled = true
+glow_intensity = 1.0
+glow_bloom = 0.07
+glow_blend_mode = 0
+glow_hdr_threshold = 0.8
+fog_enabled = true
+fog_light_color = Color(0.17, 0.15, 0.26, 1)
+fog_density = 0.02
+fog_sky_affect = 0.4
+fog_height = 0.5
+fog_height_density = 0.08
+adjustment_enabled = true
+adjustment_contrast = 1.12
+adjustment_saturation = 0.9
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ah64c"]
+size = Vector3(6.2, 0.9, 14)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_fse1r"]
+material = ExtResource("29_mlv7d")
+size = Vector2(6.2, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1f8u4"]
+size = Vector3(60, 1.6, 5)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bp562"]
+height = 1.2
+radius = 2.6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_p1blk"]
+material = ExtResource("30_jwruf")
+top_radius = 2.6
+bottom_radius = 2.6
+height = 0.04
+radial_segments = 20
+
+[sub_resource type="QuadMesh" id="QuadMesh_oekhu"]
+material = ExtResource("31_djh4t")
+size = Vector2(5.46, 5.46)
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_80plj"]
+size = Vector3(40, 8, 11)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b8dko"]
+material = ExtResource("24_7g0f4")
+size = Vector3(0.18, 1.6, 0.18)
+
+[sub_resource type="QuadMesh" id="QuadMesh_nanog"]
+material = ExtResource("33_3nksr")
+size = Vector2(0.7, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7rpke"]
+material = ExtResource("24_7g0f4")
+size = Vector3(0.18, 1.6, 0.18)
+
+[sub_resource type="QuadMesh" id="QuadMesh_mmoq4"]
+material = ExtResource("33_3nksr")
+size = Vector2(0.7, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1670y"]
+material = ExtResource("24_7g0f4")
+size = Vector3(0.18, 1.6, 0.18)
+
+[sub_resource type="QuadMesh" id="QuadMesh_o4mtc"]
+material = ExtResource("33_3nksr")
+size = Vector2(0.7, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yrma4"]
+material = ExtResource("24_7g0f4")
+size = Vector3(0.18, 1.6, 0.18)
+
+[sub_resource type="QuadMesh" id="QuadMesh_rri7n"]
+material = ExtResource("33_3nksr")
+size = Vector2(0.7, 0.9)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_4hskj"]
+height = 1.2
+radius = 2.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cd80s"]
+material = ExtResource("30_jwruf")
+top_radius = 2.0
+bottom_radius = 2.0
+height = 0.04
+radial_segments = 20
+
+[sub_resource type="QuadMesh" id="QuadMesh_22ukr"]
+material = ExtResource("31_djh4t")
+size = Vector2(4.2, 4.2)
+orientation = 1
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mcqa0"]
+height = 1.2
+radius = 2.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_sax7g"]
+material = ExtResource("30_jwruf")
+top_radius = 2.4
+bottom_radius = 2.4
+height = 0.04
+radial_segments = 20
+
+[sub_resource type="QuadMesh" id="QuadMesh_qybg6"]
+material = ExtResource("31_djh4t")
+size = Vector2(5.04, 5.04)
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_emyhr"]
+size = Vector3(160, 6, 20.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_io70i"]
+size = Vector3(160, 80, 54)
+
+[node name="Moonfen" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_msna1")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.90630776, -0.2601898, 0.33302775, 0, 0.7880108, 0.6156615, -0.42261827, -0.5579788, 0.7141803, 0, 0, 0)
+light_color = Color(0.7, 0.68, 1, 1)
+light_energy = 1.1
+shadow_enabled = true
+shadow_opacity = 0.7
+directional_shadow_mode = 1
+directional_shadow_max_distance = 55.0
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("2_3py1v")
+config = ExtResource("3_8dreg")
+material = ExtResource("4_5vman")
+
+[node name="Flora" type="Node3D" parent="."]
+script = ExtResource("5_feirp")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("6_euy36")
+grass_material = ExtResource("7_6e5kj")
+leaf_material = ExtResource("8_jku8e")
+vine_material = ExtResource("7_6e5kj")
+bark_material = ExtResource("9_str26")
+fungus_material = ExtResource("10_pa282")
+rock_material = ExtResource("11_vknqk")
+stone_material = ExtResource("12_vsf5g")
+
+[node name="Fauna" type="Node3D" parent="."]
+script = ExtResource("13_nqow3")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("14_5pldw")
+bat_material = ExtResource("15_i2flq")
+frog_material = ExtResource("16_ti2ke")
+eye_material = ExtResource("17_wtbia")
+firefly_material = ExtResource("18_ejuay")
+
+[node name="Atmosphere" type="Node3D" parent="."]
+script = ExtResource("19_13nu3")
+terrain_path = NodePath("../Terrain")
+sun_path = NodePath("../Moonlight")
+environment_path = NodePath("../WorldEnvironment")
+lightning_interval = Vector2(20, 45)
+lightning_sun_boost = 0.5
+lightning_sky_flash = 0.35
+mist_material = ExtResource("20_78uep")
+shaft_material = ExtResource("21_a4u7g")
+waterfall_material = ExtResource("22_53m6x")
+water_material = ExtResource("23_62sxd")
+waterfalls = Array[Vector3]([])
+river_height = -0.35
+
+[node name="RouteGeometry" type="Node3D" parent="."]
+
+[node name="MudWallL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 1.2, -15)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.2, 3, 16)
+material = ExtResource("24_7g0f4")
+
+[node name="MudWallR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 1.2, -15)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.2, 3, 16)
+material = ExtResource("24_7g0f4")
+
+[node name="FallenLog" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 0.3, -15)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.9, 0.6, 17)
+material = ExtResource("24_7g0f4")
+
+[node name="FarBankWall" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -8.85, -72.5)
+use_collision = true
+collision_layer = 5
+collision_mask = 0
+size = Vector3(30, 22.3, 3)
+material = ExtResource("25_3sej3")
+
+[node name="GatePillarL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("26_71yqi")
+
+[node name="GatePillarR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("26_71yqi")
+
+[node name="GateLintel" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(11, 1.4, 2)
+material = ExtResource("26_71yqi")
+
+[node name="ArenaWallL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(40, 8, 1.5)
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaWallR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(40, 8, 1.5)
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar0" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.167961, 4, -114.74671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar1" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.99235, 4, -106.24671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar3" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.99235, 4, -106.24671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar4" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.167961, 4, -114.74671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar5" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.167961, 4, -125.25329)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar6" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.99235, 4, -133.7533)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar7" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1228493e-15, 4, -137)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar8" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.99235, 4, -133.7533)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="ArenaPillar9" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.167961, 4, -125.25329)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_vsf5g")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+[node name="Checkpoints" type="Node3D" parent="."]
+
+[node name="CheckpointSpawn" parent="Checkpoints" instance=ExtResource("27_0ay7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 1)
+
+[node name="CheckpointStream" parent="Checkpoints" instance=ExtResource("27_0ay7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -26)
+
+[node name="CheckpointBog" parent="Checkpoints" instance=ExtResource("27_0ay7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -48.5)
+
+[node name="CheckpointGate" parent="Checkpoints" instance=ExtResource("27_0ay7e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -78)
+
+[node name="Hazards" type="Node3D" parent="."]
+
+[node name="MudFlats" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, -15)
+script = ExtResource("28_3h63v")
+speed_multiplier = 0.45
+blocks_jump = true
+
+[node name="@CollisionShape3D@51" type="CollisionShape3D" parent="Hazards/MudFlats"]
+shape = SubResource("BoxShape3D_ah64c")
+
+[node name="Surface" type="MeshInstance3D" parent="Hazards/MudFlats"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_fse1r")
+
+[node name="StreamCurrent" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, -33)
+script = ExtResource("28_3h63v")
+speed_multiplier = 0.8
+current = Vector3(2.2, 0, 0)
+
+[node name="@CollisionShape3D@52" type="CollisionShape3D" parent="Hazards/StreamCurrent"]
+shape = SubResource("BoxShape3D_1f8u4")
+
+[node name="PoisonPoolStream" type="Area3D" parent="Hazards" groups=["poison_pools"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0.1, -33)
+script = ExtResource("28_3h63v")
+speed_multiplier = 0.8
+damage_per_tick = 4.0
+element = &"poison"
+attack_name = &"poison"
+
+[node name="@CollisionShape3D@53" type="CollisionShape3D" parent="Hazards/PoisonPoolStream"]
+shape = SubResource("CylinderShape3D_bp562")
+
+[node name="Surface" type="MeshInstance3D" parent="Hazards/PoisonPoolStream"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.52, 0)
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_p1blk")
+
+[node name="Rim" type="MeshInstance3D" parent="Hazards/PoisonPoolStream"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_oekhu")
+
+[node name="FogBank" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -43.5)
+script = ExtResource("32_jchic")
+environment_path = NodePath("../../WorldEnvironment")
+
+[node name="@CollisionShape3D@54" type="CollisionShape3D" parent="Hazards/FogBank"]
+shape = SubResource("BoxShape3D_80plj")
+
+[node name="SpiritLantern0" type="Node3D" parent="Hazards" groups=["spirit_lanterns"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -38)
+
+[node name="@MeshInstance3D@55" type="MeshInstance3D" parent="Hazards/SpiritLantern0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_b8dko")
+
+[node name="@MeshInstance3D@56" type="MeshInstance3D" parent="Hazards/SpiritLantern0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_nanog")
+script = ExtResource("34_3g3dd")
+color = Color(0.45, 0.9, 1, 1)
+
+[node name="@OmniLight3D@57" type="OmniLight3D" parent="Hazards/SpiritLantern0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(0.45, 0.85, 1, 1)
+light_energy = 1.6
+omni_range = 6.0
+
+[node name="SpiritLantern1" type="Node3D" parent="Hazards" groups=["spirit_lanterns"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -41.3)
+
+[node name="@MeshInstance3D@58" type="MeshInstance3D" parent="Hazards/SpiritLantern1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_7rpke")
+
+[node name="@MeshInstance3D@59" type="MeshInstance3D" parent="Hazards/SpiritLantern1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_mmoq4")
+script = ExtResource("34_3g3dd")
+color = Color(0.45, 0.9, 1, 1)
+
+[node name="@OmniLight3D@60" type="OmniLight3D" parent="Hazards/SpiritLantern1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(0.45, 0.85, 1, 1)
+light_energy = 1.6
+omni_range = 6.0
+
+[node name="SpiritLantern2" type="Node3D" parent="Hazards" groups=["spirit_lanterns"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -44.6)
+
+[node name="@MeshInstance3D@61" type="MeshInstance3D" parent="Hazards/SpiritLantern2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_1670y")
+
+[node name="@MeshInstance3D@62" type="MeshInstance3D" parent="Hazards/SpiritLantern2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_o4mtc")
+script = ExtResource("34_3g3dd")
+color = Color(0.45, 0.9, 1, 1)
+
+[node name="@OmniLight3D@63" type="OmniLight3D" parent="Hazards/SpiritLantern2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(0.45, 0.85, 1, 1)
+light_energy = 1.6
+omni_range = 6.0
+
+[node name="SpiritLantern3" type="Node3D" parent="Hazards" groups=["spirit_lanterns"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -47.9)
+
+[node name="@MeshInstance3D@64" type="MeshInstance3D" parent="Hazards/SpiritLantern3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_yrma4")
+
+[node name="@MeshInstance3D@65" type="MeshInstance3D" parent="Hazards/SpiritLantern3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rri7n")
+script = ExtResource("34_3g3dd")
+color = Color(0.45, 0.9, 1, 1)
+
+[node name="@OmniLight3D@66" type="OmniLight3D" parent="Hazards/SpiritLantern3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+light_color = Color(0.45, 0.85, 1, 1)
+light_energy = 1.6
+omni_range = 6.0
+
+[node name="PoisonPoolFog" type="Area3D" parent="Hazards" groups=["poison_pools"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.1, -44)
+script = ExtResource("28_3h63v")
+speed_multiplier = 0.8
+damage_per_tick = 4.0
+element = &"poison"
+attack_name = &"poison"
+
+[node name="@CollisionShape3D@67" type="CollisionShape3D" parent="Hazards/PoisonPoolFog"]
+shape = SubResource("CylinderShape3D_4hskj")
+
+[node name="Surface" type="MeshInstance3D" parent="Hazards/PoisonPoolFog"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.52, 0)
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_cd80s")
+
+[node name="Rim" type="MeshInstance3D" parent="Hazards/PoisonPoolFog"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_22ukr")
+
+[node name="PoisonPoolHollow" type="Area3D" parent="Hazards" groups=["poison_pools"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0.1, -20)
+script = ExtResource("28_3h63v")
+speed_multiplier = 0.8
+damage_per_tick = 4.0
+element = &"poison"
+attack_name = &"poison"
+
+[node name="@CollisionShape3D@68" type="CollisionShape3D" parent="Hazards/PoisonPoolHollow"]
+shape = SubResource("CylinderShape3D_mcqa0")
+
+[node name="Surface" type="MeshInstance3D" parent="Hazards/PoisonPoolHollow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.52, 0)
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_sax7g")
+
+[node name="Rim" type="MeshInstance3D" parent="Hazards/PoisonPoolHollow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.48, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_qybg6")
+
+[node name="SinkingRaft0" parent="Hazards" instance=ExtResource("35_molej")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -53.5)
+
+[node name="SinkingRaft1" parent="Hazards" instance=ExtResource("35_molej")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -58)
+
+[node name="SinkingRaft2" parent="Hazards" instance=ExtResource("35_molej")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -62.5)
+
+[node name="SinkingRaft3" parent="Hazards" instance=ExtResource("35_molej")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -67)
+
+[node name="DeepBog" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.2, -60.5)
+script = ExtResource("36_b773i")
+damage = 20.0
+element = &"water"
+attack_name = &"drowned"
+
+[node name="@CollisionShape3D@69" type="CollisionShape3D" parent="Hazards/DeepBog"]
+shape = SubResource("BoxShape3D_emyhr")
+
+[node name="BossArenaTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -123)
+script = ExtResource("37_r72rm")
+
+[node name="@CollisionShape3D@70" type="CollisionShape3D" parent="BossArenaTrigger"]
+shape = SubResource("BoxShape3D_io70i")
+
+[node name="ArenaGateMarker" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -94)
+
+[node name="ArenaGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -120)
+light_color = Color(0.55, 0.4, 1, 1)
+light_energy = 2.5
+omni_range = 24.0
+
+[node name="GateGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -91)
+light_color = Color(0.45, 0.85, 1, 1)
+light_energy = 2.0
+omni_range = 14.0
+
+[node name="Boss" parent="." instance=ExtResource("38_4d80m")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.05, -121)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="ThornlingA" parent="Enemies" instance=ExtResource("39_toko1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.2, -16)
+
+[node name="ThornlingB" parent="Enemies" instance=ExtResource("39_toko1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.2, -24)
+
+[node name="Gatherables" type="Node3D" parent="."]
+
+[node name="spirit_moss_0" parent="Gatherables" instance=ExtResource("40_ffmdh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1, 0.65, -22.5)
+snap_to_ground = false
+
+[node name="spirit_moss_1" parent="Gatherables" instance=ExtResource("40_ffmdh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -12)
+
+[node name="spirit_moss_2" parent="Gatherables" instance=ExtResource("40_ffmdh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -36.5)
+
+[node name="spirit_moss_3" parent="Gatherables" instance=ExtResource("40_ffmdh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 0, -21)
+
+[node name="spirit_moss_4" parent="Gatherables" instance=ExtResource("40_ffmdh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, -84)
+
+[node name="ruin_shard_5" parent="Gatherables" instance=ExtResource("41_4kv4a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -46)
+
+[node name="ruin_shard_6" parent="Gatherables" instance=ExtResource("41_4kv4a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, -6)
+
+[node name="glowcap_7" parent="Gatherables" instance=ExtResource("42_h1lgo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 0, -40)
+
+[node name="glowcap_8" parent="Gatherables" instance=ExtResource("42_h1lgo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -82)
+
+[node name="LoreStone0" parent="Gatherables" instance=ExtResource("43_5a2rt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -82)
+title = "The Lantern Serpent"
+text = "Do not follow the light over the water. Nami's lantern has drowned more hunters than its jaws. The old dojo forged storm-charms against it; water only feeds it. Cut the lantern down when it bows to strike."

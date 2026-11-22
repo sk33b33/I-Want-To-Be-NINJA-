@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_ok48e"]
+[ext_resource type="Resource" path="res://data/items/lantern_pearl.tres" id="2_n3j1f"]
+[ext_resource type="Resource" path="res://data/items/spirit_moss.tres" id="3_cvwvc"]
+[ext_resource type="Resource" path="res://data/gear/moonfang_blades.tres" id="4_d3l4s"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_mwagt"]
+
+[resource]
+script = ExtResource("5_mwagt")
+id = &"moonfang_blades"
+result = ExtResource("4_d3l4s")
+inputs = Array[ExtResource("1_ok48e")]([ExtResource("2_n3j1f"), ExtResource("3_cvwvc")])
+counts = PackedInt32Array(1, 2)

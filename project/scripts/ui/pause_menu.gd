@@ -8,6 +8,8 @@ extends Control
 
 var _manager: ExpeditionManager
 var _resume: Button
+var shake_button: Button
+var warnings_button: Button
 var _mouse_mode_before: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 
 
@@ -15,6 +17,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	_manager = get_node_or_null(manager_path) as ExpeditionManager
+	GameSettings.ensure_loaded()
 	_build()
 	visible = false
 
@@ -64,6 +67,18 @@ func _build() -> void:
 	_resume = UiStyle.button("Resume")
 	_resume.pressed.connect(close)
 	col.add_child(_resume)
+	# Comfort / readability (Phase 9 accessibility pass). Saved immediately.
+	shake_button = UiStyle.button("")
+	shake_button.pressed.connect(func() -> void:
+		GameSettings.set_screen_shake(not GameSettings.screen_shake)
+		_refresh_options())
+	col.add_child(shake_button)
+	warnings_button = UiStyle.button("")
+	warnings_button.pressed.connect(func() -> void:
+		GameSettings.set_bold_warnings(not GameSettings.bold_warnings)
+		_refresh_options())
+	col.add_child(warnings_button)
+	_refresh_options()
 	var restart := UiStyle.button("Restart expedition", UiStyle.WARNING)
 	restart.pressed.connect(func() -> void: _manager.restart())
 	col.add_child(restart)
@@ -71,3 +86,8 @@ func _build() -> void:
 	board.pressed.connect(func() -> void: _manager.return_to_hunt_board())
 	col.add_child(board)
 	add_child(UiStyle.centered(panel))
+
+
+func _refresh_options() -> void:
+	shake_button.text = "Screen shake: %s" % ("On" if GameSettings.screen_shake else "Off")
+	warnings_button.text = "Bold attack warnings: %s" % ("On" if GameSettings.bold_warnings else "Off")

@@ -39,14 +39,26 @@ func _ready() -> void:
 	_on_health_changed(_health.current, _health.max_health)
 
 
+## The talisman is named and coloured after its element, so a charm swap is visible at a glance.
+const TALISMAN_NAMES := {&"fire": "Ember Talisman", &"water": "Mist Talisman", &"lightning": "Storm Talisman"}
+const TALISMAN_COLORS := {&"fire": Color(1.0, 0.6, 0.2), &"water": Color(0.45, 0.75, 1.0), &"lightning": Color(0.8, 0.85, 1.0)}
+
+
+## Current talisman line (for tests and accessibility checks).
+func skill_text() -> String:
+	return _skill.text
+
+
 func _process(delta: float) -> void:
 	_flash.color.a = maxf(_flash.color.a - delta * 1.2, 0.0)
 	# The pale "recent damage" trail catches up after a moment.
 	_trail.value = move_toward(_trail.value, _bar.value, delta * 40.0)
 	if _combat and _skill.visible:
 		var left := _combat.skill_cooldown_left
-		_skill.text = "Ember Talisman: ready" if left <= 0.0 else "Ember Talisman: %.1fs" % left
-		_skill.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2) if left <= 0.0 else UiStyle.MUTED)
+		var element := _combat.skill_element()
+		var title: String = TALISMAN_NAMES.get(element, "Talisman")
+		_skill.text = "%s: ready" % title if left <= 0.0 else "%s: %.1fs" % [title, left]
+		_skill.add_theme_color_override("font_color", TALISMAN_COLORS.get(element, Color(1.0, 0.6, 0.2)) if left <= 0.0 else UiStyle.MUTED)
 
 
 func shown_health() -> float:

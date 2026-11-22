@@ -668,3 +668,106 @@ static func vent_cone(material: Material) -> ArrayMesh:
 	_tube(st, PackedVector3Array([Vector3(0, -0.1, 0), Vector3(0, 0.55, 0)]), PackedFloat32Array([1.5, 0.75]),
 			PackedColorArray([c, c]), 10, rng, 0.12)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- Moonfen (Phase 9)
+
+## Nami, the Lantern Serpent: a long coiled body rising into a raised, finned head (faces -Z).
+## COLOR.g = 1 on the dorsal fin ridge (glows during telegraphs), COLOR.a = 1 on the eyes.
+static func serpent_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 120
+	var hide := Color(0, 0, 0, 0)
+	var fin := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	# Spine: a loose coil on the ground behind, then up through the neck to the head.
+	var spine := PackedVector3Array()
+	var radii := PackedFloat32Array()
+	var cols := PackedColorArray()
+	for i in 22:
+		var t := float(i) / 21.0
+		var ang := t * TAU * 1.15 + 0.6
+		var r := lerpf(0.6, 2.6, t)
+		spine.append(Vector3(cos(ang) * r, 0.55 + sin(t * 9.0) * 0.08, 1.8 + sin(ang) * r * 0.85))
+		radii.append(lerpf(0.12, 0.62, t))
+		cols.append(hide)
+	spine.reverse()
+	radii.reverse()
+	var neck := [Vector3(0.4, 0.8, -0.2), Vector3(0.1, 1.7, -0.9), Vector3(0, 2.8, -1.4), Vector3(0, 3.4, -2.0)]
+	for i in neck.size():
+		spine.append(neck[i])
+		radii.append(lerpf(0.62, 0.48, float(i) / 3.0))
+		cols.append(hide)
+	_tube(st, spine, radii, cols, 9, rng, 0.04)
+	# Head: long, flat skull with a jaw.
+	_blob(st, Vector3(0, 3.5, -2.55), Vector3(0.55, 0.42, 0.85), rng, hide, hide, 5, 9, 0.05)
+	_blob(st, Vector3(0, 3.18, -2.75), Vector3(0.42, 0.18, 0.7), rng, hide, hide, 3, 8, 0.05)
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.36 * sgn, 3.66, -2.95), Vector3(0.09, 0.07, 0.08), rng, eye, eye, 2, 5, 0.0)
+		# Gill fins behind the head.
+		var g := Vector3(0.45 * sgn, 3.5, -2.1)
+		_tri(st, g, g + Vector3(0.7 * sgn, 0.35, 0.4), g + Vector3(0.15 * sgn, -0.35, 0.45), fin, fin, fin)
+	# Dorsal fin ridge along the neck and first coil.
+	for i in range(8, spine.size() - 1):
+		var a := spine[i]
+		var b := spine[i + 1]
+		var up := Vector3.UP * (radii[i] + 0.35)
+		_tri(st, a + Vector3.UP * radii[i] * 0.8, b + Vector3.UP * radii[i + 1] * 0.8, a.lerp(b, 0.5) + up, fin, fin, fin)
+	return _finish(st, null, material)
+
+
+## The lure that hangs from Nami's brow on a whisker stalk (the breakable part).
+## COLOR.a = 1 on the lantern bulb (emissive); broken = only a torn stalk stub.
+static func serpent_lantern(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 121
+	var stalk := Color(0, 1, 0, 0)
+	var bulb := Color(0, 0, 0, 1)
+	var base := Vector3(0, 3.9, -2.7)
+	if broken:
+		_tube(st, PackedVector3Array([base, base + Vector3(0, 0.3, -0.1)]), PackedFloat32Array([0.07, 0.04]),
+				PackedColorArray([stalk, stalk]), 6, rng, 0.15)
+		return _finish(st, null, material)
+	var p1 := base + Vector3(0, 0.6, -0.2)
+	var p2 := p1 + Vector3(0, 0.25, -0.55)
+	var p3 := p2 + Vector3(0, -0.35, -0.3)
+	_tube(st, PackedVector3Array([base, p1, p2, p3]), PackedFloat32Array([0.07, 0.05, 0.04, 0.03]),
+			PackedColorArray([stalk, stalk, stalk, stalk]), 6, rng)
+	_blob(st, p3 + Vector3(0, -0.28, 0), Vector3(0.26, 0.32, 0.26), rng, bulb, bulb, 5, 8, 0.04)
+	return _finish(st, null, material)
+
+
+## Reed raft: a mat of bundled reeds with a few stems standing up at the edges.
+static func reed_raft(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 122
+	var c := Color(1, 1, 1)
+	for i in 7:
+		var x := lerpf(-1.25, 1.25, float(i) / 6.0)
+		_tube(st, PackedVector3Array([Vector3(x, -0.15, -1.45), Vector3(x + rng.randf_range(-0.05, 0.05), -0.12, 1.45)]),
+				PackedFloat32Array([0.2, 0.2]), PackedColorArray([c, c]), 6, rng, 0.08)
+	for i in 6:
+		var base := Vector3(rng.randf_range(-1.3, 1.3), -0.05, 1.35 * (1.0 if i % 2 == 0 else -1.0))
+		_tube(st, PackedVector3Array([base, base + Vector3(rng.randf_range(-0.2, 0.2), rng.randf_range(0.6, 1.1), 0)]),
+				PackedFloat32Array([0.04, 0.01]), PackedColorArray([c, c]), 4, rng)
+	return _finish(st, null, material)
+
+
+## Spirit spout (Lantern Lure eruption): twisting columns of ghost-water.
+static func spirit_spout(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 123
+	var c := Color(0.55, 0.4, 1.0, 1.0)
+	for i in 6:
+		var a := TAU * float(i) / 6.0
+		var pts := PackedVector3Array()
+		for k in 5:
+			var h := float(k) * 0.55
+			var r := 0.9 - float(k) * 0.12
+			pts.append(Vector3(cos(a + k * 0.5) * r, h - 0.2, sin(a + k * 0.5) * r))
+		_tube(st, pts, PackedFloat32Array([0.2, 0.17, 0.13, 0.08, 0.01]), PackedColorArray([c, c, c, c, c]), 5, rng)
+	return _finish(st, null, material)

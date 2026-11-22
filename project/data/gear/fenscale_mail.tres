@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_nsbar"]
+
+[resource]
+script = ExtResource("1_nsbar")
+id = &"fenscale_mail"
+display_name = "Fenscale Mail"
+description = "Overlapping serpent scales on a moss lining. Light, and it sheds poison."
+slot = 1
+color = Color(0.35, 0.4, 0.7, 1)
+max_health_bonus = 30.0
+damage_reduction = 0.2

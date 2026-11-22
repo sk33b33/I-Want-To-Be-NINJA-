@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CraftingCatalog" load_steps=17 format=3]
+[gd_resource type="Resource" script_class="CraftingCatalog" load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_xdif1"]
 [ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="2_nrpnu"]
@@ -11,13 +11,19 @@
 [ext_resource type="Resource" path="res://data/items/oni_horn.tres" id="7_fq8v7"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_barkhide_garb.tres" id="8_fq8v7"]
 [ext_resource type="Resource" path="res://data/items/ashen_shell_plate.tres" id="8_wxoic"]
+[ext_resource type="Resource" path="res://data/items/spirit_moss.tres" id="9_n6ycm"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_ember_charm.tres" id="9_wxoic"]
 [ext_resource type="Script" path="res://scripts/crafting/crafting_catalog.gd" id="10_msck7"]
+[ext_resource type="Resource" path="res://data/items/lantern_pearl.tres" id="10_ycgp0"]
+[ext_resource type="Resource" path="res://data/items/nami_scale.tres" id="11_a760h"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_mist_charm.tres" id="13_msck7"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_oni_fang_blades.tres" id="14_ndnp6"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_ashen_plate.tres" id="15_wg5dk"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_storm_charm.tres" id="19_j682c"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_moonfang_blades.tres" id="20_48p10"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_fenscale_mail.tres" id="21_aqplj"]
 
 [resource]
 script = ExtResource("10_msck7")
-recipes = Array[ExtResource("6_a6yit")]([ExtResource("7_ar6xg"), ExtResource("8_fq8v7"), ExtResource("9_wxoic"), ExtResource("13_msck7"), ExtResource("14_ndnp6"), ExtResource("15_wg5dk")])
-items = Array[ExtResource("1_xdif1")]([ExtResource("2_nrpnu"), ExtResource("3_p3yp2"), ExtResource("4_rrhiq"), ExtResource("5_5g8hp"), ExtResource("6_ar6xg"), ExtResource("7_fq8v7"), ExtResource("8_wxoic")])
+recipes = Array[ExtResource("6_a6yit")]([ExtResource("7_ar6xg"), ExtResource("8_fq8v7"), ExtResource("9_wxoic"), ExtResource("13_msck7"), ExtResource("14_ndnp6"), ExtResource("15_wg5dk"), ExtResource("19_j682c"), ExtResource("20_48p10"), ExtResource("21_aqplj")])
+items = Array[ExtResource("1_xdif1")]([ExtResource("2_nrpnu"), ExtResource("3_p3yp2"), ExtResource("4_rrhiq"), ExtResource("5_5g8hp"), ExtResource("6_ar6xg"), ExtResource("7_fq8v7"), ExtResource("8_wxoic"), ExtResource("9_n6ycm"), ExtResource("10_ycgp0"), ExtResource("11_a760h")])

@@ -10,5 +10,6 @@ beast_name = "Nami"
 epithet = "the Lantern Serpent"
 element = "Water / Spirit"
 weakness = "Lightning"
-signature = "Flood wave, illusion"
+description = "A fen serpent that lures hunters into the bog with the lantern on its brow. Water barely wets it; storms frighten it."
+signature = "Flood wave, lantern lure"
 config = ExtResource("1_56flh")

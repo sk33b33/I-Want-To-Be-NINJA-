@@ -22,6 +22,7 @@ func _initialize() -> void:
 	_level_scene()
 	_main_scene()
 	_emberwild()  # Phase 8
+	_moonfen()  # Phase 9
 	_hunt_board_scene()
 	print("GENERATED")
 	quit(0)
@@ -1905,6 +1906,662 @@ func _emberwild_unlock() -> void:
 	b.expedition_scene = "res://scenes/main/expedition_emberwild.tscn"
 	b.locked_note = "defeat Kurogale to unlock"
 	_save(b, "res://data/biomes/biome_emberwild.tres")
+	var board: PackedScene = load("res://scenes/ui/hunt_board.tscn")
+	var inst := board.instantiate()
+	var items: Array[ItemDefinition] = (load("res://data/crafting/catalog.tres") as CraftingCatalog).items
+	inst.set("known_items", items)
+	_pack(inst, "res://scenes/ui/hunt_board.tscn")
+
+
+# ================================================================ Phase 9: Moonfen
+
+func _moonfen() -> void:
+	_moonfen_materials()
+	_moonfen_data()
+	_moonfen_scenes()
+	_moonfen_level()
+	_main_scene("res://scenes/biomes/moonfen.tscn", "res://data/hunts/nami.tres",
+			"res://scenes/main/expedition_moonfen.tscn")
+	_moonfen_unlock()
+
+
+func _moonfen_materials() -> void:
+	var detail: Resource = load(MAT + "noise_detail.tres")
+	var ripples: Resource = load(MAT + "noise_ripples_normal.tres")
+	_save(_shader_mat("terrain", {"detail_noise": detail, "macro_noise": load(MAT + "noise_macro.tres"),
+			"moss_dark": Color(0.05, 0.05, 0.08), "moss_light": Color(0.12, 0.11, 0.18), "mud": Color(0.1, 0.08, 0.1),
+			"rock": Color(0.18, 0.17, 0.22), "rock_dark": Color(0.06, 0.055, 0.08)}), MAT + "terrain_fen.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.1, "translucency": 0.45, "tint": Color(0.75, 0.6, 1.15),
+			"brightness": 1.9}), MAT + "foliage_fen.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.06, "translucency": 0.4, "tint": Color(0.6, 0.7, 1.1),
+			"brightness": 1.8}), MAT + "leaf_fen.tres")
+	_save(_shader_mat("sky_gloom", {"cloud_noise": load(MAT + "noise_clouds.tres"), "zenith": Color(0.03, 0.02, 0.07),
+			"horizon": Color(0.2, 0.12, 0.32), "glow_tint": Color(0.45, 0.25, 0.8), "flash_color": Color(0.6, 0.5, 1.0),
+			"moon_dir": Vector3(0.35, 0.3, -0.88)}), MAT + "sky_moon.tres")
+	_save(_shader_mat("mist_card", {"mist_noise": load(MAT + "noise_mist.tres"), "color": Color(0.32, 0.28, 0.45),
+			"opacity": 0.34}), MAT + "mist_fen.tres")
+	_save(_shader_mat("light_shaft", {"color": Color(0.5, 0.45, 0.9), "strength": 0.035}), MAT + "shaft_moon.tres")
+	# Waters: each hazard reads differently at a glance (dark violet bog, brown mud, sickly green poison).
+	_save(_shader_mat("water", {"ripple_noise": ripples, "deep": Color(0.025, 0.02, 0.06), "shallow": Color(0.14, 0.1, 0.32),
+			"glow": 0.55, "flow_speed": 0.02}), MAT + "bog_water.tres")
+	_save(_shader_mat("water", {"ripple_noise": ripples, "deep": Color(0.07, 0.05, 0.035), "shallow": Color(0.16, 0.12, 0.08),
+			"glow": 0.02, "flow_speed": 0.004, "alpha": 0.97}), MAT + "mud.tres")
+	_save(_shader_mat("water", {"ripple_noise": ripples, "deep": Color(0.08, 0.14, 0.02), "shallow": Color(0.45, 0.7, 0.1),
+			"glow": 0.9, "flow_speed": 0.01, "alpha": 0.92}), MAT + "poison.tres")
+	_save(_shader_mat("area_warning", {"color": Color(0.6, 1.0, 0.1)}), MAT + "poison_warning.tres")
+	_save(_shader_mat("attack_warning", {"color": Color(1.0, 0.25, 0.5)}), MAT + "flood_warning.tres")
+	_save(_shader_mat("basalt", {"detail_noise": detail, "rock_light": Color(0.24, 0.2, 0.12),
+			"rock_dark": Color(0.08, 0.065, 0.04), "ember": Color(1.0, 0.3, 0.45), "scale": 1.4}), MAT + "reed.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.07, 0.08, 0.14), "glow_color": Color(0.5, 0.9, 1.0),
+			"glow_energy": 4.0, "spine_idle": Color(0.25, 0.18, 0.45), "spine_color": Color(0.7, 0.4, 1.0),
+			"spine_strength": 3.0}), MAT + "nami_body.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.12, 0.1, 0.16), "glow_color": Color(0.55, 0.95, 1.0),
+			"glow_energy": 6.0, "spine_idle": Color(0.2, 0.18, 0.28), "spine_color": Color(0.6, 0.9, 1.0),
+			"spine_strength": 1.5}), MAT + "nami_lantern.tres")
+
+
+func _moonfen_data() -> void:
+	var terrain := TerrainConfig.new()
+	terrain.seed = 6262
+	terrain.hill_height = 3.0  # Flat, sunken swamp.
+	terrain.valley_wall_height = 14.0
+	terrain.stream_z = -33.0
+	terrain.stream_half_width = 2.5
+	terrain.stream_depth = 0.7
+	terrain.gorge_depth = -4.0  # Deep bog (surface at -0.35); the bog LavaZone handles falls.
+	_save(terrain, "res://data/biomes/moonfen_terrain.tres")
+	var flora := FloraConfig.new()
+	flora.seed = 7373
+	flora.grass_count = 3200
+	flora.fern_count = 900
+	flora.broadleaf_count = 260
+	flora.mushroom_count = 520
+	flora.rock_count = 420
+	flora.jungle_tree_count = 55
+	flora.dead_tree_count = 70
+	flora.log_count = 30
+	flora.pillar_count = 6
+	flora.mushroom_glows = [Color(0.6, 0.3, 1.0), Color(0.3, 0.85, 1.0), Color(0.85, 0.4, 1.0)] as Array[Color]
+	_save(flora, "res://data/biomes/moonfen_flora.tres")
+	var fauna := FaunaConfig.new()
+	fauna.seed = 909
+	fauna.bat_flocks = [Vector3(-20, 14, -40), Vector3(24, 15, -70)] as Array[Vector3]
+	fauna.frog_count = 40
+	fauna.lurker_count = 14
+	fauna.lurker_glow = Color(0.7, 0.4, 1.0)
+	fauna.firefly_swarms = 26
+	fauna.firefly_color = Color(0.45, 0.9, 1.0)  # Spirit motes.
+	_save(fauna, "res://data/biomes/moonfen_fauna.tres")
+	# Items.
+	var moss := _item("spirit_moss", "Spirit Moss", "Fen moss that keeps a little moonlight in it after it is picked.",
+			Color(0.55, 0.45, 1.0), 0)
+	var pearl := _item("lantern_pearl", "Lantern Pearl", "The glowing lure of Nami's brow. It still pulls at the eye.",
+			Color(0.6, 0.95, 1.0), 1)
+	var scale := _item("nami_scale", "Nami's Scale", "A cold, iridescent scale from the Lantern Serpent.",
+			Color(0.3, 0.35, 0.6), 0)
+	# Boss: Nami, the Lantern Serpent (water / spirit; weak to lightning).
+	var el := ElementProfile.new()
+	el.affinity = &"water"
+	el.multipliers = {&"lightning": 1.5, &"fire": 0.5, &"water": 0.5}
+	var flood := _boss_attack("flood_wave", "Flood Wave", 1.2, 0.45, 1.3, 26.0, 11.0, 0.0, 11.0, 3.0, 4.0,
+			"It rears up and the strip in front of it floods pink: step sideways out of the strip, or roll through it late.")
+	flood.kind = BossAttackDefinition.Kind.FRONT
+	flood.hitbox_node = NodePath("Front/FloodHitbox")
+	flood.warning_node = NodePath("Front/FloodWarning")
+	flood.telegraph_pitch = 0.4
+	flood.glow = BossAttackDefinition.Glow.BODY
+	flood.weakened_by_part = &"lantern"
+	flood.element = &"water"
+	var lure := _boss_attack("lantern_lure", "Lantern Lure", 1.4, 0.5, 1.0, 20.0, 5.0, 3.0, 26.0, 2.0, 6.0,
+			"Its lantern flares and violet circles open under you: keep moving and get out before the spirits rise.")
+	lure.kind = BossAttackDefinition.Kind.ERUPTIONS
+	lure.eruption_offsets = PackedVector3Array([Vector3.ZERO, Vector3(2.8, 0, 1.6), Vector3(-2.8, 0, 1.6), Vector3(0, 0, -3.0)])
+	lure.telegraph_pitch = 0.1
+	lure.glow = BossAttackDefinition.Glow.PARTS
+	lure.element = &"water"
+	var dive := _boss_attack("dive_strike", "Dive Strike", 1.0, 1.1, 1.4, 28.0, 12.0, 6.0, 26.0, 2.0, 6.0,
+			"It coils back and lunges along the line: roll sideways late; it stuns itself on the stone pillars.")
+	dive.kind = BossAttackDefinition.Kind.DASH
+	dive.hitbox_node = NodePath("Front/DiveHitbox")
+	dive.warning_node = NodePath("Front/DiveWarning")
+	dive.move_speed = 13.0
+	dive.dash_homing = 0.6
+	dive.stuns_on_wall = true
+	dive.stun_time = 2.8
+	dive.telegraph_pitch = -0.2
+	dive.telegraph_wobble = 0.06
+	dive.element = &"water"
+	var rain := _boss_attack("spirit_rain", "Spirit Rain", 1.2, 0.5, 1.0, 22.0, 8.0, 0.0, 7.0, 2.0, 7.0,
+			"Enraged: the ring around it glows; get out before the spirit rain falls.")
+	rain.kind = BossAttackDefinition.Kind.RADIAL
+	rain.enraged_only = true
+	rain.hitbox_node = NodePath("BurstHitbox")
+	rain.warning_node = NodePath("BurstWarning")
+	rain.telegraph_pitch = 0.25
+	rain.glow = BossAttackDefinition.Glow.BODY
+	rain.tracks_player = false
+	rain.element = &"water"
+	var part := BossPartDefinition.new()
+	part.id = &"lantern"
+	part.display_name = "Lantern"
+	part.break_health = 220.0
+	part.reward = pearl
+	part.reward_count = 1
+	part.break_stagger_time = 2.4
+	part.intact_node = NodePath("Visual/Lantern")
+	part.broken_node = NodePath("Visual/LanternStub")
+	var def := BossDefinition.new()
+	def.id = &"nami"
+	def.display_name = "Nami, the Lantern Serpent"
+	def.max_health = 1000.0
+	def.poise = 130.0
+	def.stagger_time = 1.5
+	def.elements = el
+	def.attacks = [flood, lure, dive, rain] as Array[BossAttackDefinition]
+	def.parts = [part] as Array[BossPartDefinition]
+	def.victory_rewards = [scale] as Array[ItemDefinition]
+	def.walk_speed = 3.0
+	def.turn_sharpness = 3.5
+	def.stalk_distance = 5.5
+	def.attack_interval = 1.3
+	def.head_down_pitch = -0.45
+	def.lock_offset = Vector3(0, 2.8, -2.6)
+	_save(def, "res://data/bosses/nami.tres")
+	var h := HuntDefinition.new()
+	h.id = &"nami"
+	h.beast_name = "Nami"
+	h.epithet = "the Lantern Serpent"
+	h.element = "Water / Spirit"
+	h.weakness = "Lightning"
+	h.signature = "Flood wave, lantern lure"
+	h.description = "A fen serpent that lures hunters into the bog with the lantern on its brow. Water barely wets it; storms frighten it."
+	h.config = load("res://data/expedition/default_expedition.tres")
+	_save(h, "res://data/hunts/nami.tres")
+	# Crafting: Storm Charm (lightning talisman, from Emberwild materials) + two Moonfen recipes.
+	var crystal: ItemDefinition = load("res://data/items/ember_crystal.tres")
+	var shard: ItemDefinition = load("res://data/items/ruin_shard.tres")
+	var storm := _gear("storm_charm", "Storm Charm",
+			"Three ember crystals strung around a rune shard; they crackle when they touch. Talismans strike as lightning.",
+			GearDefinition.Slot.CHARM, Color(0.75, 0.8, 1.0), {"skill_element": &"lightning", "skill_cooldown_reduction": 0.5})
+	var moonfang := _gear("moonfang_blades", "Moonfang Blades",
+			"Blades quenched in the Lantern Pearl's light. They leave a cold, wet shimmer — the Oni-Tortoise hates them.",
+			GearDefinition.Slot.WEAPON, Color(0.55, 0.85, 1.0), {"blade_damage_multiplier": 1.35, "blade_element": &"water"})
+	var fenscale := _gear("fenscale_mail", "Fenscale Mail",
+			"Overlapping serpent scales on a moss lining. Light, and it sheds poison.", GearDefinition.Slot.ARMOR,
+			Color(0.35, 0.4, 0.7), {"max_health_bonus": 30.0, "damage_reduction": 0.2})
+	var catalog: CraftingCatalog = load("res://data/crafting/catalog.tres")
+	catalog.recipes.append(_recipe("storm_charm", storm, [crystal, shard] as Array[ItemDefinition], [3, 1]))
+	catalog.recipes.append(_recipe("moonfang_blades", moonfang, [pearl, moss] as Array[ItemDefinition], [1, 2]))
+	catalog.recipes.append(_recipe("fenscale_mail", fenscale, [scale, moss] as Array[ItemDefinition], [1, 2]))
+	catalog.items.append_array([moss, pearl, scale])
+	_save(catalog, "res://data/crafting/catalog.tres")
+
+
+func _moonfen_scenes() -> void:
+	# Lantern Lure spirit spout (RootSnare behaviour: warn ring -> rise -> hit).
+	var sp := Node3D.new()
+	sp.name = "SpiritSpout"
+	sp.set_script(load("res://scripts/bosses/root_snare.gd"))
+	sp.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "snare_warning"))
+	var roots := Node3D.new()
+	roots.name = "Roots"
+	var rm := MeshInstance3D.new()
+	rm.mesh = ProceduralMeshes.spirit_spout(load(MAT + "glow_fungus.tres"))
+	roots.add_child(rm)
+	sp.add_child(roots)
+	var cyl := CylinderShape3D.new()
+	cyl.radius = 1.6
+	cyl.height = 2.2
+	sp.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
+	_pack(sp, "res://scenes/bosses/spirit_spout.tscn")
+	var def: BossDefinition = load("res://data/bosses/nami.tres")
+	def.get_attack(&"lantern_lure").eruption_scene = load("res://scenes/bosses/spirit_spout.tscn")
+	_save(def, "res://data/bosses/nami.tres")
+
+	# Sinking reed raft.
+	var r := AnimatableBody3D.new()
+	r.name = "SinkingRaft"
+	r.set_script(load("res://scripts/world/hazards/sinking_raft.gd"))
+	r.collision_layer = 1
+	var rc := CollisionShape3D.new()
+	rc.shape = _box_shape(Vector3(3.0, 0.5, 3.0))
+	rc.position.y = -0.25
+	r.add_child(rc)
+	var rmesh := MeshInstance3D.new()
+	rmesh.name = "Mesh"
+	rmesh.mesh = ProceduralMeshes.reed_raft(load(MAT + "reed.tres"))
+	r.add_child(rmesh)
+	var trig := Area3D.new()
+	trig.name = "Trigger"
+	var tc := CollisionShape3D.new()
+	tc.shape = _box_shape(Vector3(2.8, 0.6, 2.8))
+	tc.position.y = 0.3
+	trig.add_child(tc)
+	r.add_child(trig)
+	_pack(r, "res://scenes/world/sinking_raft.tscn")
+
+	# Spirit Moss pickup.
+	var a := Area3D.new()
+	a.name = "Pickup"
+	a.set_script(load("res://scripts/world/pickup.gd"))
+	a.set("item", load("res://data/items/spirit_moss.tres"))
+	var ps := SphereShape3D.new()
+	ps.radius = 1.0
+	var pcol := CollisionShape3D.new()
+	pcol.shape = ps
+	pcol.position.y = 0.6
+	a.add_child(pcol)
+	var vis := Node3D.new()
+	vis.name = "Visual"
+	a.add_child(vis)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 124
+	var tuft := MeshInstance3D.new()
+	tuft.mesh = ProceduralMeshes.mushroom_cluster(rng, Color(0.6, 0.45, 1.0), load(MAT + "glow_fungus.tres"))
+	tuft.scale = Vector3.ONE * 0.8
+	vis.add_child(tuft)
+	var mote := MeshInstance3D.new()
+	var mq := QuadMesh.new()
+	mq.size = Vector2(0.9, 0.9)
+	mq.material = load(MAT + "spirit_flame.tres")
+	mote.mesh = mq
+	mote.position.y = 0.6
+	mote.set_script(load("res://scripts/world/instance_tint.gd"))
+	mote.set("color", Color(0.55, 0.45, 1.0) * 0.6)
+	vis.add_child(mote)
+	_pack(a, "res://scenes/world/pickup_spirit_moss.tscn")
+
+	# Nami, the Lantern Serpent.
+	var k := CharacterBody3D.new()
+	k.name = "Nami"
+	k.set_script(load("res://scripts/bosses/boss_controller.gd"))
+	k.set("definition", load("res://data/bosses/nami.tres"))
+	var col := CollisionShape3D.new()
+	col.name = "Collision"
+	col.shape = _box_shape(Vector3(3.0, 2.4, 4.6))
+	col.position = Vector3(0, 1.2, 0.6)
+	k.add_child(col)
+	var vis2 := Node3D.new()
+	vis2.name = "Visual"
+	k.add_child(vis2)
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = ProceduralMeshes.serpent_body(load(MAT + "nami_body.tres"))
+	vis2.add_child(body)
+	var lantern := MeshInstance3D.new()
+	lantern.name = "Lantern"
+	lantern.mesh = ProceduralMeshes.serpent_lantern(load(MAT + "nami_lantern.tres"), false)
+	vis2.add_child(lantern)
+	var stub := MeshInstance3D.new()
+	stub.name = "LanternStub"
+	stub.mesh = ProceduralMeshes.serpent_lantern(load(MAT + "nami_lantern.tres"), true)
+	vis2.add_child(stub)
+	var glow := OmniLight3D.new()
+	glow.name = "LanternLight"
+	glow.light_color = Color(0.55, 0.95, 1.0)
+	glow.light_energy = 2.0
+	glow.omni_range = 8.0
+	glow.position = Vector3(0, 4.1, -3.7)
+	lantern.add_child(glow)
+	var lh := _area("LanternHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(2.8, 2.6, 2.4)), Vector3(0, 3.6, -3.2))
+	lh.set("part_id", &"lantern")
+	lh.set("health_path", NodePath("../../Health"))
+	vis2.add_child(lh)
+	var front := Node3D.new()
+	front.name = "Front"
+	k.add_child(front)
+	front.add_child(_area("FloodHitbox", "res://scripts/combat/hitbox.gd", &"enemy", _box_shape(Vector3(4.6, 2.6, 11.0)), Vector3(0, 1.2, -7.5)))
+	front.add_child(_warning_quad("FloodWarning", Vector2(5.0, 11.5), Vector3(0, 0.12, -7.5), "flood_warning"))
+	var dive_shape := SphereShape3D.new()
+	dive_shape.radius = 2.4
+	front.add_child(_area("DiveHitbox", "res://scripts/combat/hitbox.gd", &"enemy", dive_shape, Vector3(0, 1.2, -1.5)))
+	front.add_child(_warning_quad("DiveWarning", Vector2(3.0, 14.0), Vector3(0, 0.12, -8.5), "attack_warning"))
+	var hcomp := Node.new()
+	hcomp.name = "Health"
+	hcomp.set_script(load("res://scripts/combat/health_component.gd"))
+	k.add_child(hcomp)
+	var bh := _area("BodyHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(3.2, 3.0, 5.4)), Vector3(0, 1.6, 0.0))
+	bh.set("health_path", NodePath("../Health"))
+	k.add_child(bh)
+	var field := SphereShape3D.new()
+	field.radius = 7.0
+	k.add_child(_area("BurstHitbox", "res://scripts/combat/hitbox.gd", &"enemy", field, Vector3(0, 1.0, 0)))
+	k.add_child(_warning_quad("BurstWarning", Vector2(14.0, 14.0), Vector3(0, 0.12, 0), "area_warning"))
+	_pack(k, "res://scenes/bosses/nami.tscn")
+
+
+## A spirit lantern on a post: the readable guide line through the fog bank.
+func _spirit_lantern(node_name: String, pos: Vector3, parent: Node) -> void:
+	var n := Node3D.new()
+	n.name = node_name
+	n.position = pos
+	n.add_to_group("spirit_lanterns", true)
+	var post := MeshInstance3D.new()
+	var pm := BoxMesh.new()
+	pm.size = Vector3(0.18, 1.6, 0.18)
+	pm.material = load(MAT + "dark_wood.tres")
+	post.mesh = pm
+	post.position.y = 0.8
+	n.add_child(post)
+	var flame := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(0.7, 0.9)
+	q.material = load(MAT + "spirit_flame.tres")
+	flame.mesh = q
+	flame.position.y = 1.85
+	flame.set_script(load("res://scripts/world/instance_tint.gd"))
+	flame.set("color", Color(0.45, 0.9, 1.0))
+	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.add_child(flame)
+	var l := OmniLight3D.new()
+	l.light_color = Color(0.45, 0.85, 1.0)
+	l.light_energy = 1.6
+	l.omni_range = 6.0
+	l.position.y = 1.9
+	n.add_child(l)
+	parent.add_child(n)
+
+
+## A round poison pool: SurfaceZone (damage + slight slow), sickly green water and a warning rim.
+func _poison_pool(node_name: String, pos: Vector3, radius: float, parent: Node) -> void:
+	var z := Area3D.new()
+	z.name = node_name
+	z.set_script(load("res://scripts/world/hazards/surface_zone.gd"))
+	z.set("speed_multiplier", 0.8)
+	z.set("damage_per_tick", 4.0)
+	z.set("tick_time", 0.5)
+	z.set("element", &"poison")
+	z.set("attack_name", &"poison")
+	z.add_to_group("poison_pools", true)
+	var shape := CylinderShape3D.new()
+	shape.radius = radius
+	shape.height = 1.2
+	var c := CollisionShape3D.new()
+	c.shape = shape
+	z.add_child(c)
+	z.position = pos
+	var water := MeshInstance3D.new()
+	water.name = "Surface"
+	var cm := CylinderMesh.new()
+	cm.top_radius = radius
+	cm.bottom_radius = radius
+	cm.height = 0.04
+	cm.radial_segments = 20
+	cm.material = load(MAT + "poison.tres")
+	water.mesh = cm
+	water.position.y = -0.52
+	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	z.add_child(water)
+	var rim := _warning_quad("Rim", Vector2(radius * 2.1, radius * 2.1), Vector3(0, -0.48, 0), "poison_warning")
+	rim.set_instance_shader_parameter("intensity", 0.25)
+	z.add_child(rim)
+	parent.add_child(z)
+
+
+func _moonfen_level() -> void:
+	_root = Node3D.new()
+	_root.name = "Moonfen"
+	var env_node := WorldEnvironment.new()
+	env_node.name = "WorldEnvironment"
+	var env := Environment.new()
+	var sky := Sky.new()
+	sky.sky_material = load(MAT + "sky_moon.tres")
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.24, 0.22, 0.34)
+	env.ambient_light_energy = 4.0
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.5
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.17, 0.15, 0.26)
+	env.fog_density = 0.02
+	env.fog_sky_affect = 0.4
+	env.fog_height = 0.5
+	env.fog_height_density = 0.08
+	env.glow_enabled = true
+	env.glow_intensity = 1.0
+	env.glow_bloom = 0.07
+	env.glow_hdr_threshold = 0.8
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.12
+	env.adjustment_saturation = 0.9
+	env_node.environment = env
+	_root.add_child(env_node)
+	var moon := DirectionalLight3D.new()
+	moon.name = "Moonlight"
+	moon.rotation_degrees = Vector3(-38, 25, 0)
+	moon.light_color = Color(0.7, 0.68, 1.0)
+	moon.light_energy = 1.1
+	moon.shadow_enabled = true
+	moon.shadow_opacity = 0.7
+	moon.directional_shadow_max_distance = 55.0
+	moon.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+	_root.add_child(moon)
+
+	var terrain := Node3D.new()
+	terrain.name = "Terrain"
+	terrain.set_script(load("res://scripts/world/biome_terrain.gd"))
+	terrain.set("material", load(MAT + "terrain_fen.tres"))
+	terrain.set("config", load("res://data/biomes/moonfen_terrain.tres"))
+	_root.add_child(terrain)
+	var flora := Node3D.new()
+	flora.name = "Flora"
+	flora.set_script(load("res://scripts/world/flora_scatter.gd"))
+	flora.set("terrain_path", NodePath("../Terrain"))
+	flora.set("grass_material", load(MAT + "foliage_fen.tres"))
+	flora.set("leaf_material", load(MAT + "leaf_fen.tres"))
+	flora.set("vine_material", load(MAT + "foliage_fen.tres"))
+	flora.set("bark_material", load(MAT + "bark_vertex.tres"))
+	flora.set("fungus_material", load(MAT + "glow_fungus.tres"))
+	flora.set("rock_material", load(MAT + "rock_vertex.tres"))
+	flora.set("stone_material", load(MAT + "stone.tres"))
+	flora.set("config", load("res://data/biomes/moonfen_flora.tres"))
+	_root.add_child(flora)
+	var fauna := Node3D.new()
+	fauna.name = "Fauna"
+	fauna.set_script(load("res://scripts/world/fauna/fauna_spawner.gd"))
+	fauna.set("terrain_path", NodePath("../Terrain"))
+	fauna.set("config", load("res://data/biomes/moonfen_fauna.tres"))
+	fauna.set("bat_material", load(MAT + "bat.tres"))
+	fauna.set("frog_material", load(MAT + "frog.tres"))
+	fauna.set("eye_material", load(MAT + "lurker_eyes.tres"))
+	fauna.set("firefly_material", load(MAT + "firefly.tres"))
+	_root.add_child(fauna)
+	var atmos := Node3D.new()
+	atmos.name = "Atmosphere"
+	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("terrain_path", NodePath("../Terrain"))
+	atmos.set("sun_path", NodePath("../Moonlight"))
+	atmos.set("environment_path", NodePath("../WorldEnvironment"))
+	atmos.set("mist_material", load(MAT + "mist_fen.tres"))
+	atmos.set("shaft_material", load(MAT + "shaft_moon.tres"))
+	atmos.set("waterfall_material", load(MAT + "waterfall.tres"))
+	atmos.set("water_material", load(MAT + "bog_water.tres"))
+	atmos.set("river_height", -0.35)
+	atmos.set("waterfalls", [] as Array[Vector3])
+	atmos.set("lightning_interval", Vector2(20.0, 45.0))
+	atmos.set("lightning_sky_flash", 0.35)
+	atmos.set("lightning_sun_boost", 0.5)
+	_root.add_child(atmos)
+	var geo := Node3D.new()
+	geo.name = "RouteGeometry"
+	_root.add_child(geo)
+	var spawn := Marker3D.new()
+	spawn.name = "SpawnPoint"
+	spawn.position = Vector3(0, 0.1, 0)
+	_root.add_child(spawn)
+	var cps := Node3D.new()
+	cps.name = "Checkpoints"
+	_root.add_child(cps)
+	_checkpoint("CheckpointSpawn", Vector3(-4.5, 0, 1))
+	_checkpoint("CheckpointStream", Vector3(-4.5, 0, -26))
+	_checkpoint("CheckpointBog", Vector3(-4.5, 0, -48.5))
+	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
+
+	var hazards := Node3D.new()
+	hazards.name = "Hazards"
+	_root.add_child(hazards)
+	# 1) Mud flats between root walls: wade slowly (no jumping) or balance along the fallen log.
+	_box("MudWallL", Vector3(1.2, 3.0, 16), Vector3(-4.6, 1.2, -15), "dark_wood")
+	_box("MudWallR", Vector3(1.2, 3.0, 16), Vector3(4.6, 1.2, -15), "dark_wood")
+	var mud := Area3D.new()
+	mud.name = "MudFlats"
+	mud.set_script(load("res://scripts/world/hazards/surface_zone.gd"))
+	mud.set("speed_multiplier", 0.45)
+	mud.set("blocks_jump", true)
+	var mc := CollisionShape3D.new()
+	mc.shape = _box_shape(Vector3(6.2, 0.9, 14.0))
+	mud.add_child(mc)
+	mud.position = Vector3(-0.7, 0.0, -15)
+	var mud_quad := MeshInstance3D.new()
+	mud_quad.name = "Surface"
+	var mp := PlaneMesh.new()
+	mp.size = Vector2(6.2, 14.0)
+	mp.material = load(MAT + "mud.tres")
+	mud_quad.mesh = mp
+	mud_quad.position.y = 0.04
+	mud_quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mud.add_child(mud_quad)
+	hazards.add_child(mud)
+	_box("FallenLog", Vector3(0.9, 0.6, 17), Vector3(3.1, 0.3, -15), "dark_wood")
+	# 2) Stream with a current pushing east, toward a poison pool downstream.
+	var stream := Area3D.new()
+	stream.name = "StreamCurrent"
+	stream.set_script(load("res://scripts/world/hazards/surface_zone.gd"))
+	stream.set("speed_multiplier", 0.8)
+	stream.set("current", Vector3(2.2, 0, 0))
+	var sc := CollisionShape3D.new()
+	sc.shape = _box_shape(Vector3(60, 1.6, 5.0))
+	stream.add_child(sc)
+	stream.position = Vector3(0, -0.2, -33)
+	hazards.add_child(stream)
+	_poison_pool("PoisonPoolStream", Vector3(9.5, 0.1, -33), 2.6, hazards)
+	# 3) Fog bank: the world closes in; spirit lanterns mark the safe line on the right,
+	#    a poison pool hides on the left.
+	var fog := Area3D.new()
+	fog.name = "FogBank"
+	fog.set_script(load("res://scripts/world/hazards/fog_zone.gd"))
+	fog.set("environment_path", NodePath("../../WorldEnvironment"))
+	var fc := CollisionShape3D.new()
+	fc.shape = _box_shape(Vector3(40, 8, 11))
+	fog.add_child(fc)
+	fog.position = Vector3(0, 2, -43.5)
+	hazards.add_child(fog)
+	for i in 4:
+		_spirit_lantern("SpiritLantern%d" % i, Vector3(2.6, 0, -38.0 - 3.3 * i), hazards)
+	_poison_pool("PoisonPoolFog", Vector3(-2.6, 0.1, -44.0), 2.0, hazards)
+	_poison_pool("PoisonPoolHollow", Vector3(-16.0, 0.1, -20.0), 2.4, hazards)
+	# 4) Deep bog: sinking reed rafts (they sink under your weight), then the root-wall far bank.
+	var raft_scene: PackedScene = load("res://scenes/world/sinking_raft.tscn")
+	var zs := [-53.5, -58.0, -62.5, -67.0]
+	for i in zs.size():
+		var rf: Node3D = raft_scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		rf.name = "SinkingRaft%d" % i
+		rf.position = Vector3(0, 0, zs[i])
+		hazards.add_child(rf)
+	var bog := Area3D.new()
+	bog.name = "DeepBog"
+	bog.set_script(load("res://scripts/world/hazards/lava_zone.gd"))
+	bog.set("damage", 20.0)
+	bog.set("element", &"water")
+	bog.set("attack_name", &"drowned")
+	var bcol := CollisionShape3D.new()
+	bcol.shape = _box_shape(Vector3(160, 6, 20.6))
+	bog.add_child(bcol)
+	bog.position = Vector3(0, -4.2, -60.5)
+	hazards.add_child(bog)
+	var wall := _box("FarBankWall", Vector3(30, 22.3, 3), Vector3(0, -8.85, -72.5), "climb_stone")
+	wall.collision_layer = 1 | 4
+
+	# Gate + arena (same layout as the other biomes).
+	_box("GatePillarL", Vector3(1.6, 8, 1.6), Vector3(-4.2, 4, -94), "gate_stone")
+	_box("GatePillarR", Vector3(1.6, 8, 1.6), Vector3(4.2, 4, -94), "gate_stone")
+	_box("GateLintel", Vector3(11, 1.4, 2.0), Vector3(0, 8.5, -94), "gate_stone")
+	_box("ArenaWallL", Vector3(40, 8, 1.5), Vector3(-25.0, 2, -94), "stone")
+	_box("ArenaWallR", Vector3(40, 8, 1.5), Vector3(25.0, 2, -94), "stone")
+	var trigger := Area3D.new()
+	trigger.name = "BossArenaTrigger"
+	trigger.set_script(load("res://scripts/world/boss_arena_trigger.gd"))
+	var tcol := CollisionShape3D.new()
+	tcol.shape = _box_shape(Vector3(160, 80, 54))
+	trigger.add_child(tcol)
+	trigger.position = Vector3(0, 10, -123)
+	_root.add_child(trigger)
+	for i in 10:
+		var ang := TAU * float(i) / 10.0 + PI / 10.0
+		if absf(wrapf(ang - PI / 2.0, -PI, PI)) < 0.5:
+			continue
+		var p := Vector3(cos(ang) * 17.0, 0, -120.0 + sin(ang) * 17.0)
+		var c := CSGCylinder3D.new()
+		c.name = "ArenaPillar%d" % i
+		c.radius = 1.0
+		c.height = 8.0
+		c.sides = 7
+		c.position = p + Vector3.UP * 4.0
+		c.use_collision = true
+		c.collision_mask = 0
+		c.material = load(MAT + "stone.tres")
+		geo.add_child(c)
+	var marker := Marker3D.new()
+	marker.name = "ArenaGateMarker"
+	marker.position = Vector3(0, 0, -94)
+	_root.add_child(marker)
+	_omni("ArenaGlow", Vector3(0, 5, -120), Color(0.55, 0.4, 1.0), 2.5, 24.0)
+	_omni("GateGlow", Vector3(0, 4, -91), Color(0.45, 0.85, 1.0), 2.0, 14.0)
+	var boss: Node3D = (load("res://scenes/bosses/nami.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	boss.name = "Boss"
+	boss.position = Vector3(0, 0.05, -121)
+	boss.rotation.y = PI
+	_root.add_child(boss)
+
+	# Enemies, gatherables, lore.
+	var enemies := Node3D.new()
+	enemies.name = "Enemies"
+	_root.add_child(enemies)
+	for spec in [["ThornlingA", Vector3(-20, 0.2, -16)], ["ThornlingB", Vector3(-22, 0.2, -24)]]:
+		var e: Node3D = (load("res://scenes/enemies/thornling.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		e.name = spec[0]
+		e.position = spec[1]
+		enemies.add_child(e)
+	var gather := Node3D.new()
+	gather.name = "Gatherables"
+	_root.add_child(gather)
+	var spots := [
+		["spirit_moss", Vector3(3.1, 0.65, -22.5), false],  # End of the fallen log
+		["spirit_moss", Vector3(-3.0, 0, -12), true],       # In the mud (slow to reach)
+		["spirit_moss", Vector3(7.0, 0, -36.5), true],      # Downstream, beside the poison
+		["spirit_moss", Vector3(-19, 0, -21), true],        # Thornling hollow
+		["spirit_moss", Vector3(-7.0, 0, -84), true],
+		["ruin_shard", Vector3(4.5, 0, -46), true], ["ruin_shard", Vector3(-9.5, 0, -6), true],
+		["glowcap", Vector3(-12.5, 0, -40), true], ["glowcap", Vector3(8.0, 0, -82), true],
+	]
+	for i in spots.size():
+		var spot: Array = spots[i]
+		var pk: Node3D = (load("res://scenes/world/pickup_%s.tscn" % spot[0]) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		pk.name = "%s_%d" % [spot[0], i]
+		pk.position = spot[1]
+		pk.set("snap_to_ground", spot[2])
+		gather.add_child(pk)
+	var ls: Node3D = (load("res://scenes/world/lore_stone.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	ls.name = "LoreStone0"
+	ls.set("title", "The Lantern Serpent")
+	ls.set("text", "Do not follow the light over the water. Nami's lantern has drowned more hunters than its jaws. The old dojo forged storm-charms against it; water only feeds it. Cut the lantern down when it bows to strike.")
+	ls.position = Vector3(6.5, 0, -82)
+	gather.add_child(ls)
+	_pack(_root, "res://scenes/biomes/moonfen.tscn")
+
+
+func _moonfen_unlock() -> void:
+	var b: BiomeDefinition = load("res://data/biomes/biome_moonfen.tres")
+	b.hunts = [load("res://data/hunts/nami.tres")] as Array[HuntDefinition]
+	b.unlocked = true
+	b.requires_hunt = &"ashen_oni_tortoise"
+	b.expedition_scene = "res://scenes/main/expedition_moonfen.tscn"
+	b.locked_note = "defeat the Ashen Oni-Tortoise to unlock"
+	_save(b, "res://data/biomes/biome_moonfen.tres")
 	var board: PackedScene = load("res://scenes/ui/hunt_board.tscn")
 	var inst := board.instantiate()
 	var items: Array[ItemDefinition] = (load("res://data/crafting/catalog.tres") as CraftingCatalog).items

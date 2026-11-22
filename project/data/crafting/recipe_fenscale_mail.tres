@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_exmvd"]
+[ext_resource type="Resource" path="res://data/items/nami_scale.tres" id="2_fpeyb"]
+[ext_resource type="Resource" path="res://data/items/spirit_moss.tres" id="3_o6gwc"]
+[ext_resource type="Resource" path="res://data/gear/fenscale_mail.tres" id="4_q143i"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_nmosv"]
+
+[resource]
+script = ExtResource("5_nmosv")
+id = &"fenscale_mail"
+result = ExtResource("4_q143i")
+inputs = Array[ExtResource("1_exmvd")]([ExtResource("2_fpeyb"), ExtResource("3_o6gwc")])
+counts = PackedInt32Array(1, 2)

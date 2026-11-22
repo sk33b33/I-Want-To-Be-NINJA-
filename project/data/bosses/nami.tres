@@ -1,0 +1,133 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_oshdt"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="2_63xoc"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/spirit_spout.tscn" id="2_kukep"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="3_kukep"]
+[ext_resource type="Resource" path="res://data/items/lantern_pearl.tres" id="4_nj1aa"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="5_qh0yw"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="6_va1pr"]
+[ext_resource type="Resource" path="res://data/items/nami_scale.tres" id="7_5y7qc"]
+
+[sub_resource type="Resource" id="Resource_ha1vo"]
+script = ExtResource("1_oshdt")
+id = &"flood_wave"
+hitbox_node = NodePath("Front/FloodHitbox")
+warning_node = NodePath("Front/FloodWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.4
+glow = 1
+element = &"water"
+weakened_by_part = &"lantern"
+display_name = "Flood Wave"
+telegraph_time = 1.2
+active_time = 0.45
+recovery_time = 1.3
+damage = 26.0
+knockback = 11.0
+max_range = 11.0
+weight = 3.0
+cooldown = 4.0
+counterplay = "It rears up and the strip in front of it floods pink: step sideways out of the strip, or roll through it late."
+
+[sub_resource type="Resource" id="Resource_0tiwq"]
+script = ExtResource("1_oshdt")
+id = &"lantern_lure"
+kind = 2
+eruption_scene = ExtResource("2_kukep")
+eruption_offsets = PackedVector3Array(0, 0, 0, 2.8, 0, 1.6, -2.8, 0, 1.6, 0, 0, -3)
+telegraph_pitch = 0.1
+glow = 2
+element = &"water"
+display_name = "Lantern Lure"
+telegraph_time = 1.4
+active_time = 0.5
+knockback = 5.0
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "Its lantern flares and violet circles open under you: keep moving and get out before the spirits rise."
+
+[sub_resource type="Resource" id="Resource_hkcmw"]
+script = ExtResource("1_oshdt")
+id = &"dive_strike"
+kind = 1
+hitbox_node = NodePath("Front/DiveHitbox")
+warning_node = NodePath("Front/DiveWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.2
+telegraph_wobble = 0.06
+dash_homing = 0.6
+stuns_on_wall = true
+stun_time = 2.8
+element = &"water"
+display_name = "Dive Strike"
+active_time = 1.1
+recovery_time = 1.4
+damage = 28.0
+knockback = 12.0
+move_speed = 13.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It coils back and lunges along the line: roll sideways late; it stuns itself on the stone pillars."
+
+[sub_resource type="Resource" id="Resource_2vv1e"]
+script = ExtResource("1_oshdt")
+id = &"spirit_rain"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.25
+glow = 1
+tracks_player = false
+element = &"water"
+display_name = "Spirit Rain"
+telegraph_time = 1.2
+active_time = 0.5
+damage = 22.0
+knockback = 8.0
+max_range = 7.0
+weight = 2.0
+cooldown = 7.0
+enraged_only = true
+counterplay = "Enraged: the ring around it glows; get out before the spirit rain falls."
+
+[sub_resource type="Resource" id="Resource_ao8ve"]
+script = ExtResource("2_63xoc")
+affinity = &"water"
+multipliers = {
+&"fire": 0.5,
+&"lightning": 1.5,
+&"water": 0.5
+}
+
+[sub_resource type="Resource" id="Resource_182aj"]
+script = ExtResource("3_kukep")
+id = &"lantern"
+display_name = "Lantern"
+break_health = 220.0
+reward = ExtResource("4_nj1aa")
+break_stagger_time = 2.4
+intact_node = NodePath("Visual/Lantern")
+broken_node = NodePath("Visual/LanternStub")
+
+[resource]
+script = ExtResource("5_qh0yw")
+id = &"nami"
+display_name = "Nami, the Lantern Serpent"
+max_health = 1000.0
+poise = 130.0
+stagger_time = 1.5
+elements = SubResource("Resource_ao8ve")
+attacks = Array[ExtResource("1_oshdt")]([SubResource("Resource_ha1vo"), SubResource("Resource_0tiwq"), SubResource("Resource_hkcmw"), SubResource("Resource_2vv1e")])
+parts = Array[ExtResource("3_kukep")]([SubResource("Resource_182aj")])
+victory_rewards = Array[ExtResource("6_va1pr")]([ExtResource("7_5y7qc")])
+turn_sharpness = 3.5
+stalk_distance = 5.5
+attack_interval = 1.3
+head_down_pitch = -0.45
+lock_offset = Vector3(0, 2.8, -2.6)

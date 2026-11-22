@@ -42,6 +42,10 @@ Checkpoint shrines light up (red → teal) as you pass and heal you the first ti
 In the dojo, switch between **Hunt board** and **Forge** with the buttons at the top (mouse, touch, or gamepad focus + A). Forge needs the listed materials; Equip puts owned gear on.
 Walk over glowing pickups (Glowcap, Ruin Shard) to gather them; walk up to a lore stone to read it. The arrow under the timer points to the arena.
 
+Pause menu options (saved between sessions): **Screen shake** On/Off, **Bold attack warnings** On/Off (brighter warning zones with thicker rims).
+
+Moonfen: mud slows you and you cannot jump while in it; a stream current pushes you sideways; green-rimmed pools are poison; in the fog bank follow the cyan spirit lanterns; reed rafts sink while you stand on them — keep moving.
+
 Notes:
 - Mouse look: click the game window to capture the mouse; Esc releases it. Mouse wheel zooms in top-down mode.
 - Touch controls appear automatically on touchscreens. To test them on a PC, run with `-- --touch` (mouse emulates touch).

@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/mist_card.gdshader" id="1_y476u"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_mist.tres" id="2_yrt46"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_y476u")
+shader_parameter/mist_noise = ExtResource("2_yrt46")
+shader_parameter/color = Color(0.32, 0.28, 0.45, 1)
+shader_parameter/opacity = 0.34
+shader_parameter/near_fade = null

@@ -2,7 +2,7 @@
 
 A 3D jungle ninja hunting adventure for **Android phones and PC**, built in Godot 4.5.
 
-**Status:** Phases 0–8 built: two jungles — the gloomy Verdant Canopy (Kurogale, the Thornback Stag) and volcanic Emberwild (the Ashen Oni-Tortoise) — with 45:00 expeditions, traversal, twin-blade combat, hazards, breakable boss parts, and a dojo forge. Human playtests pending. See `docs/PHASES.md`.
+**Status:** Phases 0–9 built: three jungles — the gloomy Verdant Canopy (Kurogale, the Thornback Stag), volcanic Emberwild (the Ashen Oni-Tortoise) and the violet swamp Moonfen (Nami, the Lantern Serpent) — with 45:00 expeditions, traversal, twin-blade combat, hazards, breakable boss parts, and a dojo forge. Human playtests pending. See `docs/PHASES.md`.
 
 ![Verdant Canopy](docs/screenshots/01_spawn_idle.png)
 

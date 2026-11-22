@@ -24,6 +24,9 @@ var _last_safe_position: Vector3
 var _was_on_floor: bool = false
 var _checkpoint: Transform3D
 var _has_checkpoint: bool = false
+## Active SurfaceZones. Typed as Area3D on purpose: SurfaceZone references PlayerController,
+## and a two-way script type reference is a cycle Godot cannot free at exit.
+var _surface_zones: Array[Area3D] = []
 
 @onready var _visual: Node3D = $Visual
 @onready var traversal: TraversalComponent = get_node_or_null("Traversal") as TraversalComponent
@@ -166,6 +169,38 @@ func clear_air_timers() -> void:
 	_jump_buffer_timer = 0.0
 
 
+## SurfaceZones (mud, poison, currents) register themselves while the player stands in them.
+func add_surface_zone(zone: Area3D) -> void:
+	if not _surface_zones.has(zone):
+		_surface_zones.append(zone)
+
+
+func remove_surface_zone(zone: Area3D) -> void:
+	_surface_zones.erase(zone)
+
+
+## Slowest active zone wins (standing on mud and in poison does not stack the slow).
+func surface_speed_multiplier() -> float:
+	var m := 1.0
+	for z in _surface_zones:
+		m = minf(m, float(z.get("speed_multiplier")))
+	return m
+
+
+func surface_blocks_jump() -> bool:
+	for z in _surface_zones:
+		if z.get("blocks_jump"):
+			return true
+	return false
+
+
+func surface_current() -> Vector3:
+	var c := Vector3.ZERO
+	for z in _surface_zones:
+		c += z.get("current") as Vector3
+	return c
+
+
 func get_horizontal_speed() -> float:
 	return Vector2(velocity.x, velocity.z).length()
 
@@ -180,14 +215,17 @@ func _input_to_world(input: Vector2) -> Vector3:
 func _update_horizontal(wish: Vector3, on_floor: bool, delta: float) -> void:
 	var has_input := wish.length_squared() > 0.0001
 	var top_speed := config.sprint_speed if Input.is_action_pressed("sprint") else config.run_speed
+	top_speed *= surface_speed_multiplier()
+	var drift := surface_current()
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 
 	if on_floor:
 		var accel := config.ground_acceleration if has_input else config.ground_deceleration
-		horizontal = horizontal.move_toward(wish * top_speed, accel * delta)
-	elif has_input:
+		# A current moves the target velocity, so standing still in a stream drifts with it.
+		horizontal = horizontal.move_toward(wish * top_speed + drift, accel * delta)
+	elif has_input or drift != Vector3.ZERO:
 		# Airborne steering; with no input the ninja keeps momentum.
-		horizontal = horizontal.move_toward(wish * top_speed, config.air_acceleration * delta)
+		horizontal = horizontal.move_toward(wish * top_speed + drift, config.air_acceleration * delta)
 
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
@@ -205,7 +243,7 @@ func _update_vertical(on_floor: bool, delta: float) -> void:
 		_coyote_timer -= delta
 	_jump_buffer_timer -= delta
 
-	if _jump_buffer_timer > 0.0 and _coyote_timer > 0.0:
+	if _jump_buffer_timer > 0.0 and _coyote_timer > 0.0 and not surface_blocks_jump():
 		velocity.y = config.jump_velocity
 		_jump_buffer_timer = 0.0
 		_coyote_timer = 0.0  # No double jump from coyote time.

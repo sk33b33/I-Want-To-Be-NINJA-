@@ -165,3 +165,33 @@ static func run_route_emberwild(tc: TestCase, player: PlayerController, level: N
 			return true
 	release_moves()
 	return false
+
+
+## Moonfen route: wades straight through the mud (no jumping there), crosses the stream against
+## its current, follows the spirit lanterns through the fog (away from the hidden poison), then
+## keeps moving raft to raft across the deep bog — rafts sink under you, so it never waits — and
+## climbs the root wall of the far bank.
+static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: float) -> bool:
+	if not await _walk_to_z(tc, player, -24.0, -0.5, 1200):  # Mud flats (slow).
+		return false
+	if not await _walk_to_z(tc, player, -37.0, 0.0):  # Stream; steering fights the drift.
+		return false
+	if not await _walk_to_z(tc, player, -48.6, 1.6):  # Fog bank, lantern side.
+		return false
+	var jump_at: Array[float] = [-49.3, -54.6, -59.1, -63.6, -68.1]
+	var next_jump := 0
+	tc.press("move_forward")
+	for i in 1500:
+		await tc.tree.physics_frame
+		_steer(player, 0.0)
+		var z := player.global_position.z
+		if next_jump < jump_at.size() and z < jump_at[next_jump] and player.is_on_floor():
+			tc.press("jump")
+			await tc.physics_frames(12)
+			tc.release("jump")
+			next_jump += 1
+		if z < stop_z:
+			release_moves()
+			return true
+	release_moves()
+	return false

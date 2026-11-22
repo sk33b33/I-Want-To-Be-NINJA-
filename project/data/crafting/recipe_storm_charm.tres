@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_u6bj0"]
+[ext_resource type="Resource" path="res://data/items/ember_crystal.tres" id="2_tauuj"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="3_plsbs"]
+[ext_resource type="Resource" path="res://data/gear/storm_charm.tres" id="4_67til"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_m3xf3"]
+
+[resource]
+script = ExtResource("5_m3xf3")
+id = &"storm_charm"
+result = ExtResource("4_67til")
+inputs = Array[ExtResource("1_u6bj0")]([ExtResource("2_tauuj"), ExtResource("3_plsbs")])
+counts = PackedInt32Array(3, 1)

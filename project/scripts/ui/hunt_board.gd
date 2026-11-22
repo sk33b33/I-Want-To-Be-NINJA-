@@ -23,6 +23,7 @@ var _tab_forge: Button
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	GameSettings.ensure_loaded()  # Applies saved readability options to the warning materials.
 	_build()
 
 

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_sdsn6"]
+
+[resource]
+script = ExtResource("1_sdsn6")
+id = &"spirit_moss"
+display_name = "Spirit Moss"
+description = "Fen moss that keeps a little moonlight in it after it is picked."
+color = Color(0.55, 0.45, 1, 1)

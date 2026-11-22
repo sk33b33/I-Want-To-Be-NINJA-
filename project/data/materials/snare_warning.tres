@@ -6,3 +6,4 @@
 render_priority = 0
 shader = ExtResource("1_p8ah2")
 shader_parameter/color = Color(0.3, 1, 0.35, 1)
+shader_parameter/boost = null

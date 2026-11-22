@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=4]
+
+[ext_resource type="Script" path="res://scripts/world/hazards/sinking_raft.gd" id="1_7kf1y"]
+[ext_resource type="Material" path="res://data/materials/reed.tres" id="2_ihuot"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yam6e"]
+size = Vector3(3, 0.5, 3)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_l6kin"]
+_surfaces = [{
+"aabb": AABB(-1.5051023, -0.33216432, -1.4533602, 2.9599733, 1.2992573, 2.906934),
+"attribute_data": PackedByteArray("////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"),
+"format": 34359742479,
+"index_count": 396,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAQAEAAUAAQAFAAIABAAGAAcABAAHAAUABgAIAAkABgAJAAcACAAKAAsACAALAAkACgAAAAMACgADAAsADAANAA4ADAAOAA8ADQAQABEADQARAA4AEAASABMAEAATABEAEgAUABUAEgAVABMAFAAWABcAFAAXABUAFgAMAA8AFgAPABcAGAAZABoAGAAaABsAGQAcAB0AGQAdABoAHAAeAB8AHAAfAB0AHgAgACEAHgAhAB8AIAAiACMAIAAjACEAIgAYABsAIgAbACMAJAAlACYAJAAmACcAJQAoACkAJQApACYAKAAqACsAKAArACkAKgAsAC0AKgAtACsALAAuAC8ALAAvAC0ALgAkACcALgAnAC8AMAAxADIAMAAyADMAMQA0ADUAMQA1ADIANAA2ADcANAA3ADUANgA4ADkANgA5ADcAOAA6ADsAOAA7ADkAOgAwADMAOgAzADsAPAA9AD4APAA+AD8APQBAAEEAPQBBAD4AQABCAEMAQABDAEEAQgBEAEUAQgBFAEMARABGAEcARABHAEUARgA8AD8ARgA/AEcASABJAEoASABKAEsASQBMAE0ASQBNAEoATABOAE8ATABPAE0ATgBQAFEATgBRAE8AUABSAFMAUABTAFEAUgBIAEsAUgBLAFMAVABVAFYAVABWAFcAVQBYAFkAVQBZAFYAWABaAFsAWABbAFkAWgBUAFcAWgBXAFsAXABdAF4AXABeAF8AXQBgAGEAXQBhAF4AYABiAGMAYABjAGEAYgBcAF8AYgBfAGMAZABlAGYAZABmAGcAZQBoAGkAZQBpAGYAaABqAGsAaABrAGkAagBkAGcAagBnAGsAbABtAG4AbABuAG8AbQBwAHEAbQBxAG4AcAByAHMAcABzAHEAcgBsAG8AcgBvAHMAdAB1AHYAdAB2AHcAdQB4AHkAdQB5AHYAeAB6AHsAeAB7AHkAegB0AHcAegB3AHsAfAB9AH4AfAB+AH8AfQCAAIEAfQCBAH4AgACCAIMAgACDAIEAggB8AH8AggB/AIMA"),
+"material": ExtResource("2_ihuot"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 132,
+"vertex_data": PackedByteArray("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")
+}]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1nb6i"]
+size = Vector3(2.8, 0.6, 2.8)
+
+[node name="SinkingRaft" type="AnimatableBody3D"]
+script = ExtResource("1_7kf1y")
+
+[node name="@CollisionShape3D@41" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("BoxShape3D_yam6e")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_l6kin")
+
+[node name="Trigger" type="Area3D" parent="."]
+
+[node name="@CollisionShape3D@42" type="CollisionShape3D" parent="Trigger"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("BoxShape3D_1nb6i")

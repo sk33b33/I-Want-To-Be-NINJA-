@@ -39,10 +39,11 @@ You are the lead game-development assistant for **I want to be NINJA**, a 3D jun
 - Tunable values live in `project/data/**.tres` Resources (`PlayerMovementConfig`, `CameraRigConfig`).
 - Physics layers: 1 = world, 2 = player, 3 = climbable (put climbable walls on layers 1 + 3 and use `climb_stone.tres` so players can see them).
 - Expedition flow (Phase 3): game boots to `scenes/ui/hunt_board.tscn`; `SceneFlow` injects the chosen `HuntDefinition` into the expedition scene's `Expedition` node (`ExpeditionManager`). Countdown logic is the pure `ExpeditionTimer`; rules in `data/expedition/default_expedition.tres` (never below 45:00 — a test enforces it). Test-only shorter timer: `-- --expedition-seconds=N`.
+- Combat (Phase 4): `PlayerCombat` (+ `HealthComponent`, `Hitbox`/`Hurtbox`, `DamageInfo`); attacks are `AttackDefinition` resources slicing `Dual_Weapon_Combo`; enemies in `scripts/enemies/` (`Thornling`, `TrainingDummy`), lock-on via group `lock_targets`. Physics layers 4 = enemy, 5 = hitbox, 6 = hurtbox.
 - Traversal lives in `TraversalComponent` (tuning: `data/player/traversal.tres`); checkpoints are `scenes/world/checkpoint.tscn`.
 - World is procedural: `BiomeTerrain` (heightmap + collision), `FloraScatter`, `FaunaSpawner`, `BiomeAtmosphere`, driven by `project/data/biomes/*.tres`. Shaders in `project/shaders/` must stay `gl_compatibility`-safe (no screen/depth texture reads).
 - `QualityProfile.is_low()` = phone tier (auto on Android, `-- --low-quality` on PC). New heavy features must scale down on LOW.
-- Player model: `project/assets/models/ninja/ninja.glb` (Mixamo). Clip mapping in `data/player/ninja_animations.tres`. It has **no Idle clip** (a pose is generated); Roll/Combo/Death clips are reserved for Phase 4.
+- Player model: `project/assets/models/ninja/ninja.glb` (Mixamo). Clip mapping in `data/player/ninja_animations.tres`. It has **no Idle clip** (a pose is generated). Combo = attacks, Quick_Roll_To_Run = dodge, Death_Backward = hurt/death. Blades are attached at runtime by `WeaponMount`.
 - Scenes were produced by `tools/generate_phase1_scaffold.gd` then `tools/generate_visual_pass.gd`; re-running a generator overwrites hand edits.
 - Concept art for the four jungles is in `docs/concept-art/` (reference only, not in-game assets):
   `verdant_canopy.jpg`, `emberwild.jpg`, `moonfen.jpg`, `stormcrag.jpg`.

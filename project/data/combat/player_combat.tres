@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PlayerCombatConfig" load_steps=7 format=3]
+
+[ext_resource type="Resource" path="res://data/combat/attack_heavy.tres" id="1_mevfo"]
+[ext_resource type="Script" path="res://scripts/combat/attack_definition.gd" id="2_rfkjf"]
+[ext_resource type="Resource" path="res://data/combat/attack_light_1.tres" id="3_yvmbd"]
+[ext_resource type="Resource" path="res://data/combat/attack_light_2.tres" id="4_wy7e8"]
+[ext_resource type="Resource" path="res://data/combat/attack_light_3.tres" id="5_1pumi"]
+[ext_resource type="Script" path="res://scripts/combat/player_combat_config.gd" id="6_ku1qa"]
+
+[resource]
+script = ExtResource("6_ku1qa")
+light_combo = Array[ExtResource("2_rfkjf")]([ExtResource("3_yvmbd"), ExtResource("4_wy7e8"), ExtResource("5_1pumi")])
+heavy = ExtResource("1_mevfo")

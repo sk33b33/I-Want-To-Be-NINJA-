@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/health_bar.gdshader" id="1_ccu3r"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ccu3r")
+shader_parameter/fill_color = null
+shader_parameter/back_color = null

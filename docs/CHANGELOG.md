@@ -43,3 +43,13 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Chosen hunt is injected into the expedition scene by `SceneFlow` (no global state singleton).
 - Debug overlay moved to bottom centre so it never covers the timer.
 - Tests: 57 (was 42).
+
+## 2026-11-22 — Phase 4: combat foundation
+- Combat building blocks: `HealthComponent`, `DamageInfo`, `Hitbox` (layer 5) / `Hurtbox` (layer 6) with teams; attacks are data (`data/combat/attack_*.tres`) slicing the owner's Mixamo clips at measured strike times.
+- `PlayerCombat`: 3-hit light combo, heavy attack, dodge roll with i-frames (keyboard: tap Shift or C), hit-stun with knockback, death (Death_Backward) → respawn at the last shrine with full health (the expedition timer keeps running), lock-on with camera tracking and strafing, hit-stop + light camera shake.
+- Twin procedural blades attached to the ninja's hands at runtime (`WeaponMount`).
+- **Thornling** (original small beast): wander → chase → telegraph (rears up, spines glow red, chevron ground strip) → lunge → punishable recovery; poise/stagger; leash; health bar; two live in a hollow west of the tunnel.
+- **Training dummy** at the spawn clearing (never dies, shows damage).
+- Feedback: pooled sparks + damage numbers (`CombatFx`), player health bar with damage trail, red hurt flash, "Defeated" message, lock-on reticle.
+- Touch controls: ATK / HVY / ROLL / LOCK buttons; CAM moved to the top-right.
+- Tests: 16 new combat tests incl. two gate bots.

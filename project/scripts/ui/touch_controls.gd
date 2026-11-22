@@ -21,9 +21,15 @@ signal look_dragged(relative: Vector2)
 const MOVE_ACTIONS := ["move_left", "move_right", "move_forward", "move_back"]
 
 var _buttons: Array[Dictionary] = [
-	{"action": "jump", "label": "JUMP", "anchor": Vector2(-2.0, -2.0), "scale": 1.35, "touch": -1},
-	{"action": "sprint", "label": "DASH", "anchor": Vector2(-4.8, -1.5), "scale": 1.0, "touch": -1},
-	{"action": "camera_toggle", "label": "CAM", "anchor": Vector2(-1.6, -4.7), "scale": 0.8, "touch": -1},
+	# Bottom-right combat cluster (anchors in button-radius units from the bottom-right corner).
+	{"action": "attack_light", "label": "ATK", "anchor": Vector2(-2.0, -2.0), "scale": 1.35, "touch": -1},
+	{"action": "attack_heavy", "label": "HVY", "anchor": Vector2(-4.9, -1.5), "scale": 1.0, "touch": -1},
+	{"action": "jump", "label": "JUMP", "anchor": Vector2(-1.7, -5.2), "scale": 1.05, "touch": -1},
+	{"action": "dodge", "label": "ROLL", "anchor": Vector2(-4.6, -4.2), "scale": 0.95, "touch": -1},
+	{"action": "sprint", "label": "DASH", "anchor": Vector2(-7.5, -2.7), "scale": 0.85, "touch": -1},
+	{"action": "lock_on", "label": "LOCK", "anchor": Vector2(-1.4, -7.9), "scale": 0.75, "touch": -1},
+	# Top-right system buttons.
+	{"action": "camera_toggle", "label": "CAM", "anchor": Vector2(-3.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 	{"action": "pause", "label": "II", "anchor": Vector2(-1.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 ]
 

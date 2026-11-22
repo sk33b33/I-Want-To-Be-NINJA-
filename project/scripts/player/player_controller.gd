@@ -27,11 +27,15 @@ var _has_checkpoint: bool = false
 
 @onready var _visual: Node3D = $Visual
 @onready var traversal: TraversalComponent = get_node_or_null("Traversal") as TraversalComponent
+@onready var combat: PlayerCombat = get_node_or_null("Combat") as PlayerCombat
 
 
 func _ready() -> void:
 	add_to_group("player")
 	_camera_rig = get_node_or_null(camera_rig_path) as CameraRig
+	if combat and _camera_rig:
+		combat.lock_target_changed.connect(func(t: Node3D) -> void:
+			_camera_rig.set_lock_target(t, combat.get_lock_point))
 	_last_safe_position = global_position
 
 
@@ -48,14 +52,26 @@ func _physics_process(delta: float) -> void:
 		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var wish := _input_to_world(input)
 
+	# Combat actions in progress (attack, dodge, hurt, death) take priority over everything.
+	if combat and combat.is_busy():
+		if traversal and traversal.state != TraversalComponent.State.NONE:
+			traversal.reset()
+		combat.physics_update(delta, input, wish)
+		_after_move(delta)
+		return
 	if traversal and traversal.physics_update(delta, input, wish):
 		_was_on_floor = false
+		_after_move(delta)
+		return
+	if combat and combat.physics_update(delta, input, wish):
 		_after_move(delta)
 		return
 
 	_update_horizontal(wish, on_floor, delta)
 	_update_vertical(on_floor, delta)
 	move_and_slide()
+	if combat and combat.lock_target:
+		face_direction(combat.get_lock_point() - global_position)  # Strafe around the target.
 	_after_move(delta)
 
 
@@ -111,6 +127,23 @@ func face_direction(dir: Vector3) -> void:
 	var flat := Vector3(dir.x, 0.0, dir.z)
 	if flat.length() > 0.001:
 		_visual.rotation.y = atan2(-flat.x, -flat.z)
+
+
+## Current facing of the body visual (flat, unit length).
+func get_facing() -> Vector3:
+	var f := -_visual.global_basis.z
+	f.y = 0.0
+	return f.normalized() if f.length() > 0.001 else Vector3.FORWARD
+
+
+## Yaw-only camera basis (identity without a camera rig).
+func get_camera_basis() -> Basis:
+	return _camera_rig.get_yaw_basis() if _camera_rig else Basis.IDENTITY
+
+
+func shake_camera(trauma: float) -> void:
+	if _camera_rig:
+		_camera_rig.add_shake(trauma)
 
 
 ## Returns true once per buffered jump press, consuming it (used by traversal).

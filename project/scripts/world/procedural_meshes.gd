@@ -421,3 +421,91 @@ static func eye_pair(material: Material) -> ArrayMesh:
 	for sgn in [-1.0, 1.0]:
 		_blob(st, Vector3(0.11 * sgn, 0, 0), Vector3(0.05, 0.028, 0.02), rng, eye, eye, 3, 6, 0.0)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- combat (Phase 4)
+
+## Thornling: squat thorn-backed beast, ~0.9 m tall, facing -Z. Spines tagged COLOR.g = 1
+## (they glow during the attack telegraph), eyes COLOR.a = 1.
+static func thornling(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 21
+	var body := Color(0, 0, 0, 0)
+	var spine := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	# Body and head.
+	_blob(st, Vector3(0, 0.5, 0.05), Vector3(0.42, 0.34, 0.62), rng, body, body, 5, 9, 0.1)
+	_blob(st, Vector3(0, 0.52, -0.6), Vector3(0.26, 0.22, 0.3), rng, body, body, 4, 8, 0.08)
+	# Tusks.
+	for sgn in [-1.0, 1.0]:
+		var base := Vector3(0.12 * sgn, 0.42, -0.82)
+		_tri(st, base, base + Vector3(0.04 * sgn, 0.0, 0.04), base + Vector3(0.06 * sgn, 0.16, -0.12), body, body, body)
+		_blob(st, Vector3(0.11 * sgn, 0.6, -0.84), Vector3(0.035, 0.03, 0.02), rng, eye, eye, 2, 5, 0.0)
+	# Legs.
+	for lx in [-0.26, 0.26]:
+		for lz in [-0.3, 0.35]:
+			_tube(st, PackedVector3Array([Vector3(lx, 0.35, lz), Vector3(lx * 1.1, 0.0, lz)]),
+					PackedFloat32Array([0.09, 0.06]), PackedColorArray([body, body]), 5, rng)
+	# Back spines in rows (the readable silhouette + telegraph glow).
+	for i in 9:
+		var z := lerpf(-0.45, 0.55, float(i) / 8.0)
+		for sgn in [-1.0, 0.0, 1.0]:
+			if sgn != 0.0 and i % 2 == 1:
+				continue
+			var base := Vector3(0.14 * sgn, 0.78 - absf(z) * 0.15, z)
+			var h := rng.randf_range(0.25, 0.42) * (1.0 - absf(z) * 0.4)
+			var tip := base + Vector3(0.12 * sgn, h, 0.12)
+			var w := Vector3(0.05, 0, 0)
+			var d := Vector3(0, 0, 0.05)
+			_tri(st, base - w, base + w, tip, spine, spine, spine)
+			_tri(st, base - d, base + d, tip, spine, spine, spine)
+	return _finish(st, null, material)
+
+
+## Training dummy: wooden post with a crossbar and a straw-bound body. Surfaces [wood].
+static func training_dummy(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var wood := Color(0.22, 0.15, 0.09)
+	var straw := Color(0.42, 0.36, 0.2)
+	var rope := Color(0.12, 0.08, 0.05)
+	_tube(st, PackedVector3Array([Vector3(0, 0, 0), Vector3(0, 2.0, 0)]), PackedFloat32Array([0.1, 0.08]),
+			PackedColorArray([wood, wood]), 8, rng)
+	_tube(st, PackedVector3Array([Vector3(-0.55, 1.45, 0), Vector3(0.55, 1.45, 0)]), PackedFloat32Array([0.06, 0.06]),
+			PackedColorArray([wood, wood]), 6, rng)
+	_blob(st, Vector3(0, 1.15, 0), Vector3(0.32, 0.45, 0.25), rng, straw, straw * 0.8, 5, 8, 0.12)
+	_blob(st, Vector3(0, 1.78, 0), Vector3(0.18, 0.2, 0.18), rng, straw, straw * 0.8, 4, 7, 0.1)
+	for y in [0.95, 1.35]:
+		_tube(st, PackedVector3Array([Vector3(-0.001, y, 0), Vector3(0.001, y + 0.06, 0)]), PackedFloat32Array([0.34, 0.34]),
+				PackedColorArray([rope, rope]), 10, rng)
+	return _finish(st, null, material)
+
+
+## Ninja short blade (kodachi) along +Y from the grip at the origin: grip, guard, blade.
+static func ninja_blade(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 9
+	var grip := Color(0.08, 0.06, 0.07)
+	var guard := Color(0.35, 0.3, 0.22)
+	var steel := Color(0.75, 0.8, 0.85)
+	_tube(st, PackedVector3Array([Vector3(0, -0.12, 0), Vector3(0, 0.08, 0)]), PackedFloat32Array([0.018, 0.018]),
+			PackedColorArray([grip, grip]), 6, rng)
+	_blob(st, Vector3(0, 0.09, 0), Vector3(0.045, 0.012, 0.045), rng, guard, guard, 2, 8, 0.0)
+	# Blade: thin, slightly curved, single edge.
+	var segs := 6
+	var length := 0.55
+	for i in segs:
+		var t0 := float(i) / segs
+		var t1 := float(i + 1) / segs
+		var c0 := Vector3(0, 0.1 + length * t0, sin(t0 * 1.4) * 0.04)
+		var c1 := Vector3(0, 0.1 + length * t1, sin(t1 * 1.4) * 0.04)
+		var w0 := 0.022 * (1.0 - t0 * 0.6)
+		var w1 := 0.022 * (1.0 - t1 * 0.6) if i < segs - 1 else 0.0
+		for sgn in [-1.0, 1.0]:
+			var th := Vector3(0.004 * sgn, 0, 0)
+			_quad(st, c0 + th, c1 + th, c1 + Vector3(0, 0, w1) + th * 0.2, c0 + Vector3(0, 0, w0) + th * 0.2,
+					steel, steel, steel, steel)
+	return _finish(st, null, material)

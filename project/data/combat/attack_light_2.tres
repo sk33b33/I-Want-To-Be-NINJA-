@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AttackDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/attack_definition.gd" id="1_y8o8y"]
+
+[resource]
+script = ExtResource("1_y8o8y")
+id = &"light_2"
+clip_start = 1.0
+clip_end = 1.45
+clip_hit = 1.18
+speed = 1.1
+damage = 11.0
+stagger = 8.0
+knockback = 1.5

@@ -32,6 +32,12 @@ extends Resource
 @export var stick_speed_deg: float = 180.0
 @export var invert_y: bool = false
 
+@export_group("Combat")
+## How quickly the camera turns toward a locked-on target.
+@export var lock_camera_sharpness: float = 6.0
+## Maximum camera shake offset in metres at full trauma.
+@export var shake_strength: float = 0.18
+
 @export_group("Smoothing")
 ## How tightly the rig follows the player (higher = tighter).
 @export var follow_sharpness: float = 14.0

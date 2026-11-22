@@ -23,6 +23,10 @@ var _td_distance: float = 0.0
 ## Current blended values (what is actually applied this frame).
 var _pitch: float = 0.0
 var _distance: float = 0.0
+var _lock_target: Node3D
+var _lock_point: Callable
+var _shake: float = 0.0
+var _shake_time: float = 0.0
 
 @onready var _pivot: Node3D = $Pivot
 @onready var _arm: SpringArm3D = $Pivot/SpringArm3D
@@ -70,6 +74,14 @@ func _process(delta: float) -> void:
 	if stick != Vector2.ZERO:
 		add_look_input(stick * deg_to_rad(config.stick_speed_deg) * delta)
 
+	if _lock_target and is_instance_valid(_lock_target):
+		# Turn so the locked target stays ahead of the player.
+		var point: Vector3 = _lock_point.call() if _lock_point.is_valid() else _lock_target.global_position
+		var dir := point - global_position
+		if Vector2(dir.x, dir.z).length() > 0.5:
+			var want := atan2(-dir.x, -dir.z)
+			_yaw = lerp_angle(_yaw, want, 1.0 - exp(-config.lock_camera_sharpness * delta))
+
 	if _target:
 		var follow_weight := 1.0 - exp(-config.follow_sharpness * delta)
 		global_position = global_position.lerp(_target_point(), follow_weight)
@@ -78,6 +90,7 @@ func _process(delta: float) -> void:
 	_pitch = lerpf(_pitch, _target_pitch(), blend_weight)
 	_distance = lerpf(_distance, _target_distance(), blend_weight)
 	_apply()
+	_apply_shake(delta)
 
 
 ## Rotate the camera. x = yaw (radians, positive turns right), y = pitch (positive looks down).
@@ -108,6 +121,17 @@ func set_mode(new_mode: Mode) -> void:
 		return
 	mode = new_mode
 	mode_changed.emit(mode)
+
+
+## Keep `target` framed (lock-on). `point` returns the world point to look at; null clears.
+func set_lock_target(target: Node3D, point: Callable = Callable()) -> void:
+	_lock_target = target
+	_lock_point = point
+
+
+## Add camera shake (0..1 "trauma"; decays quickly). Gentle by design.
+func add_shake(trauma: float) -> void:
+	_shake = clampf(_shake + trauma, 0.0, 1.0)
 
 
 func set_yaw(yaw: float) -> void:
@@ -156,6 +180,14 @@ func _apply() -> void:
 	rotation = Vector3(0.0, _yaw, 0.0)
 	_pivot.rotation = Vector3(_pitch, 0.0, 0.0)
 	_arm.spring_length = _distance
+
+
+func _apply_shake(delta: float) -> void:
+	_shake = maxf(_shake - delta * 2.5, 0.0)
+	_shake_time += delta * 40.0
+	var s := _shake * _shake * config.shake_strength
+	camera.h_offset = sin(_shake_time * 1.3) * s
+	camera.v_offset = cos(_shake_time * 1.7) * s
 
 
 func _uses_mouse_capture() -> bool:

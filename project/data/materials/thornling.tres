@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/creature.gdshader" id="1_pby7b"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_pby7b")
+shader_parameter/body_color = Color(0.09, 0.08, 0.06, 1)
+shader_parameter/glow_color = Color(1, 0.75, 0.2, 1)
+shader_parameter/flap_speed = null
+shader_parameter/flap_amount = null
+shader_parameter/glow_energy = 2.5
+shader_parameter/spine_color = null
+shader_parameter/spine_idle = null

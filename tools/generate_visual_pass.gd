@@ -12,6 +12,7 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute("res://data/biomes")
 	_materials()
 	_data()
+	_enemy_scenes()
 	_player_scene()
 	_checkpoint_scene()
 	_level_scene()
@@ -82,6 +83,17 @@ func _materials() -> void:
 	_save(_shader_mat("stone", {"detail_noise": detail, "climb_marks": 1.0}), MAT + "climb_stone.tres")
 	_save(_shader_mat("spirit_flame", {}), MAT + "spirit_flame.tres")
 	_save(_shader_mat("ring_marker", {"color": Color(1.0, 0.15, 0.05), "strength": 0.7}), MAT + "arena_sigil.tres")
+	_save(_shader_mat("health_bar", {}), MAT + "health_bar.tres")
+	_save(_shader_mat("attack_warning", {}), MAT + "attack_warning.tres")
+	_save(_shader_mat("lock_reticle", {}), MAT + "lock_reticle.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.09, 0.08, 0.06), "glow_color": Color(1.0, 0.75, 0.2),
+			"glow_energy": 2.5}), MAT + "thornling.tres")
+	var blade := StandardMaterial3D.new()
+	blade.vertex_color_use_as_albedo = true
+	blade.metallic = 0.85
+	blade.roughness = 0.25
+	blade.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_save(blade, MAT + "blade.tres")
 	_save(_shader_mat("sky_gloom", {"cloud_noise": clouds}), MAT + "sky_gloom.tres")
 
 	var bark := StandardMaterial3D.new()
@@ -107,6 +119,7 @@ func _data() -> void:
 	_save(load("res://scripts/player/ninja_animation_config.gd").new(), "res://data/player/ninja_animations.tres")
 	_save(load("res://scripts/traversal/traversal_config.gd").new(), "res://data/player/traversal.tres")
 	_expedition_data()
+	_combat_data()
 
 
 func _own(node: Node, owner: Node) -> void:
@@ -132,7 +145,7 @@ func _player_scene() -> void:
 	p.set_script(load("res://scripts/player/player_controller.gd"))
 	p.set("config", load("res://data/player/default_movement.tres"))
 	p.collision_layer = 2
-	p.collision_mask = 1
+	p.collision_mask = 1 | 8  # world + enemies
 	p.floor_snap_length = 0.3
 	p.floor_max_angle = deg_to_rad(46.0)
 
@@ -186,6 +199,55 @@ func _player_scene() -> void:
 	animator.set("config", load("res://data/player/ninja_animations.tres"))
 	animator.set("animation_player_path", NodePath("../Visual/NinjaModel/AnimationPlayer"))
 	p.add_child(animator)
+
+	# ---- Phase 4 combat
+	var health := Node.new()
+	health.name = "Health"
+	health.set_script(load("res://scripts/combat/health_component.gd"))
+	p.add_child(health)
+	var hurt := Area3D.new()
+	hurt.name = "Hurtbox"
+	hurt.set_script(load("res://scripts/combat/hurtbox.gd"))
+	hurt.set("team", &"player")
+	hurt.set("health_path", NodePath("../Health"))
+	var hcol := CollisionShape3D.new()
+	var hcap := CapsuleShape3D.new()
+	hcap.radius = 0.45
+	hcap.height = 1.8
+	hcol.shape = hcap
+	hcol.position.y = 0.9
+	hurt.add_child(hcol)
+	p.add_child(hurt)
+	var weapon := Area3D.new()
+	weapon.name = "WeaponHitbox"
+	weapon.set_script(load("res://scripts/combat/hitbox.gd"))
+	weapon.set("team", &"player")
+	var wcol := CollisionShape3D.new()
+	var wbox := BoxShape3D.new()
+	wbox.size = Vector3(2.0, 1.6, 1.9)
+	wcol.shape = wbox
+	wcol.position = Vector3(0, 1.0, -1.05)
+	weapon.add_child(wcol)
+	visual.add_child(weapon)
+	var combat := Node.new()
+	combat.name = "Combat"
+	combat.set_script(load("res://scripts/combat/player_combat.gd"))
+	combat.set("config", load("res://data/combat/player_combat.tres"))
+	p.add_child(combat)
+	var mount := Node.new()
+	mount.name = "WeaponMount"
+	mount.set_script(load("res://scripts/combat/weapon_mount.gd"))
+	mount.set("blade_material", load(MAT + "blade.tres"))
+	p.add_child(mount)
+	var reticle := MeshInstance3D.new()
+	reticle.name = "LockReticle"
+	reticle.set_script(load("res://scripts/combat/lock_reticle.gd"))
+	var rq := QuadMesh.new()
+	rq.size = Vector2(0.9, 0.9)
+	rq.material = load(MAT + "lock_reticle.tres")
+	reticle.mesh = rq
+	reticle.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	p.add_child(reticle)
 
 	var rig := Node3D.new()
 	rig.name = "CameraRig"
@@ -474,6 +536,18 @@ func _level_scene() -> void:
 	_checkpoint("CheckpointGorge", Vector3(-4.5, 0, -48))
 	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
 
+	# Phase 4: training dummy at spawn and a Thornling hollow off the main path (west of the tunnel).
+	var enemies := Node3D.new()
+	enemies.name = "Enemies"
+	_root.add_child(enemies)
+	for spec in [["TrainingDummy", "res://scenes/enemies/training_dummy.tscn", Vector3(4.5, 0, -4)],
+			["ThornlingA", "res://scenes/enemies/thornling.tscn", Vector3(-23, 0.2, -20)],
+			["ThornlingB", "res://scenes/enemies/thornling.tscn", Vector3(-26, 0.2, -25)]]:
+		var e: Node3D = (load(spec[1]) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		e.name = spec[0]
+		e.position = spec[2]
+		enemies.add_child(e)
+
 	# Phase 3: boss arena behind the gate. Walls funnel the player through the gate.
 	_box("ArenaWallL", Vector3(40, 8, 1.5), Vector3(-25.0, 2, -94), "stone")
 	_box("ArenaWallR", Vector3(40, 8, 1.5), Vector3(25.0, 2, -94), "stone")
@@ -557,6 +631,20 @@ func _main_scene() -> void:
 	touch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(touch)
 	touch.owner = main
+	var fx := Node3D.new()
+	fx.name = "CombatFx"
+	fx.set_script(load("res://scripts/combat/combat_fx.gd"))
+	fx.set("spark_material", load(MAT + "firefly.tres"))
+	main.add_child(fx)
+	fx.owner = main
+	var php := Control.new()
+	php.name = "PlayerHud"
+	php.set_script(load("res://scripts/ui/player_hud.gd"))
+	php.set("player_path", NodePath("../../Player"))
+	php.set_anchors_preset(Control.PRESET_FULL_RECT)
+	php.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(php)
+	php.owner = main
 	for spec in [["ExpeditionHud", "res://scripts/ui/expedition_hud.gd"], ["PauseMenu", "res://scripts/ui/pause_menu.gd"],
 			["ExpeditionResults", "res://scripts/ui/expedition_results.gd"]]:
 		var c := Control.new()
@@ -631,3 +719,144 @@ func _hunt_board_scene() -> void:
 	board.set("biomes", list)
 	board.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pack(board, "res://scenes/ui/hunt_board.tscn")
+
+
+func _attack(id: String, start: float, end: float, hit: float, speed: float, damage: float, stagger: float,
+		knockback: float, lunge: float) -> AttackDefinition:
+	var a := AttackDefinition.new()
+	a.id = StringName(id)
+	a.clip = &"Dual_Weapon_Combo"
+	a.clip_start = start
+	a.clip_end = end
+	a.clip_hit = hit
+	a.speed = speed
+	a.damage = damage
+	a.stagger = stagger
+	a.knockback = knockback
+	a.lunge_speed = lunge
+	return _save(a, "res://data/combat/attack_%s.tres" % id)
+
+
+func _combat_data() -> void:
+	DirAccess.make_dir_recursive_absolute("res://data/combat")
+	DirAccess.make_dir_recursive_absolute("res://data/enemies")
+	# Slices of Dual_Weapon_Combo; hit times are the measured hand-speed peaks (0.77/1.18/1.83/2.68 s).
+	var l1 := _attack("light_1", 0.35, 1.0, 0.77, 1.15, 10.0, 8.0, 1.5, 3.0)
+	var l2 := _attack("light_2", 1.0, 1.45, 1.18, 1.1, 11.0, 8.0, 1.5, 3.0)
+	var l3 := _attack("light_3", 1.45, 2.25, 1.83, 1.0, 17.0, 18.0, 4.0, 4.0)
+	var heavy := _attack("heavy", 2.25, 3.3, 2.68, 0.85, 32.0, 30.0, 6.0, 2.0)
+	var cfg := PlayerCombatConfig.new()
+	cfg.light_combo = [l1, l2, l3] as Array[AttackDefinition]
+	cfg.heavy = heavy
+	_save(cfg, "res://data/combat/player_combat.tres")
+	_save(EnemyConfig.new(), "res://data/enemies/thornling.tres")
+
+
+func _enemy_scenes() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/enemies")
+	# Thornling.
+	var t := CharacterBody3D.new()
+	t.name = "Thornling"
+	t.set_script(load("res://scripts/enemies/thornling.gd"))
+	t.set("config", load("res://data/enemies/thornling.tres"))
+	var col := CollisionShape3D.new()
+	col.name = "Collision"
+	var cap := CapsuleShape3D.new()
+	cap.radius = 0.45
+	cap.height = 1.0
+	col.shape = cap
+	col.position.y = 0.5
+	t.add_child(col)
+	var vis := Node3D.new()
+	vis.name = "Visual"
+	t.add_child(vis)
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = ProceduralMeshes.thornling(load(MAT + "thornling.tres"))
+	vis.add_child(body)
+	var hb := Area3D.new()
+	hb.name = "LungeHitbox"
+	hb.set_script(load("res://scripts/combat/hitbox.gd"))
+	hb.set("team", &"enemy")
+	var hbc := CollisionShape3D.new()
+	var hbs := BoxShape3D.new()
+	hbs.size = Vector3(1.1, 1.0, 1.3)
+	hbc.shape = hbs
+	hbc.position = Vector3(0, 0.55, -0.7)
+	hb.add_child(hbc)
+	vis.add_child(hb)
+	var health := Node.new()
+	health.name = "Health"
+	health.set_script(load("res://scripts/combat/health_component.gd"))
+	t.add_child(health)
+	var hurt := Area3D.new()
+	hurt.name = "Hurtbox"
+	hurt.set_script(load("res://scripts/combat/hurtbox.gd"))
+	hurt.set("team", &"enemy")
+	hurt.set("health_path", NodePath("../Health"))
+	var hc := CollisionShape3D.new()
+	var hs := BoxShape3D.new()
+	hs.size = Vector3(1.0, 1.1, 1.7)
+	hc.shape = hs
+	hc.position = Vector3(0, 0.6, -0.1)
+	hurt.add_child(hc)
+	t.add_child(hurt)
+	var warn := MeshInstance3D.new()
+	warn.name = "Warning"
+	var wq := QuadMesh.new()
+	wq.size = Vector2(1.3, 4.0)
+	wq.orientation = PlaneMesh.FACE_Y
+	wq.material = load(MAT + "attack_warning.tres")
+	warn.mesh = wq
+	warn.top_level = true
+	warn.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	t.add_child(warn)
+	var bar := MeshInstance3D.new()
+	bar.name = "HealthBar"
+	var bq := QuadMesh.new()
+	bq.size = Vector2(1.0, 0.14)
+	bq.material = load(MAT + "health_bar.tres")
+	bar.mesh = bq
+	bar.position.y = 1.55
+	bar.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	t.add_child(bar)
+	_pack(t, "res://scenes/enemies/thornling.tscn")
+
+	# Training dummy.
+	var d := StaticBody3D.new()
+	d.name = "TrainingDummy"
+	d.set_script(load("res://scripts/enemies/training_dummy.gd"))
+	d.collision_layer = 8
+	var dcol := CollisionShape3D.new()
+	var dcyl := CylinderShape3D.new()
+	dcyl.radius = 0.3
+	dcyl.height = 2.0
+	dcol.shape = dcyl
+	dcol.position.y = 1.0
+	d.add_child(dcol)
+	var dvis := Node3D.new()
+	dvis.name = "Visual"
+	d.add_child(dvis)
+	var dm := MeshInstance3D.new()
+	dm.name = "Mesh"
+	dm.mesh = ProceduralMeshes.training_dummy(load(MAT + "bark_vertex.tres"))
+	dvis.add_child(dm)
+	var dh := Node.new()
+	dh.name = "Health"
+	dh.set_script(load("res://scripts/combat/health_component.gd"))
+	dh.set("max_health", 500.0)
+	d.add_child(dh)
+	var dhurt := Area3D.new()
+	dhurt.name = "Hurtbox"
+	dhurt.set_script(load("res://scripts/combat/hurtbox.gd"))
+	dhurt.set("team", &"enemy")
+	dhurt.set("health_path", NodePath("../Health"))
+	var dhc := CollisionShape3D.new()
+	var dhs := CylinderShape3D.new()
+	dhs.radius = 0.5
+	dhs.height = 1.6
+	dhc.shape = dhs
+	dhc.position.y = 1.2
+	dhurt.add_child(dhc)
+	d.add_child(dhurt)
+	_pack(d, "res://scenes/enemies/training_dummy.tscn")

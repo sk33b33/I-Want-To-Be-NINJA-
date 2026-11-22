@@ -19,7 +19,7 @@ extends Resource
 	Vector2(0, 30), Vector2(0, -50), Vector2(0, -71), Vector2(0, -130)])
 ## Circular flat clearings: x, z, radius (one Vector3 each).
 @export var clearings: Array[Vector3] = [
-	Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -16, 10), Vector3(0, -30, 9), Vector3(0, -46, 12), Vector3(0, -84, 15), Vector3(0, -120, 18)]
+	Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -16, 10), Vector3(0, -30, 9), Vector3(0, -46, 12), Vector3(0, -84, 15), Vector3(0, -120, 18), Vector3(-24, -22, 9)]
 @export var route_height: float = 0.0
 ## Half width of the perfectly flat part of the corridor.
 @export var corridor_half_width: float = 6.0

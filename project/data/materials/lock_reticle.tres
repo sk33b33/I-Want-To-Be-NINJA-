@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/lock_reticle.gdshader" id="1_8w26d"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_8w26d")
+shader_parameter/color = null

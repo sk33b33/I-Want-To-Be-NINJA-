@@ -10,3 +10,5 @@ shader_parameter/glow_color = null
 shader_parameter/flap_speed = null
 shader_parameter/flap_amount = 0.9
 shader_parameter/glow_energy = null
+shader_parameter/spine_color = null
+shader_parameter/spine_idle = null

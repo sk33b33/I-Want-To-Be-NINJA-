@@ -2,7 +2,7 @@
 
 A 3D jungle ninja hunting adventure for **Android phones and PC**, built in Godot 4.5.
 
-**Status:** Phases 0–3 built: hunt board, 45:00 expedition timer, gloomy procedural Verdant Canopy, Mixamo ninja with climbing and ledge grabs, checkpoints, and a boss arena (boss arrives in Phase 5). 57 automated tests pass; human playtests pending. See `docs/PHASES.md`.
+**Status:** Phases 0–4 built: hunt board, 45:00 expedition timer, gloomy procedural Verdant Canopy, Mixamo ninja with climbing, ledge grabs and twin-blade combat (combo, heavy, dodge, lock-on), Thornling enemies, checkpoints, and a boss arena (boss arrives in Phase 5). Human playtests pending. See `docs/PHASES.md`.
 
 ![Verdant Canopy](docs/screenshots/01_spawn_idle.png)
 

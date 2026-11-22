@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AttackDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/attack_definition.gd" id="1_64cah"]
+
+[resource]
+script = ExtResource("1_64cah")
+id = &"heavy"
+clip_start = 2.25
+clip_end = 3.3
+clip_hit = 2.68
+speed = 0.85
+damage = 32.0
+stagger = 30.0
+knockback = 6.0
+lunge_speed = 2.0

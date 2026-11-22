@@ -26,6 +26,17 @@ extends Resource
 @export var mantle_clip: StringName = &"Jump"
 @export var mantle_start_time: float = 1.15
 
+@export_group("Combat (Phase 4)")
+## Attack clips/slices come from AttackDefinition resources; these cover the rest.
+@export var roll_clip: StringName = &"Quick_Roll_To_Run"
+## The roll part of Quick_Roll_To_Run ends here (the rest is the run-out).
+@export var roll_end_time: float = 0.9
+@export var hurt_clip: StringName = &"Death_Backward"
+@export var hurt_end_time: float = 0.35
+@export var death_clip: StringName = &"Death_Backward"
+## Clips whose forward root motion is removed (the code moves the body instead).
+@export var strip_forward_motion: Array[StringName] = [&"Dual_Weapon_Combo", &"Quick_Roll_To_Run", &"Death_Backward"]
+
 @export_group("Jump timing (seconds into the clip)")
 @export var jump_takeoff_time: float = 0.45
 ## While airborne the clip pauses here (tucked pose) until landing.

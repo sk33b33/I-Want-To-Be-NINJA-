@@ -4,7 +4,7 @@ extends Node
 ## it never changes movement). States: IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE.
 ## Implements docs/PHASES.md Phase 1 player feedback using assets/models/ninja/ninja.glb.
 
-enum State { IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE }
+enum State { IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE, COMBAT, DEAD }
 
 @export var player_path: NodePath = ^".."
 @export var animation_player_path: NodePath
@@ -31,10 +31,29 @@ func _ready() -> void:
 	_player.landed.connect(_on_landed)
 	if _player.traversal:
 		_player.traversal.state_changed.connect(_on_traversal_state)
+	if _player.combat:
+		var c := _player.combat
+		c.attack_started.connect(_on_attack_started)
+		c.dodge_started.connect(_on_dodge_started)
+		c.hurt.connect(_on_hurt)
+		c.player_died.connect(_on_player_died)
+		c.player_respawned.connect(func() -> void: _set_state(State.IDLE, _idle_name, 1.0))
+		c.hit_stopped.connect(_on_hit_stopped)
 	_play(_idle_name)
 
 
 func _physics_process(delta: float) -> void:
+	if _freeze > 0.0:
+		_freeze -= delta
+		if _freeze <= 0.0:
+			_anim.speed_scale = _frozen_speed
+	if _player.combat and _player.combat.is_busy():
+		_update_combat()
+		return
+	if state == State.COMBAT or state == State.DEAD:
+		state = State.LAND  # Hand back to locomotion.
+		_enter_ground_state(_player.get_horizontal_speed())
+		return
 	if _player.traversal and _player.traversal.state != TraversalComponent.State.NONE:
 		if state == State.CLIMB:
 			var climb_speed := _player.traversal.get_climb_velocity().length()
@@ -80,6 +99,52 @@ func _set_state(new_state: State, clip: StringName, speed_scale: float) -> void:
 	if state != new_state or _anim.current_animation != clip:
 		state = new_state
 		_play(clip)
+
+
+var _freeze: float = 0.0
+var _frozen_speed: float = 1.0
+var _slice_end: float = INF
+
+
+func _update_combat() -> void:
+	# Hold the last frame of a clip slice instead of running into the next move.
+	if _anim.current_animation_position >= _slice_end and _anim.speed_scale > 0.0:
+		_anim.pause()
+
+
+func _play_slice(clip: StringName, from: float, to: float, speed: float, blend: float) -> void:
+	state = State.COMBAT
+	_freeze = 0.0
+	_anim.play(clip, blend)
+	_anim.seek(from, true)
+	_anim.speed_scale = speed
+	_slice_end = to
+
+
+func _on_attack_started(attack: AttackDefinition, _index: int) -> void:
+	_play_slice(attack.clip, attack.clip_start, attack.clip_end, attack.speed, 0.06)
+
+
+func _on_dodge_started(_dir: Vector3) -> void:
+	var speed := config.roll_end_time / maxf(_player.combat.config.dodge_time, 0.05)
+	_play_slice(config.roll_clip, 0.0, config.roll_end_time, speed, 0.05)
+
+
+func _on_hurt(_info: DamageInfo) -> void:
+	var speed := config.hurt_end_time / maxf(_player.combat.config.hurt_time, 0.05)
+	_play_slice(config.hurt_clip, 0.0, config.hurt_end_time, speed, 0.05)
+
+
+func _on_player_died() -> void:
+	_play_slice(config.death_clip, 0.0, INF, 1.0, 0.1)
+	state = State.DEAD
+
+
+func _on_hit_stopped(seconds: float) -> void:
+	if _freeze <= 0.0:
+		_frozen_speed = _anim.speed_scale
+	_freeze = seconds
+	_anim.speed_scale = 0.0
 
 
 func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
@@ -149,6 +214,9 @@ func _prepare_clips() -> void:
 	for clip in [config.jump_clip, config.sprint_jump_clip]:
 		if _anim.has_animation(clip):
 			_flatten_hips(_anim.get_animation(clip))
+	for clip in config.strip_forward_motion:
+		if _anim.has_animation(clip):
+			_strip_forward(_anim.get_animation(clip))
 	if config.idle_clip != &"" and _anim.has_animation(config.idle_clip):
 		_idle_name = config.idle_clip
 		_anim.get_animation(_idle_name).loop_mode = Animation.LOOP_LINEAR
@@ -171,6 +239,17 @@ func _flatten_hips(anim: Animation) -> void:
 		p.y = start.y  # Remove forward root motion.
 		p.z = maxf(p.z, -max_up_cm)  # Clamp vertical rise.
 		anim.track_set_key_value(track, k, p)
+
+
+## Remove travel along the ground (bone-space x/y) but keep the vertical motion (crouch, fall).
+func _strip_forward(anim: Animation) -> void:
+	var track := anim.find_track(config.hips_bone_track, Animation.TYPE_POSITION_3D)
+	if track < 0:
+		return
+	var start: Vector3 = anim.track_get_key_value(track, 0)
+	for k in anim.track_get_key_count(track):
+		var p: Vector3 = anim.track_get_key_value(track, k)
+		anim.track_set_key_value(track, k, Vector3(start.x, start.y, p.z))
 
 
 ## A looping single-pose animation sampled from `source` at `time`, with a slow breathing sway.

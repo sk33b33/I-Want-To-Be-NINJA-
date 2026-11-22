@@ -1,43 +1,71 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=26 format=3]
 
-[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_h17s1"]
-[ext_resource type="Resource" path="res://data/player/default_movement.tres" id="2_je7p5"]
-[ext_resource type="PackedScene" path="res://assets/models/ninja/ninja.glb" id="3_fm80t"]
-[ext_resource type="Material" path="res://data/materials/ring_marker.tres" id="4_gx1jg"]
-[ext_resource type="Script" path="res://scripts/traversal/traversal_component.gd" id="5_ugbui"]
-[ext_resource type="Resource" path="res://data/player/traversal.tres" id="6_fcs02"]
-[ext_resource type="Script" path="res://scripts/player/ninja_animator.gd" id="7_myrg7"]
-[ext_resource type="Resource" path="res://data/player/ninja_animations.tres" id="8_kvlxm"]
-[ext_resource type="Script" path="res://scripts/camera/camera_rig.gd" id="9_uf5tr"]
-[ext_resource type="Resource" path="res://data/camera/default_camera.tres" id="10_lgqa7"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_lgqa7"]
+[ext_resource type="Resource" path="res://data/player/default_movement.tres" id="2_8ydkj"]
+[ext_resource type="PackedScene" path="res://assets/models/ninja/ninja.glb" id="3_3j4b4"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="4_yj68g"]
+[ext_resource type="Material" path="res://data/materials/ring_marker.tres" id="5_ioxgp"]
+[ext_resource type="Script" path="res://scripts/traversal/traversal_component.gd" id="6_cnsyf"]
+[ext_resource type="Resource" path="res://data/player/traversal.tres" id="7_007i1"]
+[ext_resource type="Script" path="res://scripts/player/ninja_animator.gd" id="8_6cv16"]
+[ext_resource type="Resource" path="res://data/player/ninja_animations.tres" id="9_j4nxn"]
+[ext_resource type="Script" path="res://scripts/combat/health_component.gd" id="10_28m0y"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="11_uniwh"]
+[ext_resource type="Script" path="res://scripts/combat/player_combat.gd" id="12_iqsei"]
+[ext_resource type="Resource" path="res://data/combat/player_combat.tres" id="13_tffgl"]
+[ext_resource type="Script" path="res://scripts/combat/weapon_mount.gd" id="14_pk8ii"]
+[ext_resource type="Material" path="res://data/materials/blade.tres" id="15_5mf0n"]
+[ext_resource type="Material" path="res://data/materials/lock_reticle.tres" id="16_4hvnv"]
+[ext_resource type="Script" path="res://scripts/combat/lock_reticle.gd" id="17_bbmj2"]
+[ext_resource type="Script" path="res://scripts/camera/camera_rig.gd" id="18_kxw46"]
+[ext_resource type="Resource" path="res://data/camera/default_camera.tres" id="19_8qxvo"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8ydkj"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5q8fn"]
 radius = 0.4
 height = 1.8
 
-[sub_resource type="QuadMesh" id="QuadMesh_3j4b4"]
-material = ExtResource("4_gx1jg")
+[sub_resource type="BoxShape3D" id="BoxShape3D_wva7c"]
+size = Vector3(2, 1.6, 1.9)
+
+[sub_resource type="QuadMesh" id="QuadMesh_7obkq"]
+material = ExtResource("5_ioxgp")
 size = Vector2(1.6, 1.6)
 orientation = 1
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_yj68g"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_vo27k"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="QuadMesh" id="QuadMesh_genst"]
+material = ExtResource("16_4hvnv")
+size = Vector2(0.9, 0.9)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_niom3"]
 radius = 0.25
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 2
+collision_mask = 9
 floor_max_angle = 0.80285144
 floor_snap_length = 0.3
-script = ExtResource("1_h17s1")
-config = ExtResource("2_je7p5")
+script = ExtResource("1_lgqa7")
+config = ExtResource("2_8ydkj")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-shape = SubResource("CapsuleShape3D_8ydkj")
+shape = SubResource("CapsuleShape3D_5q8fn")
 
 [node name="Visual" type="Node3D" parent="."]
 
-[node name="NinjaModel" parent="Visual" instance=ExtResource("3_fm80t")]
+[node name="NinjaModel" parent="Visual" instance=ExtResource("3_3j4b4")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="WeaponHitbox" type="Area3D" parent="Visual"]
+script = ExtResource("4_yj68g")
+
+[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="Visual/WeaponHitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.05)
+shape = SubResource("BoxShape3D_wva7c")
 
 [node name="ReadabilityLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0.8)
@@ -47,25 +75,51 @@ light_energy = 0.7
 [node name="GroundRing" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 cast_shadow = 0
-mesh = SubResource("QuadMesh_3j4b4")
+mesh = SubResource("QuadMesh_7obkq")
 
 [node name="Traversal" type="Node" parent="."]
-script = ExtResource("5_ugbui")
-config = ExtResource("6_fcs02")
+script = ExtResource("6_cnsyf")
+config = ExtResource("7_007i1")
 
 [node name="NinjaAnimator" type="Node" parent="."]
-script = ExtResource("7_myrg7")
+script = ExtResource("8_6cv16")
 animation_player_path = NodePath("../Visual/NinjaModel/AnimationPlayer")
-config = ExtResource("8_kvlxm")
+config = ExtResource("9_j4nxn")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("10_28m0y")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+script = ExtResource("11_uniwh")
+team = &"player"
+health_path = NodePath("../Health")
+
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_vo27k")
+
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("12_iqsei")
+config = ExtResource("13_tffgl")
+
+[node name="WeaponMount" type="Node" parent="."]
+script = ExtResource("14_pk8ii")
+blade_material = ExtResource("15_5mf0n")
+hand_bones = PackedStringArray("mixamorig_RightHand", "mixamorig_LeftHand")
+
+[node name="LockReticle" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_genst")
+script = ExtResource("17_bbmj2")
 
 [node name="CameraRig" type="Node3D" parent="."]
-script = ExtResource("9_uf5tr")
-config = ExtResource("10_lgqa7")
+script = ExtResource("18_kxw46")
+config = ExtResource("19_8qxvo")
 
 [node name="Pivot" type="Node3D" parent="CameraRig"]
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraRig/Pivot"]
-shape = SubResource("SphereShape3D_yj68g")
+shape = SubResource("SphereShape3D_niom3")
 spring_length = 5.0
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig/Pivot/SpringArm3D"]

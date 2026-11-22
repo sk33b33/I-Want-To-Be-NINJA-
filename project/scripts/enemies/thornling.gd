@@ -41,6 +41,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	collision_layer = 8  # layer 4: enemy
 	collision_mask = 1 | 2 | 8
+	platform_floor_layers = 1  # Never ride on the player (or each other).
 	home = global_position
 	_wander_target = home
 	_rng.seed = hash(name)

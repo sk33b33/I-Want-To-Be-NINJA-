@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FloraConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/flora_config.gd" id="1_pdcfo"]
+
+[resource]
+script = ExtResource("1_pdcfo")
+seed = 5150
+grass_count = 2500
+fern_count = 500
+broadleaf_count = 120
+mushroom_count = 380
+rock_count = 900
+mushroom_glows = Array[Color]([Color(1, 0.45, 0.1, 1), Color(1, 0.2, 0.05, 1), Color(1, 0.75, 0.2, 1)])
+jungle_tree_count = 25
+dead_tree_count = 85
+log_count = 18
+pillar_count = 10

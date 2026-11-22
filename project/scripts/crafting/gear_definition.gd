@@ -23,6 +23,10 @@ enum Slot { WEAPON, ARMOR, CHARM }
 @export var skill_cooldown_reduction: float = 0.0
 ## Multiplier on Ember Talisman damage.
 @export var skill_damage_multiplier: float = 1.0
+## Changes the talisman's element (e.g. &"water" for the Mist Charm). Empty = keep fire.
+@export var skill_element: StringName = &""
+## Gives the blades an element (e.g. &"fire"). Empty = physical.
+@export var blade_element: StringName = &""
 
 
 static func slot_name(s: Slot) -> String:
@@ -42,4 +46,8 @@ func stat_lines() -> PackedStringArray:
 		lines.append("Ember Talisman cooldown -%.1fs" % skill_cooldown_reduction)
 	if skill_damage_multiplier != 1.0:
 		lines.append("Ember Talisman damage %+d%%" % int(round((skill_damage_multiplier - 1.0) * 100.0)))
+	if skill_element != &"":
+		lines.append("Talisman becomes %s" % String(skill_element).capitalize())
+	if blade_element != &"":
+		lines.append("Blades deal %s damage" % String(blade_element).capitalize())
 	return lines

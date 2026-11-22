@@ -97,7 +97,7 @@ func _build() -> void:
 	for biome in biomes:
 		var card := _biome_card(biome)
 		grid.add_child(card)
-		if first == null and biome.unlocked and not biome.hunts.is_empty():
+		if first == null and _start_buttons.has(biome.hunts[0].id if not biome.hunts.is_empty() else &""):
 			first = _start_buttons.get(biome.hunts[0].id)
 	if first:
 		first.grab_focus.call_deferred()
@@ -139,8 +139,19 @@ func _materials_text() -> String:
 	return "Materials: " + ",  ".join(parts)
 
 
+## Open on the board: content exists (unlocked) and its prerequisite hunt is done.
+## `-- --unlock-all` opens everything for testing.
+static func is_open(biome: BiomeDefinition, profile: PlayerProfile) -> bool:
+	if not biome.unlocked:
+		return false
+	if "--unlock-all" in OS.get_cmdline_user_args() or biome.requires_hunt == &"":
+		return true
+	return int(profile.hunts_completed.get(String(biome.requires_hunt), 0)) > 0
+
+
 func _biome_card(biome: BiomeDefinition) -> Control:
-	var accent := biome.accent if biome.unlocked else Color(0.35, 0.35, 0.35)
+	var open := is_open(biome, PlayerProfile.load_profile())
+	var accent := biome.accent if open else Color(0.35, 0.35, 0.35)
 	var card := UiStyle.panel(Color(0.04, 0.05, 0.055, 0.95), accent * Color(1, 1, 1, 0.6))
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var col := VBoxContainer.new()
@@ -149,17 +160,20 @@ func _biome_card(biome: BiomeDefinition) -> Control:
 	col.add_child(UiStyle.label(biome.display_name, 30, accent))
 	col.add_child(UiStyle.label(biome.mood, 18, UiStyle.MUTED))
 	for hunt in biome.hunts:
-		col.add_child(UiStyle.label(hunt.full_name(), 22, UiStyle.BONE if biome.unlocked else UiStyle.MUTED))
+		col.add_child(UiStyle.label(hunt.full_name(), 22, UiStyle.BONE if open else UiStyle.MUTED))
 		col.add_child(UiStyle.label("Element: %s   Weak to: %s" % [hunt.element, hunt.weakness], 18, UiStyle.MUTED))
-		if biome.unlocked:
+		if open:
 			col.add_child(UiStyle.label(hunt.description, 17, UiStyle.MUTED))
 			var minutes := int((hunt.config.duration_seconds if hunt.config else ExpeditionConfig.MIN_DURATION_SECONDS) / 60.0)
 			var b := UiStyle.button("Begin expedition  (%d:00)" % minutes, accent)
 			b.pressed.connect(begin.bind(biome, hunt))
 			col.add_child(b)
 			_start_buttons[hunt.id] = b
-	if not biome.unlocked:
-		var locked := UiStyle.button("Locked — %s" % biome.locked_note, accent)
+	if not open:
+		var note := biome.locked_note
+		if biome.unlocked and biome.requires_hunt != &"":
+			note = "defeat %s to unlock" % String(biome.requires_hunt).capitalize()
+		var locked := UiStyle.button("Locked — %s" % note, accent)
 		locked.disabled = true
 		col.add_child(locked)
 	return card

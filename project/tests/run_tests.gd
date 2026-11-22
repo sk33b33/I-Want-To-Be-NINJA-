@@ -16,6 +16,7 @@ const SUITES: Array[String] = [
 	"res://tests/boss_test.gd",
 	"res://tests/biome_slice_test.gd",
 	"res://tests/crafting_test.gd",
+	"res://tests/emberwild_test.gd",
 	"res://tests/main_scene_test.gd",
 ]
 
@@ -43,6 +44,9 @@ func _run() -> void:
 			await suite.call(name)
 			suite.cleanup()
 			await process_frame
+			# Let the physics engine drop the freed bodies before the next test builds its world.
+			await physics_frame
+			await physics_frame
 			if suite.failed:
 				failures += 1
 				print("FAIL  %s::%s" % [path.get_file(), name])

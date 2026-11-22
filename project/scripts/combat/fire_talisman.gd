@@ -6,6 +6,8 @@ extends Node3D
 @export var speed: float = 22.0
 @export var lifetime: float = 1.2
 
+const ELEMENT_COLORS := {&"fire": Color(1.0, 0.45, 0.1), &"water": Color(0.2, 0.6, 1.0)}
+
 var direction: Vector3 = Vector3.FORWARD
 var _t: float = 0.0
 var _info: DamageInfo
@@ -18,7 +20,12 @@ func launch(from: Vector3, dir: Vector3, info: DamageInfo) -> void:
 	global_position = from
 	direction = dir.normalized()
 	_info = info
-	_info.element = &"fire"
+	if _info.element == &"":
+		_info.element = &"fire"
+	# Colour follows the element (water charm = blue mist).
+	var flame := get_node_or_null("Flame") as GeometryInstance3D
+	if flame:
+		flame.set_instance_shader_parameter("flame_color", ELEMENT_COLORS.get(_info.element, Color(1.0, 0.45, 0.1)))
 	_hitbox.hit_landed.connect(func(_h: Hurtbox, _i: DamageInfo) -> void: _burst())
 	_hitbox.activate(_info)
 

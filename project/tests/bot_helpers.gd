@@ -41,15 +41,16 @@ static func run_route(tc: TestCase, player: PlayerController, stop_z: float, max
 	return false
 
 
-## Fights Kurogale by reading its telegraphs: roll back from sweeps, sideways off charges, strafe
-## out of snare rings, back out of thorn bursts; punish openings in front of the lowered head;
+## Fights any BossController by reading its telegraphs by attack kind: roll back from FRONT
+## attacks, sideways off DASHes, strafe out of ERUPTIONS, back out of RADIAL blasts; punish
+## openings in front of the lowered head;
 ## throw the Ember Talisman whenever it is ready. Returns when the boss is defeated or time runs out.
-static func fight_boss(tc: TestCase, player: PlayerController, boss: Kurogale, max_frames: int = 60 * 300) -> void:
+static func fight_boss(tc: TestCase, player: PlayerController, boss: BossController, max_frames: int = 60 * 300) -> void:
 	var reacted_to := -1
 	var attack_count := 0
 	for frame in max_frames:
 		await tc.tree.physics_frame
-		if boss.state == Kurogale.State.DEFEATED:
+		if boss.state == BossController.State.DEFEATED:
 			break
 		if player.combat.state == PlayerCombat.State.DEAD:
 			continue
@@ -59,31 +60,31 @@ static func fight_boss(tc: TestCase, player: PlayerController, boss: Kurogale, m
 		to_boss.y = 0.0
 		var dist := to_boss.length()
 		release_moves()
-		if boss.state == Kurogale.State.TELEGRAPH:
+		if boss.state == BossController.State.TELEGRAPH:
 			var a := boss.current_attack
 			var left := boss.telegraph_seconds(a) - boss.state_time()
-			match a.id:
-				&"root_snare":
-					Input.action_press("move_left")
+			match a.kind:
+				BossAttackDefinition.Kind.ERUPTIONS:
+					Input.action_press("move_left")  # Strafe around the boss, out of the circles.
 					Input.action_press("sprint")
-				&"thorn_burst":
-					if dist < 6.5:
+				BossAttackDefinition.Kind.RADIAL:
+					if dist < 7.5:
 						Input.action_press("move_back")
 						Input.action_press("sprint")
 				_:
 					if left < 0.18 and reacted_to != attack_count:
 						reacted_to = attack_count
-						Input.action_press("move_left" if a.id == &"charge" else "move_back")
+						Input.action_press("move_left" if a.kind == BossAttackDefinition.Kind.DASH else "move_back")
 						await tap(tc, "dodge")
 			continue
-		if boss.state == Kurogale.State.ATTACK:
+		if boss.state == BossController.State.ATTACK:
 			attack_count += 1 if boss.state_time() < 0.02 else 0
 			continue
-		var opening := boss.state in [Kurogale.State.RECOVER, Kurogale.State.STAGGER, Kurogale.State.STUNNED, Kurogale.State.PART_BREAK]
+		var opening := boss.state in [BossController.State.RECOVER, BossController.State.STAGGER, BossController.State.STUNNED, BossController.State.PART_BREAK]
 		if player.combat.skill_cooldown_left <= 0.0 and player.combat.state == PlayerCombat.State.READY:
 			await tap(tc, "skill")
 			continue
-		var head_spot := boss.global_position - boss.global_basis.z * 4.6
+		var head_spot := boss.global_position - boss.global_basis.z * (absf(boss.definition.lock_offset.z) + 2.8)
 		head_spot.y = player.global_position.y
 		var to_spot := head_spot - player.global_position
 		if to_spot.length() > 1.2:
@@ -93,3 +94,74 @@ static func fight_boss(tc: TestCase, player: PlayerController, boss: Kurogale, m
 		if dist < 6.5 and opening and player.combat.state == PlayerCombat.State.READY:
 			await tap(tc, "attack_heavy" if frame % 3 == 0 else "attack_light")
 	release_moves()
+
+
+## Steer toward world x while holding forward (camera yaw 0: forward = -Z).
+static func _steer(player: PlayerController, target_x: float) -> void:
+	var steer := clampf((target_x - player.global_position.x) * 0.8, -1.0, 1.0)
+	Input.action_press("move_right", maxf(steer, 0.0))
+	Input.action_press("move_left", maxf(-steer, 0.0))
+
+
+## Walk forward (and steer) until z < stop_z. Returns false on timeout.
+static func _walk_to_z(tc: TestCase, player: PlayerController, stop_z: float, target_x: float, max_frames: int = 900) -> bool:
+	tc.press("move_forward")
+	for i in max_frames:
+		await tc.tree.physics_frame
+		_steer(player, target_x)
+		if player.global_position.z < stop_z:
+			return true
+	return false
+
+
+## Emberwild route: waits for the vent wave and runs behind it, takes the cool lane past the heat
+## zone, waits for the sinking stones to rise, then crosses the lava river and climbs the far bank.
+static func run_route_emberwild(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	var vents: Array = []
+	for i in 4:
+		vents.append(level.get_node("Hazards/FireVent%d" % i))
+	var stones: Array = []
+	for i in 4:
+		stones.append(level.get_node("Hazards/SinkingStone%d" % i))
+	# 1) Up to the vent field entrance, wait until the first vent has just finished erupting.
+	if not await _walk_to_z(tc, player, -5.0, 0.0):
+		return false
+	release_moves()
+	var v0 := vents[0] as FireVent
+	for i in 600:
+		await tc.tree.physics_frame
+		if v0.phase == FireVent.Phase.DORMANT and v0.time_to_eruption() > v0.cycle_length() - v0.erupt_time - 0.9:
+			break
+	tc.press("sprint")
+	if not await _walk_to_z(tc, player, -28.0, 0.0):
+		return false
+	tc.release("sprint")
+	# 2) Cool lane on the right past the heat zone.
+	if not await _walk_to_z(tc, player, -38.5, 4.8):
+		return false
+	if not await _walk_to_z(tc, player, -48.6, 0.0):
+		return false
+	release_moves()
+	# 3) Wait for the stones to rise, then run and jump stone to stone.
+	var s0 := stones[0] as SinkingStone
+	for i in 900:
+		await tc.tree.physics_frame
+		if s0.is_safe() and s0.safe_time_left() > s0.up_time - 0.25:
+			break
+	var jump_at: Array[float] = [-49.3, -54.6, -59.1, -63.6, -68.1]
+	var next_jump := 0
+	tc.press("move_forward")
+	for i in 1500:
+		await tc.tree.physics_frame
+		_steer(player, 0.0)
+		var z := player.global_position.z
+		if next_jump < jump_at.size() and z < jump_at[next_jump] and player.is_on_floor():
+			tc.press("jump")
+			await tc.physics_frames(12)
+			tc.release("jump")
+			next_jump += 1
+		if z < stop_z:
+			release_moves()
+			return true
+	release_moves()
+	return false

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_h0ukd"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="2_ey0b5"]
+[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="3_gwlcj"]
+[ext_resource type="Resource" path="res://data/gear/mist_charm.tres" id="4_lpthn"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_jr3ia"]
+
+[resource]
+script = ExtResource("5_jr3ia")
+id = &"mist_charm"
+result = ExtResource("4_lpthn")
+inputs = Array[ExtResource("1_h0ukd")]([ExtResource("2_ey0b5"), ExtResource("3_gwlcj")])
+counts = PackedInt32Array(2, 2)

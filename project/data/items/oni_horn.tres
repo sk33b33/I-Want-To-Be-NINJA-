@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_gdhh4"]
+
+[resource]
+script = ExtResource("1_gdhh4")
+id = &"oni_horn"
+display_name = "Oni Horn"
+description = "A horn of the Ashen Oni-Tortoise, heavy as an anvil and still hot."
+color = Color(0.85, 0.55, 0.35, 1)
+rarity = 1

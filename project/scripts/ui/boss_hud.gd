@@ -6,7 +6,7 @@ extends Control
 @export var manager_path: NodePath
 
 var _manager: ExpeditionManager
-var _boss: Kurogale
+var _boss: BossController
 var _box: VBoxContainer
 var _name: Label
 var _bar: ProgressBar
@@ -23,6 +23,7 @@ func _ready() -> void:
 	if _manager == null or _manager.boss == null:
 		return
 	_boss = _manager.boss
+	_name.text = _boss.definition.display_name
 	_boss.awakened.connect(func() -> void: _box.visible = true; _refresh())
 	_boss.enraged.connect(func() -> void: _show_banner("%s is enraged!" % _boss.definition.display_name, UiStyle.DANGER))
 	_boss.get_health().changed.connect(func(_c: float, _m: float) -> void: _refresh())
@@ -73,7 +74,7 @@ func _build() -> void:
 	_box.custom_minimum_size = Vector2(520, 0)
 	_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_box)
-	_name = UiStyle.label("Kurogale, the Thornback Stag", 22)
+	_name = UiStyle.label("", 22)
 	_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(_name)
 	_bar = ProgressBar.new()

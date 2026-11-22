@@ -131,8 +131,10 @@ func test_hunt_board_lists_biomes_and_starts_expedition() -> void:
 	var board := instantiate("res://scenes/ui/hunt_board.tscn") as HuntBoard
 	await process_frames(3)
 	check(board.biomes.size() == 4, "four jungles listed")
-	var unlocked := board.biomes.filter(func(b: BiomeDefinition) -> bool: return b.unlocked)
-	check(unlocked.size() == 1 and unlocked[0].id == &"verdant_canopy", "only Verdant Canopy unlocked")
+	# With no hunts completed only the Verdant Canopy is open (Emberwild needs Kurogale first).
+	var fresh := PlayerProfile.new()
+	var unlocked := board.biomes.filter(func(b: BiomeDefinition) -> bool: return HuntBoard.is_open(b, fresh))
+	check(unlocked.size() == 1 and unlocked[0].id == &"verdant_canopy", "only Verdant Canopy open for a new hunter")
 	var start := board.get_start_button(&"kurogale")
 	check(start != null and not start.disabled, "Kurogale hunt can be started")
 	var scene := board.begin(unlocked[0], unlocked[0].hunts[0])

@@ -18,7 +18,7 @@ Not yet implemented: interact.
 | Heavy attack (breaks enemy poise) | Right mouse | Y / Triangle | HVY button |
 | Lock-on (press again to release) | Q or middle mouse | Right-stick click | LOCK button |
 | Interact | E | X / Square (context-sensitive) | — (later) |
-| Ember Talisman (fire charm, 4 s cooldown) | F | RB / R1 | FIRE button |
+| Ember Talisman (fire charm, 4 s cooldown; water with the Mist Charm) | F | RB / R1 | FIRE button |
 | Switch camera | V | D-pad down | CAM button |
 | Pause (freezes the expedition timer) | Esc | Start / Menu | **II** button (top right) |
 

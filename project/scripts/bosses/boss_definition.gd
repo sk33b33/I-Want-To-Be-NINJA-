@@ -30,6 +30,12 @@ extends Resource
 @export var enrage_tempo: float = 0.8
 
 @export_group("Presentation")
+## Body mesh (spine glow + hit flash). Part meshes come from BossPartDefinition.intact_node.
+@export var body_mesh_node: NodePath = ^"Visual/Body"
+## Pitch while recovering / staggered (negative lowers the head so head parts can be struck).
+@export var head_down_pitch: float = -0.6
+## Lock-on point relative to the boss (forward is -Z).
+@export var lock_offset: Vector3 = Vector3(0, 2.6, -1.8)
 @export var intro_time: float = 2.2
 @export var death_time: float = 3.0
 

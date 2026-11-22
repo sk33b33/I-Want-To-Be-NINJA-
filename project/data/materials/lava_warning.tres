@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/area_warning.gdshader" id="1_60w0b"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_60w0b")
+shader_parameter/color = Color(1, 0.55, 0.08, 1)

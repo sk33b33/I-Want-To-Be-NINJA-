@@ -9,5 +9,6 @@ id = &"ashen_oni_tortoise"
 beast_name = "Ashen Oni-Tortoise"
 element = "Fire"
 weakness = "Water"
+description = "A horned tortoise of living basalt that sleeps in the caldera. Fire only feeds it."
 signature = "Shell slam, lava burst"
 config = ExtResource("1_kj374")

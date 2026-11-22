@@ -57,6 +57,9 @@ var blade_damage_multiplier: float = 1.0
 var skill_damage_multiplier: float = 1.0
 var skill_cooldown_reduction: float = 0.0
 var equipped_gear: Array[GearDefinition] = []
+## Element overrides from gear (empty = default: fire talisman, physical blades).
+var skill_element_override: StringName = &""
+var blade_element: StringName = &""
 
 
 func _ready() -> void:
@@ -145,6 +148,13 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 		skill_used.emit(skill_cooldown_left)
 		return true
 	return false
+
+
+## The talisman's current element (fire unless a charm changes it).
+func skill_element() -> StringName:
+	if skill_element_override != &"":
+		return skill_element_override
+	return config.skill.element if config.skill else &""
 
 
 func effective_skill_cooldown() -> float:
@@ -258,6 +268,10 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 		info.stagger = a.stagger
 		info.knockback = a.knockback
 		info.element = a.element
+		if a.projectile_scene and skill_element_override != &"":
+			info.element = skill_element_override
+		elif not a.projectile_scene and blade_element != &"":
+			info.element = blade_element
 		info.source = body
 		info.attack_name = a.id
 		if a.projectile_scene:

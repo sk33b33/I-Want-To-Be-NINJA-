@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/lava.gdshader" id="1_d8p33"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_ghbaa"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_d8p33")
+shader_parameter/flow_noise = ExtResource("2_ghbaa")
+shader_parameter/crust = null
+shader_parameter/hot = null
+shader_parameter/white_hot = null
+shader_parameter/speed = null
+shader_parameter/flow_dir = null
+shader_parameter/glow = null
+shader_parameter/falling = null

@@ -584,3 +584,87 @@ static func snare_roots(material: Material) -> ArrayMesh:
 		_tube(st, PackedVector3Array([base, (base + top) * 0.5 + Vector3(0.1, 0, 0), top]),
 				PackedFloat32Array([0.16, 0.09, 0.01]), PackedColorArray([root, root, tip]), 5, rng, 0.1)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- Emberwild (Phase 8)
+
+## Ashen Oni-Tortoise body: huge domed basalt shell (spikes glow, COLOR.g = 1), heavy legs and a
+## low head with glowing eyes. Faces -Z; ~2.6 m tall at the shell crest, head at z ≈ -2.8.
+static func oni_tortoise_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 88
+	var hide := Color(0, 0, 0, 0)
+	var spike := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 1.45, 0.2), Vector3(2.0, 1.15, 2.4), rng, hide, hide, 6, 12, 0.07)   # Shell.
+	_blob(st, Vector3(0, 0.75, 0.2), Vector3(1.9, 0.45, 2.2), rng, hide, hide, 4, 12, 0.05)   # Plastron.
+	_tube(st, PackedVector3Array([Vector3(0, 1.1, -1.9), Vector3(0, 1.25, -2.5)]), PackedFloat32Array([0.55, 0.45]),
+			PackedColorArray([hide, hide]), 8, rng)                                                # Neck.
+	_blob(st, Vector3(0, 1.35, -2.95), Vector3(0.6, 0.5, 0.7), rng, hide, hide, 5, 9, 0.06)    # Head.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.32 * sgn, 1.55, -3.4), Vector3(0.09, 0.07, 0.06), rng, eye, eye, 2, 5, 0.0)
+		# Tusks.
+		var b := Vector3(0.25 * sgn, 1.05, -3.45)
+		_tri(st, b, b + Vector3(0.06 * sgn, 0, 0.06), b + Vector3(0.08 * sgn, 0.35, -0.15), hide, hide, hide)
+	for lx in [-1.4, 1.4]:
+		for lz in [-1.2, 1.5]:
+			_tube(st, PackedVector3Array([Vector3(lx, 0.9, lz), Vector3(lx * 1.1, 0.0, lz)]), PackedFloat32Array([0.45, 0.38]),
+					PackedColorArray([hide, hide]), 8, rng, 0.05)
+	# Volcanic spikes on the shell.
+	for i in 22:
+		var a := rng.randf() * TAU
+		var r := rng.randf_range(0.2, 1.6)
+		var base := Vector3(cos(a) * r, 0.0, 0.2 + sin(a) * r * 1.2)
+		base.y = 1.45 + 1.1 * sqrt(maxf(0.0, 1.0 - (base.x * base.x) / 4.0 - pow((base.z - 0.2) / 2.4, 2.0))) - 0.05
+		var h := rng.randf_range(0.35, 0.8)
+		var tip := base + Vector3(base.x * 0.15, h, (base.z - 0.2) * 0.12)
+		_tri(st, base - Vector3(0.12, 0, 0), base + Vector3(0.12, 0, 0), tip, spike, spike, spike)
+		_tri(st, base - Vector3(0, 0, 0.12), base + Vector3(0, 0, 0.12), tip, spike, spike, spike)
+	return _finish(st, null, material)
+
+
+## The Oni-Tortoise's breakable horns (two curved oni horns above the head). COLOR.g = 1 (glow).
+static func oni_horns(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 89
+	var c := Color(0, 1, 0, 0)
+	for sgn in [-1.0, 1.0]:
+		var base := Vector3(0.3 * sgn, 1.75, -2.85)
+		if broken:
+			_tube(st, PackedVector3Array([base, base + Vector3(0.05 * sgn, 0.25, 0)]), PackedFloat32Array([0.12, 0.1]),
+					PackedColorArray([c, c]), 6, rng, 0.12)
+			continue
+		var p1 := base + Vector3(0.25 * sgn, 0.45, 0.05)
+		var p2 := p1 + Vector3(0.25 * sgn, 0.4, 0.25)
+		var p3 := p2 + Vector3(-0.05 * sgn, 0.3, 0.35)
+		_tube(st, PackedVector3Array([base, p1, p2, p3]), PackedFloat32Array([0.14, 0.11, 0.07, 0.015]),
+				PackedColorArray([c, c, c, c]), 7, rng)
+	return _finish(st, null, material)
+
+
+## Lava burst eruption: a cluster of molten spikes (for the lava-burst hazard).
+static func magma_spikes(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 90
+	var c := Color(1.0, 0.45, 0.1, 1.0)
+	for i in 9:
+		var a := TAU * float(i) / 9.0 + rng.randf_range(-0.2, 0.2)
+		var r := rng.randf_range(0.1, 1.3)
+		var base := Vector3(cos(a) * r, -0.2, sin(a) * r)
+		var top := base + Vector3(rng.randf_range(-0.2, 0.2), rng.randf_range(1.2, 2.2), rng.randf_range(-0.2, 0.2))
+		_tube(st, PackedVector3Array([base, top]), PackedFloat32Array([0.22, 0.01]), PackedColorArray([c, c]), 5, rng)
+	return _finish(st, null, material)
+
+
+## Volcanic vent: a cracked rock cone, open at the top.
+static func vent_cone(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 91
+	var c := Color(1, 1, 1)
+	_tube(st, PackedVector3Array([Vector3(0, -0.1, 0), Vector3(0, 0.55, 0)]), PackedFloat32Array([1.5, 0.75]),
+			PackedColorArray([c, c]), 10, rng, 0.12)
+	return _finish(st, null, material)

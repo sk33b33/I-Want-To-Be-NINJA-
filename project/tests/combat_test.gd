@@ -77,10 +77,18 @@ func test_light_combo_chains_three_hits() -> void:
 	var indices: Array[int] = []
 	p.combat.attack_started.connect(func(_a: AttackDefinition, i: int) -> void: indices.append(i))
 	await physics_frames(10)
-	for i in 3:
+	await _tap("lock_on")  # Swings track the dummy, as a player would fight.
+	await _tap("attack_light")
+	for k in 2:
+		# Press the next light attack inside the current attack's combo (cancel) window.
+		for i in 120:
+			await tree.physics_frame
+			var a := p.combat.current_attack
+			if a and p.combat.state == PlayerCombat.State.ATTACK and indices.size() == k + 1 \
+					and p.combat._t >= a.total_seconds() - a.cancel_window * 0.6:
+				break
 		await _tap("attack_light")
-		await physics_frames(22)
-	await physics_frames(60)
+	await physics_frames(90)
 	check(indices == [0, 1, 2], "combo chained light 1 -> 2 -> 3 (got %s)" % [indices])
 	check(d.hits == 3, "three hits landed (hits=%d)" % d.hits)
 	check_near(d.total_damage, 10.0 + 11.0 + 17.0, 0.01, "combo damage adds up")

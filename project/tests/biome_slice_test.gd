@@ -47,7 +47,7 @@ func test_pickup_collects_once_and_is_kept_even_if_the_beast_escapes() -> void:
 	check(pk.taken, "picked up")
 	check(int(m.gathered.get(&"glowcap", 0)) == 1, "counted once (got %d)" % int(m.gathered.get(&"glowcap", 0)))
 	m.debug_set_remaining(0.2)
-	await process_frames(30)
+	await physics_frames(30)  # Physics frames pace real time; process frames may not (headless).
 	check(m.ended, "the beast escaped (timeout)")
 	check(PlayerProfile.load_profile().count(&"glowcap") == 1, "gathered glowcap saved anyway")
 	check(PlayerProfile.load_profile().hunts_completed.is_empty(), "no hunt credit for an escape")
@@ -134,7 +134,7 @@ func test_gate_full_expedition_from_hunt_board_to_rewards() -> void:
 	check(int(m.gathered.get(&"glowcap", 0)) >= 1, "gathered a glowcap on the gorge stones")
 
 	await BotHelpers.fight_boss(self, player, boss)
-	check(boss.state == Kurogale.State.DEFEATED, "Kurogale defeated (hp %.0f)" % boss.get_health().current)
+	check(boss.state == BossController.State.DEFEATED, "Kurogale defeated (hp %.0f)" % boss.get_health().current)
 	check(boss.is_part_broken(&"antler"), "antlers broken")
 	await physics_frames(int(boss.definition.death_time * 60.0) + 30)
 	check(results.visible, "results screen shown")

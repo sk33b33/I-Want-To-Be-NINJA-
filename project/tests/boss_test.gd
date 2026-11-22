@@ -98,11 +98,11 @@ func test_dormant_until_awakened_then_intro_then_stalks() -> void:
 	var nodes := _arena()
 	var boss: Kurogale = nodes[0]
 	await physics_frames(30)
-	check(boss.state == Kurogale.State.DORMANT, "sleeps until the arena event")
+	check(boss.state == BossController.State.DORMANT, "sleeps until the arena event")
 	boss.awaken()
-	check(boss.state == Kurogale.State.INTRO, "roars")
+	check(boss.state == BossController.State.INTRO, "roars")
 	await physics_frames(int(boss.definition.intro_time * 60.0) + 5)
-	check(boss.state != Kurogale.State.DORMANT and boss.state != Kurogale.State.INTRO, "fight on")
+	check(boss.state != BossController.State.DORMANT and boss.state != BossController.State.INTRO, "fight on")
 
 
 func _measure_attack(attack_id: StringName, player_at: Vector3) -> Dictionary:
@@ -176,7 +176,7 @@ func test_charge_into_a_pillar_stuns_the_boss() -> void:
 	var stunned := [false]
 	for i in 90:
 		await tree.physics_frame
-		stunned[0] = stunned[0] or boss.state == Kurogale.State.STUNNED
+		stunned[0] = stunned[0] or boss.state == BossController.State.STUNNED
 	check(stunned[0], "slammed into the pillar and was stunned")
 
 
@@ -194,7 +194,7 @@ func test_antlers_break_once_and_reward_once() -> void:
 	check(broken[0] == 1, "part_broken emitted exactly once (got %d)" % broken[0])
 	check(not (boss.get_node("Visual/Antlers") as Node3D).visible, "antlers gone")
 	check((boss.get_node("Visual/AntlerStubs") as Node3D).visible, "stubs shown")
-	check(boss.state == Kurogale.State.PART_BREAK, "big stagger on break")
+	check(boss.state == BossController.State.PART_BREAK, "big stagger on break")
 	for i in 5:
 		_hit(antler, 30.0)
 	check(broken[0] == 1, "further hits never break or reward again")
@@ -219,7 +219,7 @@ func test_enrages_once_at_half_health_and_unlocks_thorn_burst() -> void:
 	check(r >= expected - 0.02, "thorn burst still warns first (%.2f / %.2f)" % [r, expected])
 
 
-func _measure_attack_on(boss: Kurogale, p: PlayerController, id: StringName) -> float:
+func _measure_attack_on(boss: BossController, p: PlayerController, id: StringName) -> float:
 	p.global_position = boss.global_position + Vector3(0, 0.05, 3.0)
 	await physics_frames(5)
 	boss.debug_force_attack(id)
@@ -265,7 +265,7 @@ func test_victory_records_rewards_once_and_shows_results() -> void:
 	var player := main.get_node("Player") as PlayerController
 	player.global_position = Vector3(0, 0.5, -104)
 	await physics_frames(10)
-	check(m.arena_entered and boss.state != Kurogale.State.DORMANT, "arena entry woke the boss")
+	check(m.arena_entered and boss.state != BossController.State.DORMANT, "arena entry woke the boss")
 	var antler := boss.get_node("Visual/AntlerHurtbox") as Hurtbox
 	for i in 8:
 		_hit(antler, 30.0)
@@ -273,7 +273,7 @@ func test_victory_records_rewards_once_and_shows_results() -> void:
 	check(int(m.run_rewards.get(&"thornback_antler", 0)) == 1, "antler reward granted once")
 	_hit(boss.get_node("BodyHurtbox") as Hurtbox, 5000.0)
 	await physics_frames(5)
-	check(boss.state == Kurogale.State.DEFEATED, "defeated")
+	check(boss.state == BossController.State.DEFEATED, "defeated")
 	_hit(boss.get_node("BodyHurtbox") as Hurtbox, 5000.0)  # Hitting the corpse changes nothing.
 	await physics_frames(int(boss.definition.death_time * 60.0) + 30)
 	check(ended[0].get("outcome") == "victory", "victory outcome")
@@ -331,7 +331,7 @@ func test_gate_bot_defeats_kurogale_and_breaks_antlers() -> void:
 	var attack_count := 0
 	for frame in 60 * 300:
 		await tree.physics_frame
-		if boss.state == Kurogale.State.DEFEATED:
+		if boss.state == BossController.State.DEFEATED:
 			break
 		if p.combat.state == PlayerCombat.State.DEAD:
 			continue
@@ -342,7 +342,7 @@ func test_gate_bot_defeats_kurogale_and_breaks_antlers() -> void:
 		var dist := to_boss.length()
 		for m in ["move_forward", "move_back", "move_left", "move_right", "sprint"]:
 			Input.action_release(m)
-		if boss.state == Kurogale.State.TELEGRAPH:
+		if boss.state == BossController.State.TELEGRAPH:
 			var a := boss.current_attack
 			var left := boss.telegraph_seconds(a) - boss.state_time()
 			match a.id:
@@ -359,10 +359,10 @@ func test_gate_bot_defeats_kurogale_and_breaks_antlers() -> void:
 						Input.action_press("move_left" if a.id == &"charge" else "move_back")
 						await _tap("dodge")
 			continue
-		if boss.state == Kurogale.State.ATTACK:
+		if boss.state == BossController.State.ATTACK:
 			attack_count += 1 if boss.state_time() < 0.02 else 0
 			continue
-		var opening := boss.state in [Kurogale.State.RECOVER, Kurogale.State.STAGGER, Kurogale.State.STUNNED, Kurogale.State.PART_BREAK]
+		var opening := boss.state in [BossController.State.RECOVER, BossController.State.STAGGER, BossController.State.STUNNED, BossController.State.PART_BREAK]
 		if p.combat.skill_cooldown_left <= 0.0 and p.combat.state == PlayerCombat.State.READY:
 			await _tap("skill")
 			continue
@@ -382,5 +382,22 @@ func test_gate_bot_defeats_kurogale_and_breaks_antlers() -> void:
 		Input.action_release(m)
 	print("        gate bot: boss hp %.0f, antler dmg %.0f, player deaths %d" % [
 			boss.get_health().current, float(boss.part_damage.get(&"antler", 0.0)), deaths[0]])
-	check(boss.state == Kurogale.State.DEFEATED, "Kurogale defeated (hp left %.0f)" % boss.get_health().current)
+	check(boss.state == BossController.State.DEFEATED, "Kurogale defeated (hp left %.0f)" % boss.get_health().current)
 	check(boss.is_part_broken(&"antler"), "antlers broken during the fight")
+
+
+## Regression: the boss could land on the player capsule and ride along as if the player were
+## a moving floor (seen as the Tortoise teleporting onto the player in the Phase 8 tests).
+func test_boss_never_rides_on_the_player() -> void:
+	make_floor(Vector3(80, 1, 80))
+	var boss := instantiate("res://scenes/bosses/kurogale.tscn") as BossController
+	boss.global_position = Vector3(0, 3.5, 0)  # Dropped from above, onto the player.
+	var p := make_player(Vector3(0, 0.05, 0))
+	p.input_enabled = false
+	await physics_frames(90)  # Let the boss fall and settle.
+	p.global_position = Vector3(10, 0.05, 12)
+	await physics_frames(30)
+	check(Vector2(boss.global_position.x, boss.global_position.z).length() < 1.0,
+			"the boss stayed put when the player moved away (boss at %s)" % boss.global_position)
+	check(boss.global_position.y < 0.6, "the boss stands on the ground, not on the player (y=%.2f)" % boss.global_position.y)
+

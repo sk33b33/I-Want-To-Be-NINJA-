@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FaunaConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/fauna/fauna_config.gd" id="1_y6sv4"]
+
+[resource]
+script = ExtResource("1_y6sv4")
+seed = 808
+bat_flocks = Array[Vector3]([Vector3(0, 12, -60), Vector3(-28, 16, -15), Vector3(26, 15, -35), Vector3(15, 18, -100)])
+frog_count = 0
+lurker_count = 12
+lurker_glow = Color(1, 0.45, 0.05, 1)
+firefly_swarms = 20
+firefly_color = Color(1, 0.45, 0.1, 1)

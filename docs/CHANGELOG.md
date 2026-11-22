@@ -88,3 +88,12 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - `GearLoadout` applies equipped gear at expedition start (damage, health, armor, talisman); HUD shows the loadout.
 - `PlayerProfile` v2: `gear_owned`, `equipped`; v1 saves still load.
 - Tests: `crafting_test.gd` (11) incl. the gate.
+
+## 2026-11-22 — Phase 8: Emberwild + Ashen Oni-Tortoise
+- **Boss refactor:** `BossController` runs any boss from data. `BossAttackDefinition.kind` = FRONT / DASH / ERUPTIONS / RADIAL plus the scene nodes, pose, glow and part-weakening it uses; parts declare their intact/broken visuals. `Kurogale` is now an empty subclass (all Phase 5 tests unchanged and passing).
+- **Emberwild** (`scenes/main/expedition_emberwild.tscn`): ash/basalt terrain, scorched flora, ember-glow mushrooms, rising embers, ember sky, lava river and lavafalls, basalt route pieces with glowing veins.
+- **Hazards** (`scripts/world/hazards/`): `FireVent` (dormant → warning → erupt; four in a wave), `HeatZone` (burns over time; cool lane alongside), `SinkingStone` (up → warning → sink → rise), `CrumblePlatform` (breaks after you step on it, reforms), `LavaZone` (burns + back to the last shrine).
+- **Ashen Oni-Tortoise** (fire; ×1.5 water, ×0.25 fire): Shell Slam, Lava Burst, Shell Spin (homing; stuns on pillars), enraged Ember Field. Breakable horns → Oni Horn; victory → Ashen Shell Plate.
+- **Progression:** Emberwild unlocks after defeating Kurogale (`BiomeDefinition.requires_hunt`; `-- --unlock-all` for testing). New forge items: **Mist Charm** (talisman becomes water — the counter to the Tortoise), **Oni Fang Blades** (+40%, fire blades — strong vs Kurogale), **Ashen Plate** (+40 HP, −25% damage). New gatherable: Ember Crystal. Gear can now set blade / talisman elements.
+- **Bug fixes found by the new tests:** bosses could land on the player and ride along (the player counted as a moving floor) — bosses now collide with the world only and never use the player (or each other) as a platform; test runner now lets physics settle between tests.
+- Tests: `emberwild_test.gd` (13) incl. the gate, boss regression test; 125 total. Also hardened three older tests: the light-combo test now locks on and presses inside the combo window (it relied on exact frame timing), the timeout test waits physics frames (render frames do not pace real time headless), and two tests updated for Phase 8 content (6 recipes; Emberwild gated by Kurogale).

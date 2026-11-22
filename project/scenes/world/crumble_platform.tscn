@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/hazards/crumble_platform.gd" id="1_3w1ki"]
+[ext_resource type="Material" path="res://data/materials/basalt.tres" id="2_7jxca"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7wtxe"]
+size = Vector3(2.6, 0.8, 2.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_whowm"]
+material = ExtResource("2_7jxca")
+size = Vector3(2.6, 0.8, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_10wwd"]
+size = Vector3(2.4, 0.6, 2.4)
+
+[node name="CrumblePlatform" type="AnimatableBody3D"]
+script = ExtResource("1_3w1ki")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+shape = SubResource("BoxShape3D_7wtxe")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+mesh = SubResource("BoxMesh_whowm")
+
+[node name="Trigger" type="Area3D" parent="."]
+
+[node name="@CollisionShape3D@27" type="CollisionShape3D" parent="Trigger"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("BoxShape3D_10wwd")

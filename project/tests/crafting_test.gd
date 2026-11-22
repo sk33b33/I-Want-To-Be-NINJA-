@@ -30,7 +30,7 @@ func _recipe(gear_id: StringName) -> RecipeDefinition:
 
 
 func test_catalog_has_three_recipes_using_hunt_materials() -> void:
-	check(catalog.recipes.size() == 3, "three recipes")
+	check(catalog.recipes.size() >= 3, "at least three recipes (%d)" % catalog.recipes.size())
 	var slots := {}
 	for r in catalog.recipes:
 		slots[r.result.slot] = true

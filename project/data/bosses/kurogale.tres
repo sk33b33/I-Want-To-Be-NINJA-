@@ -1,16 +1,24 @@
-[gd_resource type="Resource" script_class="BossDefinition" load_steps=14 format=3]
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
 
-[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_jrwdr"]
-[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="2_lgl4i"]
-[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="3_uin1k"]
-[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="4_hwjqt"]
-[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="5_fax44"]
-[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="6_qg2wr"]
-[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="7_23fs5"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_lgl4i"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/root_snare.tscn" id="2_uin1k"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="3_hwjqt"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="4_fax44"]
+[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="5_qg2wr"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="6_23fs5"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_ef3qq"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="8_be0d6"]
 
-[sub_resource type="Resource" id="Resource_ef3qq"]
-script = ExtResource("1_jrwdr")
+[sub_resource type="Resource" id="Resource_kck7j"]
+script = ExtResource("1_lgl4i")
 id = &"antler_sweep"
+hitbox_node = NodePath("Front/SweepHitbox")
+warning_node = NodePath("Front/SweepWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.3
+glow = 2
+element = &"nature"
+weakened_by_part = &"antler"
 display_name = "Antler Sweep"
 telegraph_time = 0.9
 active_time = 0.35
@@ -22,9 +30,15 @@ weight = 3.0
 cooldown = 2.5
 counterplay = "Roll away or get behind it; its head stays low afterwards: strike the antlers."
 
-[sub_resource type="Resource" id="Resource_be0d6"]
-script = ExtResource("1_jrwdr")
+[sub_resource type="Resource" id="Resource_1qcfe"]
+script = ExtResource("1_lgl4i")
 id = &"root_snare"
+kind = 2
+eruption_scene = ExtResource("2_uin1k")
+eruption_offsets = PackedVector3Array(0, 0, 0, 2.6, 0, 1.2, -2.4, 0, -1.6)
+telegraph_pitch = 0.2
+glow = 1
+element = &"nature"
 display_name = "Root Snare"
 telegraph_time = 1.2
 active_time = 0.45
@@ -37,9 +51,17 @@ weight = 2.0
 cooldown = 6.0
 counterplay = "Step out of the glowing green rings before the roots erupt."
 
-[sub_resource type="Resource" id="Resource_kck7j"]
-script = ExtResource("1_jrwdr")
+[sub_resource type="Resource" id="Resource_50jtk"]
+script = ExtResource("1_lgl4i")
 id = &"charge"
+kind = 1
+hitbox_node = NodePath("Front/ChargeHitbox")
+warning_node = NodePath("Front/ChargeWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.12
+telegraph_wobble = 0.1
+stuns_on_wall = true
+element = &"nature"
 display_name = "Charge"
 active_time = 0.9
 recovery_time = 1.2
@@ -52,9 +74,17 @@ weight = 2.0
 cooldown = 5.0
 counterplay = "Roll sideways off the red strip; if it slams into a pillar it is stunned."
 
-[sub_resource type="Resource" id="Resource_1qcfe"]
-script = ExtResource("1_jrwdr")
+[sub_resource type="Resource" id="Resource_n74kr"]
+script = ExtResource("1_lgl4i")
 id = &"thorn_burst"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"nature"
 display_name = "Thorn Burst"
 active_time = 0.3
 recovery_time = 0.9
@@ -65,26 +95,28 @@ cooldown = 6.0
 enraged_only = true
 counterplay = "Leave the red ring around it."
 
-[sub_resource type="Resource" id="Resource_50jtk"]
-script = ExtResource("2_lgl4i")
+[sub_resource type="Resource" id="Resource_wmc7h"]
+script = ExtResource("3_hwjqt")
 affinity = &"nature"
 multipliers = {
 &"earth": 0.5,
 &"fire": 1.5
 }
 
-[sub_resource type="Resource" id="Resource_n74kr"]
-script = ExtResource("3_uin1k")
+[sub_resource type="Resource" id="Resource_8qqfl"]
+script = ExtResource("4_fax44")
 id = &"antler"
 display_name = "Antlers"
 break_health = 220.0
-reward = ExtResource("4_hwjqt")
+reward = ExtResource("5_qg2wr")
+intact_node = NodePath("Visual/Antlers")
+broken_node = NodePath("Visual/AntlerStubs")
 
 [resource]
-script = ExtResource("5_fax44")
+script = ExtResource("6_23fs5")
 id = &"kurogale"
 display_name = "Kurogale, the Thornback Stag"
-elements = SubResource("Resource_50jtk")
-attacks = Array[ExtResource("1_jrwdr")]([SubResource("Resource_ef3qq"), SubResource("Resource_be0d6"), SubResource("Resource_kck7j"), SubResource("Resource_1qcfe")])
-parts = Array[ExtResource("3_uin1k")]([SubResource("Resource_n74kr")])
-victory_rewards = Array[ExtResource("6_qg2wr")]([ExtResource("7_23fs5")])
+elements = SubResource("Resource_wmc7h")
+attacks = Array[ExtResource("1_lgl4i")]([SubResource("Resource_kck7j"), SubResource("Resource_1qcfe"), SubResource("Resource_50jtk"), SubResource("Resource_n74kr")])
+parts = Array[ExtResource("4_fax44")]([SubResource("Resource_8qqfl")])
+victory_rewards = Array[ExtResource("7_ef3qq")]([ExtResource("8_be0d6")])

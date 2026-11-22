@@ -1,0 +1,66 @@
+[gd_scene load_steps=10 format=4]
+
+[ext_resource type="Script" path="res://scripts/world/hazards/fire_vent.gd" id="1_rw4ls"]
+[ext_resource type="Material" path="res://data/materials/basalt.tres" id="2_k8iay"]
+[ext_resource type="Material" path="res://data/materials/vent_glow.tres" id="3_wr4aj"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="4_blygn"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="5_85ym3"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_jcs8x"]
+_surfaces = [{
+"aabb": AABB(-1.4963256, -0.1, -1.5067556, 2.8265007, 0.65000004, 3.1127007),
+"attribute_data": PackedByteArray("//////////////////////////////////////////////////////////////////////////////////////////////////////////8="),
+"format": 34359742479,
+"index_count": 60,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAQAEAAUAAQAFAAIABAAGAAcABAAHAAUABgAIAAkABgAJAAcACAAKAAsACAALAAkACgAMAA0ACgANAAsADAAOAA8ADAAPAA0ADgAQABEADgARAA8AEAASABMAEAATABEAEgAAAAMAEgADABMA"),
+"material": ExtResource("2_k8iay"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 20,
+"vertex_data": PackedByteArray("AAAAAM3MzL1e3cC/j7lNv83MzL32k42/m7T4vs3MDD8pKCu/AAAAAM3MDD/xwDK/8kS0v83MzL3OSuq+KoM3v83MDD/TgW6+mYe/v83MzL1U7fg+yDwuv83MDD/kc2I+b9xPv83MzL1RDI8/1ePovs3MDD/VRSA/M79ipc3MzL2cj80/DbDTpM3MDD+q6D8/OOhUP83MzL1QhZI/oYbHPs3MDD/aTwk/I5CmP83MzL17etg++vExP83MDD+KRWc+LUOqP83MzL1TSd2+CmNEP83MDD9nPX++D2Z5P83MzL1Ioqu/N6LlPs3MDD8lCB6/DIhvQF0okpijp8VODzmOoBydTkovMaKcwXrTO28fI5oQtLhBiETIqauzPEnSREyotsJ6LQBa8aktvrI1k1LeqhvKwRqZZ4ukmsjyHz1lHqbFQ7oIgUOis/a+xAbOU1ar5jeZI388A8UzOl0cjDV1vxM4UjkIUlLR4jfVLkNIy8wbS0lIN1bX2XdEOUZfWcTXGGntPwgF7qScXVVGGRiR2w==")
+}]
+
+[sub_resource type="QuadMesh" id="QuadMesh_kqw0y"]
+material = ExtResource("3_wr4aj")
+size = Vector2(3.4, 3.4)
+orientation = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_bhr2c"]
+material = ExtResource("4_blygn")
+size = Vector2(2.2, 6)
+center_offset = Vector3(0, 3, 0)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_urf3c"]
+height = 5.0
+radius = 1.6
+
+[node name="FireVent" type="Node3D"]
+script = ExtResource("1_rw4ls")
+
+[node name="Cone" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_jcs8x")
+
+[node name="Glow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_kqw0y")
+
+[node name="Column" type="Node3D" parent="."]
+
+[node name="@MeshInstance3D@23" type="MeshInstance3D" parent="Column"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_bhr2c")
+
+[node name="@OmniLight3D@24" type="OmniLight3D" parent="Column"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+light_color = Color(1, 0.45, 0.1, 1)
+light_energy = 3.0
+omni_range = 7.0
+
+[node name="Hitbox" type="Area3D" parent="."]
+script = ExtResource("5_85ym3")
+team = &"enemy"
+
+[node name="@CollisionShape3D@25" type="CollisionShape3D" parent="Hitbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+shape = SubResource("CylinderShape3D_urf3c")

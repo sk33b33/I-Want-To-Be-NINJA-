@@ -21,6 +21,7 @@ func _initialize() -> void:
 	_crafting_data()
 	_level_scene()
 	_main_scene()
+	_emberwild()  # Phase 8
 	_hunt_board_scene()
 	print("GENERATED")
 	quit(0)
@@ -641,11 +642,12 @@ func _level_scene() -> void:
 	_pack(_root, "res://scenes/biomes/verdant_canopy.tscn")
 
 
-func _main_scene() -> void:
+func _main_scene(level_path: String = "res://scenes/biomes/verdant_canopy.tscn",
+		hunt_path: String = "res://data/hunts/kurogale.tres", out_path: String = "res://scenes/main/main.tscn") -> void:
 	var main := Node3D.new()
 	main.name = "Main"
 	main.set_script(load("res://scripts/main/main.gd"))
-	var level: Node = (load("res://scenes/biomes/verdant_canopy.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	var level: Node = (load(level_path) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
 	level.name = "Level"
 	main.add_child(level)
 	level.owner = main
@@ -656,9 +658,9 @@ func _main_scene() -> void:
 	var expedition := Node.new()
 	expedition.name = "Expedition"
 	expedition.set_script(load("res://scripts/expedition/expedition_manager.gd"))
-	expedition.set("hunt", load("res://data/hunts/kurogale.tres"))
+	expedition.set("hunt", load(hunt_path))
 	expedition.set("default_config", load("res://data/expedition/default_expedition.tres"))
-	expedition.set("scene_path", "res://scenes/main/main.tscn")
+	expedition.set("scene_path", out_path)
 	expedition.set("crafting", load("res://data/crafting/catalog.tres"))
 	main.add_child(expedition)
 	expedition.owner = main
@@ -712,7 +714,7 @@ func _main_scene() -> void:
 		c.owner = main
 	var ps := PackedScene.new()
 	ps.pack(main)
-	_save(ps, "res://scenes/main/main.tscn")
+	_save(ps, out_path)
 	main.free()
 
 
@@ -972,9 +974,37 @@ func _boss_data() -> void:
 	var charge := _boss_attack("charge", "Charge", 1.0, 0.9, 1.2, 28.0, 10.0, 7.0, 26.0, 2.0, 5.0,
 			"Roll sideways off the red strip; if it slams into a pillar it is stunned.")
 	charge.move_speed = 15.0
+	# Behaviour (BossController reads these; see BossAttackDefinition.Kind).
+	sweep.kind = BossAttackDefinition.Kind.FRONT
+	sweep.hitbox_node = NodePath("Front/SweepHitbox")
+	sweep.warning_node = NodePath("Front/SweepWarning")
+	sweep.telegraph_pitch = -0.3
+	sweep.glow = BossAttackDefinition.Glow.PARTS
+	sweep.weakened_by_part = &"antler"
+	sweep.element = &"nature"
+	snare.kind = BossAttackDefinition.Kind.ERUPTIONS
+	snare.eruption_scene = load("res://scenes/bosses/root_snare.tscn")
+	snare.eruption_offsets = PackedVector3Array([Vector3.ZERO, Vector3(2.6, 0, 1.2), Vector3(-2.4, 0, -1.6)])
+	snare.telegraph_pitch = 0.2
+	snare.glow = BossAttackDefinition.Glow.BODY
+	snare.element = &"nature"
+	charge.kind = BossAttackDefinition.Kind.DASH
+	charge.hitbox_node = NodePath("Front/ChargeHitbox")
+	charge.warning_node = NodePath("Front/ChargeWarning")
+	charge.telegraph_pitch = -0.12
+	charge.telegraph_wobble = 0.1
+	charge.stuns_on_wall = true
+	charge.element = &"nature"
 	var burst := _boss_attack("thorn_burst", "Thorn Burst", 1.0, 0.3, 0.9, 20.0, 9.0, 0.0, 5.0, 2.0, 6.0,
 			"Leave the red ring around it.")
 	burst.enraged_only = true
+	burst.kind = BossAttackDefinition.Kind.RADIAL
+	burst.hitbox_node = NodePath("BurstHitbox")
+	burst.warning_node = NodePath("BurstWarning")
+	burst.telegraph_pitch = 0.2
+	burst.glow = BossAttackDefinition.Glow.BODY
+	burst.tracks_player = false
+	burst.element = &"nature"
 	var part := BossPartDefinition.new()
 	part.id = &"antler"
 	part.display_name = "Antlers"
@@ -982,6 +1012,8 @@ func _boss_data() -> void:
 	part.reward = antler
 	part.reward_count = 1
 	part.break_stagger_time = 2.0
+	part.intact_node = NodePath("Visual/Antlers")
+	part.broken_node = NodePath("Visual/AntlerStubs")
 	var def := BossDefinition.new()
 	def.id = &"kurogale"
 	def.display_name = "Kurogale, the Thornback Stag"
@@ -990,6 +1022,7 @@ func _boss_data() -> void:
 	def.attacks = [sweep, snare, charge, burst] as Array[BossAttackDefinition]
 	def.parts = [part] as Array[BossPartDefinition]
 	def.victory_rewards = [hide] as Array[ItemDefinition]
+	def.lock_offset = Vector3(0, 2.6, -1.8)
 	_save(def, "res://data/bosses/kurogale.tres")
 
 
@@ -1050,29 +1083,13 @@ func _boss_scenes() -> void:
 	tal.add_child(light)
 	_pack(tal, "res://scenes/combat/fire_talisman.tscn")
 
-	# Root snare hazard.
-	var sn := Node3D.new()
-	sn.name = "RootSnare"
-	sn.set_script(load("res://scripts/bosses/root_snare.gd"))
-	sn.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "snare_warning"))
-	var roots := Node3D.new()
-	roots.name = "Roots"
-	var rm := MeshInstance3D.new()
-	rm.mesh = ProceduralMeshes.snare_roots(load(MAT + "bark_vertex.tres"))
-	roots.add_child(rm)
-	sn.add_child(roots)
-	var cyl := CylinderShape3D.new()
-	cyl.radius = 1.6
-	cyl.height = 2.0
-	sn.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
-	_pack(sn, "res://scenes/bosses/root_snare.tscn")
+	_root_snare_scene()
 
 	# Kurogale.
 	var k := CharacterBody3D.new()
 	k.name = "Kurogale"
 	k.set_script(load("res://scripts/bosses/kurogale.gd"))
 	k.set("definition", load("res://data/bosses/kurogale.tres"))
-	k.set("root_snare_scene", load("res://scenes/bosses/root_snare.tscn"))
 	var col := CollisionShape3D.new()
 	col.name = "Collision"
 	col.shape = _box_shape(Vector3(1.8, 3.0, 4.4))
@@ -1122,6 +1139,8 @@ func _boss_scenes() -> void:
 func _boss_scenes_prerequisites() -> void:
 	if not ResourceLoader.exists("res://scenes/combat/fire_talisman.tscn"):
 		_boss_scenes_talisman_only()
+	if not ResourceLoader.exists("res://scenes/bosses/root_snare.tscn"):
+		_root_snare_scene()
 
 
 func _boss_scenes_talisman_only() -> void:
@@ -1250,3 +1269,644 @@ func _crafting_data() -> void:
 	] as Array[RecipeDefinition]
 	catalog.items = [antler, hide, glow, shard] as Array[ItemDefinition]
 	_save(catalog, "res://data/crafting/catalog.tres")
+
+
+func _root_snare_scene() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/bosses")
+	# Root snare hazard.
+	var sn := Node3D.new()
+	sn.name = "RootSnare"
+	sn.set_script(load("res://scripts/bosses/root_snare.gd"))
+	sn.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "snare_warning"))
+	var roots := Node3D.new()
+	roots.name = "Roots"
+	var rm := MeshInstance3D.new()
+	rm.mesh = ProceduralMeshes.snare_roots(load(MAT + "bark_vertex.tres"))
+	roots.add_child(rm)
+	sn.add_child(roots)
+	var cyl := CylinderShape3D.new()
+	cyl.radius = 1.6
+	cyl.height = 2.0
+	sn.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
+	_pack(sn, "res://scenes/bosses/root_snare.tscn")
+
+
+# ================================================================ Phase 8: Emberwild
+
+func _emberwild() -> void:
+	_emberwild_materials()
+	_emberwild_data()
+	_emberwild_scenes()
+	_emberwild_level()
+	_main_scene("res://scenes/biomes/emberwild.tscn", "res://data/hunts/ashen_oni_tortoise.tres",
+			"res://scenes/main/expedition_emberwild.tscn")
+	_emberwild_unlock()
+
+
+func _emberwild_materials() -> void:
+	var detail: Resource = load(MAT + "noise_detail.tres")
+	_save(_shader_mat("lava", {"flow_noise": detail}), MAT + "lava.tres")
+	_save(_shader_mat("lava", {"flow_noise": detail, "falling": true, "glow": 2.6}), MAT + "lava_fall.tres")
+	_save(_shader_mat("basalt", {"detail_noise": detail}), MAT + "basalt.tres")
+	_save(_shader_mat("basalt", {"detail_noise": detail, "climb_marks": 1.0}), MAT + "basalt_climb.tres")
+	_save(_shader_mat("terrain", {"detail_noise": detail, "macro_noise": load(MAT + "noise_macro.tres"),
+			"moss_dark": Color(0.07, 0.06, 0.055), "moss_light": Color(0.16, 0.13, 0.11), "mud": Color(0.12, 0.08, 0.06),
+			"rock": Color(0.14, 0.12, 0.12), "rock_dark": Color(0.04, 0.035, 0.035)}), MAT + "terrain_ash.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.08, "translucency": 0.15, "tint": Color(1.1, 0.6, 0.35),
+			"brightness": 1.6}), MAT + "foliage_scorched.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.04, "translucency": 0.1, "tint": Color(0.9, 0.45, 0.3),
+			"brightness": 1.5}), MAT + "leaf_scorched.tres")
+	_save(_shader_mat("sky_gloom", {"cloud_noise": load(MAT + "noise_clouds.tres"), "zenith": Color(0.06, 0.03, 0.03),
+			"horizon": Color(0.32, 0.12, 0.06), "glow_tint": Color(0.9, 0.3, 0.08), "flash_color": Color(1.0, 0.4, 0.15),
+			"moon_dir": Vector3(-0.3, 0.15, -0.9)}), MAT + "sky_ember.tres")
+	_save(_shader_mat("mist_card", {"mist_noise": load(MAT + "noise_mist.tres"), "color": Color(0.25, 0.2, 0.18),
+			"opacity": 0.28}), MAT + "mist_ash.tres")
+	_save(_shader_mat("light_shaft", {"color": Color(0.7, 0.3, 0.12), "strength": 0.03}), MAT + "shaft_ember.tres")
+	_save(_shader_mat("area_warning", {"color": Color(1.0, 0.35, 0.05)}), MAT + "vent_glow.tres")
+	_save(_shader_mat("area_warning", {"color": Color(1.0, 0.5, 0.1)}), MAT + "heat_shimmer.tres")
+	_save(_shader_mat("area_warning", {"color": Color(1.0, 0.55, 0.08)}), MAT + "lava_warning.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.22, 0.19, 0.17), "glow_color": Color(1.0, 0.6, 0.1),
+			"glow_energy": 4.0, "spine_idle": Color(0.55, 0.16, 0.05), "spine_color": Color(1.0, 0.35, 0.05),
+			"spine_strength": 2.5}), MAT + "oni_body.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.3, 0.27, 0.24), "spine_idle": Color(0.35, 0.3, 0.26),
+			"spine_color": Color(1.0, 0.5, 0.1), "spine_strength": 0.8}), MAT + "oni_horns.tres")
+
+
+func _emberwild_data() -> void:
+	# World configs.
+	var terrain := TerrainConfig.new()
+	terrain.seed = 4040
+	terrain.hill_height = 7.0
+	terrain.valley_wall_height = 20.0
+	terrain.stream_z = -1000.0  # No stream in Emberwild.
+	terrain.stream_depth = 0.0
+	terrain.gorge_depth = -4.0  # Lava river (surface at -1.6); LavaZone handles falls.
+	_save(terrain, "res://data/biomes/emberwild_terrain.tres")
+	var flora := FloraConfig.new()
+	flora.seed = 5150
+	flora.grass_count = 2500
+	flora.fern_count = 500
+	flora.broadleaf_count = 120
+	flora.mushroom_count = 380
+	flora.rock_count = 900
+	flora.jungle_tree_count = 25
+	flora.dead_tree_count = 85
+	flora.log_count = 18
+	flora.pillar_count = 10
+	flora.mushroom_glows = [Color(1.0, 0.45, 0.1), Color(1.0, 0.2, 0.05), Color(1.0, 0.75, 0.2)] as Array[Color]
+	_save(flora, "res://data/biomes/emberwild_flora.tres")
+	var fauna := FaunaConfig.new()
+	fauna.seed = 808
+	fauna.bat_flocks = [Vector3(0, 12, -60), Vector3(-28, 16, -15), Vector3(26, 15, -35), Vector3(15, 18, -100)] as Array[Vector3]
+	fauna.frog_count = 0
+	fauna.lurker_count = 12
+	fauna.lurker_glow = Color(1.0, 0.45, 0.05)
+	fauna.firefly_swarms = 20
+	fauna.firefly_color = Color(1.0, 0.45, 0.1)  # Rising embers.
+	_save(fauna, "res://data/biomes/emberwild_fauna.tres")
+	# Items.
+	var crystal := _item("ember_crystal", "Ember Crystal", "A shard of cooled magma that never quite stops glowing.",
+			Color(1.0, 0.45, 0.15), 0)
+	var horn := _item("oni_horn", "Oni Horn", "A horn of the Ashen Oni-Tortoise, heavy as an anvil and still hot.",
+			Color(0.85, 0.55, 0.35), 1)
+	var plate := _item("ashen_shell_plate", "Ashen Shell Plate", "A slab of the Oni-Tortoise's volcanic shell.",
+			Color(0.35, 0.3, 0.28), 0)
+	# Boss.
+	var el := ElementProfile.new()
+	el.affinity = &"fire"
+	el.multipliers = {&"water": 1.5, &"fire": 0.25, &"nature": 0.75}
+	var slam := _boss_attack("shell_slam", "Shell Slam", 1.1, 0.35, 1.2, 30.0, 10.0, 0.0, 6.0, 3.0, 3.0,
+			"It rears onto its hind legs: back out of the red zone in front, then strike its lowered horns.")
+	slam.kind = BossAttackDefinition.Kind.FRONT
+	slam.hitbox_node = NodePath("Front/SlamHitbox")
+	slam.warning_node = NodePath("Front/SlamWarning")
+	slam.telegraph_pitch = 0.35
+	slam.glow = BossAttackDefinition.Glow.BODY
+	slam.weakened_by_part = &"horns"
+	slam.element = &"fire"
+	var burst := _boss_attack("lava_burst", "Lava Burst", 1.3, 0.5, 1.0, 22.0, 6.0, 3.0, 26.0, 2.0, 6.0,
+			"Glowing orange circles open under you: step out before the magma erupts.")
+	burst.kind = BossAttackDefinition.Kind.ERUPTIONS
+	burst.eruption_scene = load("res://scenes/bosses/lava_burst.tscn") if ResourceLoader.exists("res://scenes/bosses/lava_burst.tscn") else null
+	burst.eruption_offsets = PackedVector3Array([Vector3.ZERO, Vector3(3.0, 0, 0.8), Vector3(-2.8, 0, 1.2), Vector3(0.6, 0, -3.0)])
+	burst.telegraph_pitch = 0.15
+	burst.glow = BossAttackDefinition.Glow.BODY
+	burst.element = &"fire"
+	var spin := _boss_attack("shell_spin", "Shell Spin", 1.0, 1.3, 1.5, 26.0, 12.0, 6.0, 26.0, 2.0, 6.0,
+			"It withdraws and spins at you, curving slightly: roll sideways late; it stuns itself on pillars.")
+	spin.kind = BossAttackDefinition.Kind.DASH
+	spin.hitbox_node = NodePath("Front/SpinHitbox")
+	spin.warning_node = NodePath("Front/SpinWarning")
+	spin.move_speed = 11.0
+	spin.dash_homing = 1.2
+	spin.stuns_on_wall = true
+	spin.stun_time = 3.0
+	spin.telegraph_pitch = -0.1
+	spin.telegraph_wobble = 0.08
+	spin.element = &"fire"
+	var field := _boss_attack("ember_field", "Ember Field", 1.2, 0.4, 1.0, 24.0, 9.0, 0.0, 6.5, 2.0, 7.0,
+			"Enraged: the ground around it glows; get out of the ring.")
+	field.kind = BossAttackDefinition.Kind.RADIAL
+	field.enraged_only = true
+	field.hitbox_node = NodePath("BurstHitbox")
+	field.warning_node = NodePath("BurstWarning")
+	field.telegraph_pitch = 0.2
+	field.glow = BossAttackDefinition.Glow.BODY
+	field.tracks_player = false
+	field.element = &"fire"
+	var part := BossPartDefinition.new()
+	part.id = &"horns"
+	part.display_name = "Horns"
+	part.break_health = 260.0
+	part.reward = horn
+	part.reward_count = 1
+	part.break_stagger_time = 2.2
+	part.intact_node = NodePath("Visual/Horns")
+	part.broken_node = NodePath("Visual/HornStubs")
+	var def := BossDefinition.new()
+	def.id = &"ashen_oni_tortoise"
+	def.display_name = "Ashen Oni-Tortoise"
+	def.max_health = 1100.0
+	def.poise = 150.0
+	def.stagger_time = 1.6
+	def.elements = el
+	def.attacks = [slam, burst, spin, field] as Array[BossAttackDefinition]
+	def.parts = [part] as Array[BossPartDefinition]
+	def.victory_rewards = [plate] as Array[ItemDefinition]
+	def.walk_speed = 2.4
+	def.turn_sharpness = 3.0
+	def.stalk_distance = 5.5
+	def.attack_interval = 1.4
+	def.head_down_pitch = -0.35
+	def.lock_offset = Vector3(0, 1.8, -2.6)
+	_save(def, "res://data/bosses/ashen_oni_tortoise.tres")
+	# Hunt (replaces the Phase 3 stub).
+	var h := HuntDefinition.new()
+	h.id = &"ashen_oni_tortoise"
+	h.beast_name = "Ashen Oni-Tortoise"
+	h.element = "Fire"
+	h.weakness = "Water"
+	h.signature = "Shell slam, lava burst"
+	h.description = "A horned tortoise of living basalt that sleeps in the caldera. Fire only feeds it."
+	h.config = load("res://data/expedition/default_expedition.tres")
+	_save(h, "res://data/hunts/ashen_oni_tortoise.tres")
+	# Crafting: Mist Charm (water talisman) + two Emberwild recipes.
+	var glow: ItemDefinition = load("res://data/items/glowcap.tres")
+	var shard: ItemDefinition = load("res://data/items/ruin_shard.tres")
+	var mist := _gear("mist_charm", "Mist Charm",
+			"A rune shard wrapped in damp glowcap moss. Talismans burst into cold mist instead of flame.",
+			GearDefinition.Slot.CHARM, Color(0.4, 0.75, 1.0), {"skill_element": &"water", "skill_cooldown_reduction": 0.5})
+	var oni_blades := _gear("oni_fang_blades", "Oni Fang Blades",
+			"Blades ground from an oni horn. They stay hot enough to sear.", GearDefinition.Slot.WEAPON,
+			Color(1.0, 0.45, 0.15), {"blade_damage_multiplier": 1.4, "blade_element": &"fire"})
+	var ashen := _gear("ashen_plate", "Ashen Plate",
+			"Armor plates cut from the Oni-Tortoise's shell. Heavy, and nearly fireproof.", GearDefinition.Slot.ARMOR,
+			Color(0.45, 0.4, 0.38), {"max_health_bonus": 40.0, "damage_reduction": 0.25})
+	var catalog: CraftingCatalog = load("res://data/crafting/catalog.tres")
+	catalog.recipes.append(_recipe("mist_charm", mist, [shard, glow] as Array[ItemDefinition], [2, 2]))
+	catalog.recipes.append(_recipe("oni_fang_blades", oni_blades, [horn, crystal] as Array[ItemDefinition], [1, 2]))
+	catalog.recipes.append(_recipe("ashen_plate", ashen, [plate, crystal] as Array[ItemDefinition], [1, 2]))
+	catalog.items.append_array([crystal, horn, plate])
+	_save(catalog, "res://data/crafting/catalog.tres")
+
+
+func _emberwild_scenes() -> void:
+	# Lava burst eruption (RootSnare behaviour, molten visuals).
+	var lb := Node3D.new()
+	lb.name = "LavaBurst"
+	lb.set_script(load("res://scripts/bosses/root_snare.gd"))
+	lb.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "lava_warning"))
+	var roots := Node3D.new()
+	roots.name = "Roots"
+	var rm := MeshInstance3D.new()
+	rm.mesh = ProceduralMeshes.magma_spikes(load(MAT + "glow_fungus.tres"))
+	roots.add_child(rm)
+	lb.add_child(roots)
+	var cyl := CylinderShape3D.new()
+	cyl.radius = 1.6
+	cyl.height = 2.2
+	lb.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
+	_pack(lb, "res://scenes/bosses/lava_burst.tscn")
+	# Re-save the boss data now that the eruption scene exists.
+	var def: BossDefinition = load("res://data/bosses/ashen_oni_tortoise.tres")
+	def.get_attack(&"lava_burst").eruption_scene = load("res://scenes/bosses/lava_burst.tscn")
+	_save(def, "res://data/bosses/ashen_oni_tortoise.tres")
+
+	# Fire vent.
+	var v := Node3D.new()
+	v.name = "FireVent"
+	v.set_script(load("res://scripts/world/hazards/fire_vent.gd"))
+	var cone := MeshInstance3D.new()
+	cone.name = "Cone"
+	cone.mesh = ProceduralMeshes.vent_cone(load(MAT + "basalt.tres"))
+	v.add_child(cone)
+	v.add_child(_warning_quad("Glow", Vector2(3.4, 3.4), Vector3(0, 0.6, 0), "vent_glow"))
+	var column := Node3D.new()
+	column.name = "Column"
+	var fq := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(2.2, 6.0)
+	q.center_offset = Vector3(0, 3.0, 0)
+	q.material = load(MAT + "spirit_flame.tres")
+	fq.mesh = q
+	fq.set_instance_shader_parameter("flame_color", Color(1.0, 0.45, 0.08))
+	fq.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	column.add_child(fq)
+	var fl := OmniLight3D.new()
+	fl.light_color = Color(1.0, 0.45, 0.1)
+	fl.light_energy = 3.0
+	fl.omni_range = 7.0
+	fl.position.y = 2.0
+	column.add_child(fl)
+	v.add_child(column)
+	var vcyl := CylinderShape3D.new()
+	vcyl.radius = 1.6
+	vcyl.height = 5.0
+	v.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", vcyl, Vector3(0, 2.5, 0)))
+	_pack(v, "res://scenes/world/fire_vent.tscn")
+
+	# Sinking stepping stone.
+	var s := AnimatableBody3D.new()
+	s.name = "SinkingStone"
+	s.set_script(load("res://scripts/world/hazards/sinking_stone.gd"))
+	s.collision_layer = 1
+	var sc := CollisionShape3D.new()
+	sc.shape = _box_shape(Vector3(3.2, 1.0, 3.2))
+	sc.position.y = -0.5
+	s.add_child(sc)
+	var smesh := MeshInstance3D.new()
+	smesh.name = "Mesh"
+	var sb := BoxMesh.new()
+	sb.size = Vector3(3.2, 1.0, 3.2)
+	sb.material = load(MAT + "basalt.tres")
+	smesh.mesh = sb
+	smesh.position.y = -0.5
+	s.add_child(smesh)
+	_pack(s, "res://scenes/world/sinking_stone.tscn")
+
+	# Crumbling basalt platform.
+	var c := AnimatableBody3D.new()
+	c.name = "CrumblePlatform"
+	c.set_script(load("res://scripts/world/hazards/crumble_platform.gd"))
+	c.collision_layer = 1
+	var cc := CollisionShape3D.new()
+	cc.name = "Collision"
+	cc.shape = _box_shape(Vector3(2.6, 0.8, 2.6))
+	cc.position.y = -0.4
+	c.add_child(cc)
+	var cm := MeshInstance3D.new()
+	cm.name = "Mesh"
+	var cb := BoxMesh.new()
+	cb.size = Vector3(2.6, 0.8, 2.6)
+	cb.material = load(MAT + "basalt.tres")
+	cm.mesh = cb
+	cm.position.y = -0.4
+	cm.set_instance_shader_parameter("rune_glow", 0.35)  # Brittle: veins glow faintly.
+	c.add_child(cm)
+	var trig := Area3D.new()
+	trig.name = "Trigger"
+	var tc := CollisionShape3D.new()
+	tc.shape = _box_shape(Vector3(2.4, 0.6, 2.4))
+	tc.position.y = 0.3
+	trig.add_child(tc)
+	c.add_child(trig)
+	_pack(c, "res://scenes/world/crumble_platform.tscn")
+
+	# Ember Crystal pickup.
+	var a := Area3D.new()
+	a.name = "Pickup"
+	a.set_script(load("res://scripts/world/pickup.gd"))
+	a.set("item", load("res://data/items/ember_crystal.tres"))
+	var ps := SphereShape3D.new()
+	ps.radius = 1.0
+	var pcol := CollisionShape3D.new()
+	pcol.shape = ps
+	pcol.position.y = 0.6
+	a.add_child(pcol)
+	var vis := Node3D.new()
+	vis.name = "Visual"
+	a.add_child(vis)
+	var gem := MeshInstance3D.new()
+	var gm := PrismMesh.new()
+	gm.size = Vector3(0.35, 0.6, 0.35)
+	gm.material = load(MAT + "lava.tres")
+	gem.mesh = gm
+	vis.add_child(gem)
+	var mote := MeshInstance3D.new()
+	var mq := QuadMesh.new()
+	mq.size = Vector2(0.9, 0.9)
+	mq.material = load(MAT + "spirit_flame.tres")
+	mote.mesh = mq
+	mote.position.y = 0.6
+	mote.set_instance_shader_parameter("flame_color", Color(1.0, 0.45, 0.1) * 0.6)
+	vis.add_child(mote)
+	_pack(a, "res://scenes/world/pickup_ember_crystal.tscn")
+
+	# Ashen Oni-Tortoise.
+	var k := CharacterBody3D.new()
+	k.name = "AshenOniTortoise"
+	k.set_script(load("res://scripts/bosses/boss_controller.gd"))
+	k.set("definition", load("res://data/bosses/ashen_oni_tortoise.tres"))
+	var col := CollisionShape3D.new()
+	col.name = "Collision"
+	col.shape = _box_shape(Vector3(3.4, 2.4, 4.4))
+	col.position = Vector3(0, 1.2, 0.2)
+	k.add_child(col)
+	var vis2 := Node3D.new()
+	vis2.name = "Visual"
+	k.add_child(vis2)
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = ProceduralMeshes.oni_tortoise_body(load(MAT + "oni_body.tres"))
+	vis2.add_child(body)
+	var horns := MeshInstance3D.new()
+	horns.name = "Horns"
+	horns.mesh = ProceduralMeshes.oni_horns(load(MAT + "oni_horns.tres"), false)
+	vis2.add_child(horns)
+	var stubs := MeshInstance3D.new()
+	stubs.name = "HornStubs"
+	stubs.mesh = ProceduralMeshes.oni_horns(load(MAT + "oni_horns.tres"), true)
+	vis2.add_child(stubs)
+	var hh := _area("HornHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(2.6, 1.8, 2.0)), Vector3(0, 2.0, -3.0))
+	hh.set("part_id", &"horns")
+	hh.set("health_path", NodePath("../../Health"))
+	vis2.add_child(hh)
+	var front := Node3D.new()
+	front.name = "Front"
+	k.add_child(front)
+	front.add_child(_area("SlamHitbox", "res://scripts/combat/hitbox.gd", &"enemy", _box_shape(Vector3(6.0, 2.6, 5.0)), Vector3(0, 1.2, -4.2)))
+	front.add_child(_warning_quad("SlamWarning", Vector2(6.5, 5.5), Vector3(0, 0.12, -4.3), "area_warning"))
+	var spin_shape := SphereShape3D.new()
+	spin_shape.radius = 2.8
+	front.add_child(_area("SpinHitbox", "res://scripts/combat/hitbox.gd", &"enemy", spin_shape, Vector3(0, 1.2, 0)))
+	front.add_child(_warning_quad("SpinWarning", Vector2(3.2, 14.0), Vector3(0, 0.12, -8.5), "attack_warning"))
+	var hcomp := Node.new()
+	hcomp.name = "Health"
+	hcomp.set_script(load("res://scripts/combat/health_component.gd"))
+	k.add_child(hcomp)
+	var bh := _area("BodyHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(3.6, 2.6, 4.6)), Vector3(0, 1.4, 0.2))
+	bh.set("health_path", NodePath("../Health"))
+	k.add_child(bh)
+	var field := SphereShape3D.new()
+	field.radius = 6.5
+	k.add_child(_area("BurstHitbox", "res://scripts/combat/hitbox.gd", &"enemy", field, Vector3(0, 1.0, 0)))
+	k.add_child(_warning_quad("BurstWarning", Vector2(13.0, 13.0), Vector3(0, 0.12, 0), "area_warning"))
+	_pack(k, "res://scenes/bosses/ashen_oni_tortoise.tscn")
+
+
+func _basalt(node_name: String, size: Vector3, pos: Vector3, climbable: bool = false) -> CSGBox3D:
+	var b := _box(node_name, size, pos, "basalt_climb" if climbable else "basalt")
+	if climbable:
+		b.collision_layer = 1 | 4
+	return b
+
+
+func _emberwild_level() -> void:
+	_root = Node3D.new()
+	_root.name = "Emberwild"
+	var env_node := WorldEnvironment.new()
+	env_node.name = "WorldEnvironment"
+	var env := Environment.new()
+	var sky := Sky.new()
+	sky.sky_material = load(MAT + "sky_ember.tres")
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.29, 0.23, 0.21)
+	env.ambient_light_energy = 3.6
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.45
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.2, 0.14, 0.11)
+	env.fog_density = 0.018
+	env.fog_sky_affect = 0.35
+	env.fog_height = 0.0
+	env.fog_height_density = 0.05
+	env.glow_enabled = true
+	env.glow_intensity = 1.0
+	env.glow_bloom = 0.06
+	env.glow_hdr_threshold = 0.8
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.15
+	env.adjustment_saturation = 0.82
+	env_node.environment = env
+	_root.add_child(env_node)
+	var sun := DirectionalLight3D.new()
+	sun.name = "Moonlight"  # Atmosphere/tests look for this name; here it is a low ember-red sun.
+	sun.rotation_degrees = Vector3(-28, -40, 0)
+	sun.light_color = Color(1.0, 0.7, 0.55)
+	sun.light_energy = 1.2
+	sun.shadow_enabled = true
+	sun.shadow_opacity = 0.7
+	sun.directional_shadow_max_distance = 55.0
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+	_root.add_child(sun)
+
+	var terrain := Node3D.new()
+	terrain.name = "Terrain"
+	terrain.set_script(load("res://scripts/world/biome_terrain.gd"))
+	terrain.set("material", load(MAT + "terrain_ash.tres"))
+	terrain.set("config", load("res://data/biomes/emberwild_terrain.tres"))
+	_root.add_child(terrain)
+	var flora := Node3D.new()
+	flora.name = "Flora"
+	flora.set_script(load("res://scripts/world/flora_scatter.gd"))
+	flora.set("terrain_path", NodePath("../Terrain"))
+	flora.set("grass_material", load(MAT + "foliage_scorched.tres"))
+	flora.set("leaf_material", load(MAT + "leaf_scorched.tres"))
+	flora.set("vine_material", load(MAT + "foliage_scorched.tres"))
+	flora.set("bark_material", load(MAT + "bark_vertex.tres"))
+	flora.set("fungus_material", load(MAT + "glow_fungus.tres"))
+	flora.set("rock_material", load(MAT + "rock_vertex.tres"))
+	flora.set("stone_material", load(MAT + "basalt.tres"))
+	flora.set("config", load("res://data/biomes/emberwild_flora.tres"))
+	_root.add_child(flora)
+	var fauna := Node3D.new()
+	fauna.name = "Fauna"
+	fauna.set_script(load("res://scripts/world/fauna/fauna_spawner.gd"))
+	fauna.set("terrain_path", NodePath("../Terrain"))
+	fauna.set("config", load("res://data/biomes/emberwild_fauna.tres"))
+	fauna.set("bat_material", load(MAT + "bat.tres"))
+	fauna.set("frog_material", load(MAT + "frog.tres"))
+	fauna.set("eye_material", load(MAT + "lurker_eyes.tres"))
+	fauna.set("firefly_material", load(MAT + "firefly.tres"))
+	_root.add_child(fauna)
+	var atmos := Node3D.new()
+	atmos.name = "Atmosphere"
+	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("terrain_path", NodePath("../Terrain"))
+	atmos.set("sun_path", NodePath("../Moonlight"))
+	atmos.set("environment_path", NodePath("../WorldEnvironment"))
+	atmos.set("mist_material", load(MAT + "mist_ash.tres"))
+	atmos.set("shaft_material", load(MAT + "shaft_ember.tres"))
+	atmos.set("waterfall_material", load(MAT + "lava_fall.tres"))
+	atmos.set("water_material", load(MAT + "lava.tres"))
+	atmos.set("river_height", -1.6)
+	atmos.set("lightning_interval", Vector2(14.0, 30.0))
+	atmos.set("lightning_sky_flash", 0.4)
+	atmos.set("lightning_sun_boost", 0.6)
+	_root.add_child(atmos)
+	var geo := Node3D.new()
+	geo.name = "RouteGeometry"
+	_root.add_child(geo)
+	var spawn := Marker3D.new()
+	spawn.name = "SpawnPoint"
+	spawn.position = Vector3(0, 0.1, 0)
+	_root.add_child(spawn)
+	var cps := Node3D.new()
+	cps.name = "Checkpoints"
+	_root.add_child(cps)
+	_checkpoint("CheckpointSpawn", Vector3(-4.5, 0, 1))
+	_checkpoint("CheckpointLava", Vector3(-4.5, 0, -45))
+	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
+
+	var hazards := Node3D.new()
+	hazards.name = "Hazards"
+	_root.add_child(hazards)
+	# 1) Vent field: basalt walls funnel the route past four vents erupting in a wave.
+	_basalt("VentWallL", Vector3(1.5, 3.5, 20), Vector3(-4.2, 1.5, -17))
+	_basalt("VentWallR", Vector3(1.5, 3.5, 20), Vector3(4.2, 1.5, -17))
+	var vent_scene: PackedScene = load("res://scenes/world/fire_vent.tscn")
+	var cycle := 2.6 + 1.2 + 0.9
+	for i in 4:
+		var vent: Node3D = vent_scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		vent.name = "FireVent%d" % i
+		vent.position = Vector3(0, 0, -10.0 - 5.0 * i)
+		vent.set("phase_offset", fmod(cycle - 0.7 * i, cycle))
+		hazards.add_child(vent)
+	# 2) Heat zone across most of the route, with a cool lane along the right edge.
+	var heat := Area3D.new()
+	heat.name = "HeatZone"
+	heat.set_script(load("res://scripts/world/hazards/heat_zone.gd"))
+	var hc := CollisionShape3D.new()
+	hc.shape = _box_shape(Vector3(8.5, 3.0, 8.0))
+	heat.add_child(hc)
+	heat.position = Vector3(-1.2, 1.0, -33)
+	var shimmer := _warning_quad("Shimmer", Vector2(8.5, 8.0), Vector3(0, -0.92, 0), "heat_shimmer")
+	shimmer.set_instance_shader_parameter("intensity", 0.12)
+	heat.add_child(shimmer)
+	hazards.add_child(heat)
+	for i in 4:
+		_box("CoolLaneMarker%d" % i, Vector3(0.6, 0.5, 0.6), Vector3(3.4, 0.25, -29.5 - 2.3 * i), "basalt")
+	# 3) Lava river: sinking stones (all on one rhythm, a slight ripple), lava volume.
+	var stone_scene: PackedScene = load("res://scenes/world/sinking_stone.tscn")
+	var zs := [-53.5, -58.0, -62.5, -67.0]
+	for i in zs.size():
+		var st: Node3D = stone_scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		st.name = "SinkingStone%d" % i
+		st.position = Vector3(0, 0, zs[i])
+		st.set("up_time", 4.0)
+		st.set("phase_offset", -0.25 * i + 100.0)
+		hazards.add_child(st)
+	var lava := Area3D.new()
+	lava.name = "LavaRiver"
+	lava.set_script(load("res://scripts/world/hazards/lava_zone.gd"))
+	var lcol := CollisionShape3D.new()
+	lcol.shape = _box_shape(Vector3(160, 6, 20.6))
+	lava.add_child(lcol)
+	lava.position = Vector3(0, -4.0, -60.5)
+	hazards.add_child(lava)
+	# Optional shortcut on the right: crumbling basalt to an ember crystal on a pillar.
+	var crumble_scene: PackedScene = load("res://scenes/world/crumble_platform.tscn")
+	for i in 3:
+		var cp: Node3D = crumble_scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		cp.name = "Crumble%d" % i
+		cp.position = Vector3(8.0, -0.2 + 0.1 * i, -54.5 - 4.6 * i)
+		hazards.add_child(cp)
+	_basalt("CrystalPillar", Vector3(2.4, 22, 2.4), Vector3(8.0, -10.7, -68.5))
+	# Far bank: climbable basalt cliff.
+	_basalt("FarBankWall", Vector3(30, 22.3, 3), Vector3(0, -8.85, -72.5), true)
+
+	# Gate + arena (same layout as the Verdant Canopy).
+	_box("GatePillarL", Vector3(1.6, 8, 1.6), Vector3(-4.2, 4, -94), "basalt")
+	_box("GatePillarR", Vector3(1.6, 8, 1.6), Vector3(4.2, 4, -94), "basalt")
+	_box("GateLintel", Vector3(11, 1.4, 2.0), Vector3(0, 8.5, -94), "basalt")
+	_box("ArenaWallL", Vector3(40, 8, 1.5), Vector3(-25.0, 2, -94), "basalt")
+	_box("ArenaWallR", Vector3(40, 8, 1.5), Vector3(25.0, 2, -94), "basalt")
+	var trigger := Area3D.new()
+	trigger.name = "BossArenaTrigger"
+	trigger.set_script(load("res://scripts/world/boss_arena_trigger.gd"))
+	var tcol := CollisionShape3D.new()
+	tcol.shape = _box_shape(Vector3(160, 80, 54))
+	trigger.add_child(tcol)
+	trigger.position = Vector3(0, 10, -123)
+	_root.add_child(trigger)
+	for i in 10:
+		var ang := TAU * float(i) / 10.0 + PI / 10.0
+		if absf(wrapf(ang - PI / 2.0, -PI, PI)) < 0.5:
+			continue
+		var p := Vector3(cos(ang) * 17.0, 0, -120.0 + sin(ang) * 17.0)
+		var c := CSGCylinder3D.new()
+		c.name = "ArenaPillar%d" % i
+		c.radius = 1.0
+		c.height = 8.0
+		c.sides = 7
+		c.position = p + Vector3.UP * 4.0
+		c.use_collision = true
+		c.collision_mask = 0
+		c.material = load(MAT + "basalt.tres")
+		geo.add_child(c)
+	var marker := Marker3D.new()
+	marker.name = "ArenaGateMarker"
+	marker.position = Vector3(0, 0, -94)
+	_root.add_child(marker)
+	_omni("ArenaGlow", Vector3(0, 5, -120), Color(1.0, 0.35, 0.1), 2.5, 24.0)
+	_omni("GateGlow", Vector3(0, 4, -91), Color(1.0, 0.3, 0.05), 2.0, 14.0)
+	var boss: Node3D = (load("res://scenes/bosses/ashen_oni_tortoise.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	boss.name = "Boss"
+	boss.position = Vector3(0, 0.05, -121)
+	boss.rotation.y = PI
+	_root.add_child(boss)
+
+	# Enemies, gatherables, lore.
+	var enemies := Node3D.new()
+	enemies.name = "Enemies"
+	_root.add_child(enemies)
+	for spec in [["ThornlingA", Vector3(-23, 0.2, -20)], ["ThornlingB", Vector3(-26, 0.2, -25)]]:
+		var e: Node3D = (load("res://scenes/enemies/thornling.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		e.name = spec[0]
+		e.position = spec[1]
+		enemies.add_child(e)
+	var gather := Node3D.new()
+	gather.name = "Gatherables"
+	_root.add_child(gather)
+	var spots := [
+		["ember_crystal", Vector3(4.6, 0, -33), true],        # Cool lane
+		["ember_crystal", Vector3(-1.0, 0, -34), true],       # Middle of the heat (risky)
+		["ember_crystal", Vector3(8.0, 0.65, -68.5), false],  # Crumble shortcut pillar
+		["ember_crystal", Vector3(-24, 0, -22), true],        # Thornling hollow
+		["ember_crystal", Vector3(6.0, 0, -83), true],
+		["ruin_shard", Vector3(-7.5, 0, -40), true], ["ruin_shard", Vector3(9.5, 0, -12), true],
+		["glowcap", Vector3(-27.5, 0, -18.5), true], ["glowcap", Vector3(-8.0, 0, -84), true],
+	]
+	for i in spots.size():
+		var spot: Array = spots[i]
+		var pk: Node3D = (load("res://scenes/world/pickup_%s.tscn" % spot[0]) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		pk.name = "%s_%d" % [spot[0], i]
+		pk.position = spot[1]
+		pk.set("snap_to_ground", spot[2])
+		gather.add_child(pk)
+	var ls: Node3D = (load("res://scenes/world/lore_stone.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	ls.name = "LoreStone0"
+	ls.set("title", "The Ashen Oni")
+	ls.set("text", "Its shell drinks fire and breathes it back. Only the rains ever cooled it; the old dojo's mist-charms were made for this. Strike the horns when it bows its head.")
+	ls.position = Vector3(6.5, 0, -82)
+	gather.add_child(ls)
+	_pack(_root, "res://scenes/biomes/emberwild.tscn")
+
+
+func _emberwild_unlock() -> void:
+	var b: BiomeDefinition = load("res://data/biomes/biome_emberwild.tres")
+	b.hunts = [load("res://data/hunts/ashen_oni_tortoise.tres")] as Array[HuntDefinition]
+	b.unlocked = true
+	b.requires_hunt = &"kurogale"
+	b.expedition_scene = "res://scenes/main/expedition_emberwild.tscn"
+	b.locked_note = "defeat Kurogale to unlock"
+	_save(b, "res://data/biomes/biome_emberwild.tres")
+	var board: PackedScene = load("res://scenes/ui/hunt_board.tscn")
+	var inst := board.instantiate()
+	var items: Array[ItemDefinition] = (load("res://data/crafting/catalog.tres") as CraftingCatalog).items
+	inst.set("known_items", items)
+	_pack(inst, "res://scenes/ui/hunt_board.tscn")

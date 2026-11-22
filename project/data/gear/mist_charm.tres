@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_rlqci"]
+
+[resource]
+script = ExtResource("1_rlqci")
+id = &"mist_charm"
+display_name = "Mist Charm"
+description = "A rune shard wrapped in damp glowcap moss. Talismans burst into cold mist instead of flame."
+slot = 2
+color = Color(0.4, 0.75, 1, 1)
+skill_cooldown_reduction = 0.5
+skill_element = &"water"

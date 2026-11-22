@@ -9,6 +9,8 @@ extends Resource
 @export_file("*.tscn") var expedition_scene: String = ""
 @export var hunts: Array[HuntDefinition] = []
 @export var unlocked: bool = false
+## Also requires this hunt to have been completed (e.g. &"kurogale" unlocks Emberwild).
+@export var requires_hunt: StringName = &""
 ## Shown on locked biomes, e.g. "Arrives in Phase 8".
 @export var locked_note: String = ""
 ## Card accent colour on the hunt board.

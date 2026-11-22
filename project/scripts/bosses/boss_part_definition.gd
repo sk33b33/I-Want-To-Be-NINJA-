@@ -11,3 +11,7 @@ extends Resource
 @export var reward_count: int = 1
 ## Long stagger when it breaks (a reward moment for the player).
 @export var break_stagger_time: float = 2.0
+
+## Boss scene nodes: shown while intact / after breaking (visual swap).
+@export var intact_node: NodePath
+@export var broken_node: NodePath

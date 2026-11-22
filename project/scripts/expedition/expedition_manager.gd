@@ -37,7 +37,7 @@ var config: ExpeditionConfig
 var is_debug_duration: bool = false
 var arena_entered: bool = false
 var ended: bool = false
-var boss: Kurogale
+var boss: BossController
 ## Rewards earned this run: item id -> count, and their definitions.
 var run_rewards: Dictionary = {}
 var run_items: Dictionary = {}
@@ -62,7 +62,7 @@ func _ready() -> void:
 	timer.expired.connect(_on_timer_expired)
 	if _player and crafting:
 		GearLoadout.apply(_player, Forge.equipped_gear(PlayerProfile.load_profile(), crafting))
-	boss = get_node_or_null(boss_path) as Kurogale
+	boss = get_node_or_null(boss_path) as BossController
 	if boss:
 		boss.part_broken.connect(_on_part_broken)
 		boss.defeated.connect(_on_boss_defeated)

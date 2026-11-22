@@ -13,6 +13,8 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 	var cd := 0.0
 	var skill := 1.0
 	var tint := Color(0, 0, 0, 0)
+	var skill_element := &""
+	var blade_element := &""
 	for g in gear:
 		blade *= g.blade_damage_multiplier
 		health_bonus += g.max_health_bonus
@@ -21,9 +23,15 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 		skill *= g.skill_damage_multiplier
 		if g.slot == GearDefinition.Slot.WEAPON:
 			tint = g.color
+		if g.skill_element != &"":
+			skill_element = g.skill_element
+		if g.blade_element != &"":
+			blade_element = g.blade_element
 	combat.blade_damage_multiplier = blade
 	combat.skill_damage_multiplier = skill
 	combat.skill_cooldown_reduction = cd
+	combat.skill_element_override = skill_element
+	combat.blade_element = blade_element
 	combat.health.max_health = combat.config.max_health + health_bonus
 	combat.health.damage_taken_multiplier = 1.0 - clampf(reduction, 0.0, 0.9)
 	combat.health.reset()

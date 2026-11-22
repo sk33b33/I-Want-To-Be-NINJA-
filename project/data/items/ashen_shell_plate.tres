@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_qxuwc"]
+
+[resource]
+script = ExtResource("1_qxuwc")
+id = &"ashen_shell_plate"
+display_name = "Ashen Shell Plate"
+description = "A slab of the Oni-Tortoise's volcanic shell."
+color = Color(0.35, 0.3, 0.28, 1)

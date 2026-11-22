@@ -1,0 +1,34 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/pickup.gd" id="1_dqvqd"]
+[ext_resource type="Resource" path="res://data/items/ember_crystal.tres" id="2_lnmel"]
+[ext_resource type="Material" path="res://data/materials/lava.tres" id="3_ejamk"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="4_oiolo"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ac5e8"]
+radius = 1.0
+
+[sub_resource type="PrismMesh" id="PrismMesh_feqo3"]
+material = ExtResource("3_ejamk")
+size = Vector3(0.35, 0.6, 0.35)
+
+[sub_resource type="QuadMesh" id="QuadMesh_eujjv"]
+material = ExtResource("4_oiolo")
+size = Vector2(0.9, 0.9)
+
+[node name="Pickup" type="Area3D"]
+script = ExtResource("1_dqvqd")
+item = ExtResource("2_lnmel")
+
+[node name="@CollisionShape3D@28" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("SphereShape3D_ac5e8")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="@MeshInstance3D@29" type="MeshInstance3D" parent="Visual"]
+mesh = SubResource("PrismMesh_feqo3")
+
+[node name="@MeshInstance3D@30" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("QuadMesh_eujjv")

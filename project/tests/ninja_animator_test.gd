@@ -79,3 +79,67 @@ func test_jump_clips_have_no_root_motion() -> void:
 		for k in a.track_get_key_count(track):
 			highest = maxf(highest, -(a.track_get_key_value(track, k) as Vector3).z)
 		check(highest <= cfg.max_hips_height * 100.0 + 0.01, "%s hips rise is clamped (%.1f cm)" % [clip, highest])
+
+
+# Regression: the animator connected to PlayerCombat/TraversalComponent before the player had
+# resolved them (child _ready runs before the parent's @onready), so attack, roll and climb
+# animations never played even though the combat state changed.
+
+func test_light_attack_plays_the_combo_clip() -> void:
+	var nodes := _setup()
+	var player: PlayerController = nodes[0]
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(50)
+	press("attack_light")
+	await physics_frames(6)
+	release("attack_light")
+	check(player.combat.state == PlayerCombat.State.ATTACK, "attacking")
+	check(anim.current_animation == &"Dual_Weapon_Combo", "combo clip playing (got %s)" % anim.current_animation)
+	var a := player.combat.config.light_combo[0]
+	check(anim.current_animation_position >= a.clip_start - 0.01 and anim.current_animation_position <= a.clip_end + 0.01,
+			"inside the light-1 slice (pos %.2f)" % anim.current_animation_position)
+
+
+func test_dodge_plays_the_roll_clip() -> void:
+	var nodes := _setup()
+	var player: PlayerController = nodes[0]
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(50)
+	press("dodge")
+	await physics_frames(6)
+	release("dodge")
+	check(player.combat.state == PlayerCombat.State.DODGE, "dodging")
+	check(anim.current_animation == &"Quick_Roll_To_Run", "roll clip playing (got %s)" % anim.current_animation)
+
+
+func test_heavy_attack_plays_its_slice() -> void:
+	var nodes := _setup()
+	var player: PlayerController = nodes[0]
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(50)
+	press("attack_heavy")
+	await physics_frames(6)
+	release("attack_heavy")
+	var h := player.combat.config.heavy
+	check(anim.current_animation == h.clip, "heavy uses %s (got %s)" % [h.clip, anim.current_animation])
+	check(anim.current_animation_position >= h.clip_start - 0.01, "inside the heavy slice (pos %.2f)" % anim.current_animation_position)
+
+
+func test_climbing_plays_the_climb_clip() -> void:
+	make_floor()
+	var wall := make_floor(Vector3(8, 8, 1), Vector3(0, 4, -2.0))
+	wall.collision_layer = 1 | 4
+	var player := make_player(Vector3(0, 0.05, 0))
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(10)
+	press("move_forward")
+	await physics_frames(5)
+	press("jump")
+	for i in 40:
+		await tree.physics_frame
+		if player.traversal.state == TraversalComponent.State.CLIMB:
+			break
+	await physics_frames(3)
+	var cfg := (player.get_node("NinjaAnimator") as NinjaAnimator).config
+	check(player.traversal.state == TraversalComponent.State.CLIMB, "climbing")
+	check(anim.current_animation == cfg.climb_clip, "climb clip playing (got %s)" % anim.current_animation)

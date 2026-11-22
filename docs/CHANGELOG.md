@@ -63,3 +63,9 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Victory: "Hunt complete" results (time, parts broken, materials). Rewards written once to `user://profile.json` (`PlayerProfile`); the hunt board lists earned materials.
 - Boss HUD: name, health bar, part status, enrage / part-broken banners. Arena sigil recoloured violet (red now always means danger).
 - Tests: 16 boss tests incl. the gate bot (defeats Kurogale, breaks antlers, no deaths).
+
+## 2026-11-22 — Fix: attack, roll and climb animations did not play
+- Reported by the owner: attacks and the dodge roll showed no animation although they worked.
+- Cause: `NinjaAnimator._ready()` runs before the player's own `_ready()` (children first), so `player.combat` / `player.traversal` were still null and the animator never connected to them. Attack (Dual_Weapon_Combo slices), roll (Quick_Roll_To_Run), hurt/death and the Phase 2 climb/hang/mantle animations were all silently skipped.
+- Fix: the animator looks the components up directly on the player.
+- Regression tests (seen failing before the fix): light, heavy, roll and climb each check the AnimationPlayer's current clip. 93/93 tests pass.

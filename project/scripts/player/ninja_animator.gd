@@ -29,10 +29,14 @@ func _ready() -> void:
 	_prepare_clips()
 	_player.jumped.connect(_on_jumped)
 	_player.landed.connect(_on_landed)
-	if _player.traversal:
-		_player.traversal.state_changed.connect(_on_traversal_state)
-	if _player.combat:
-		var c := _player.combat
+	# Look the components up directly: this node's _ready runs before the player's, so the
+	# player's own @onready references (player.traversal / player.combat) are still null here.
+	var traversal := _player.get_node_or_null("Traversal") as TraversalComponent
+	var combat := _player.get_node_or_null("Combat") as PlayerCombat
+	if traversal:
+		traversal.state_changed.connect(_on_traversal_state)
+	if combat:
+		var c := combat
 		c.attack_started.connect(_on_attack_started)
 		c.dodge_started.connect(_on_dodge_started)
 		c.hurt.connect(_on_hurt)
@@ -43,6 +47,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# (player.combat / player.traversal are resolved by now: the player is ready.)
 	if _freeze > 0.0:
 		_freeze -= delta
 		if _freeze <= 0.0:

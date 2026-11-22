@@ -1,0 +1,218 @@
+[gd_resource type="Resource" script_class="SoundBank" load_steps=57 format=3]
+
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/verdant_canopy.res" id="1_sei3t"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/emberwild.res" id="2_da57c"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/moonfen.res" id="3_46htt"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/stormcrag.res" id="4_8pmpq"]
+[ext_resource type="Script" path="res://scripts/audio/sound_cue.gd" id="5_f5jwi"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/swing.res" id="6_vim1x"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/hit.res" id="7_4usny"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/hit_heavy.res" id="8_xfp70"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/hurt.res" id="9_8c2j0"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/dodge.res" id="10_7h2cj"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/jump.res" id="11_nkhbh"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/land.res" id="12_gul8s"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/step.res" id="13_fr0a0"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/talisman.res" id="14_tqfst"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/telegraph.res" id="15_1s214"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/boss_roar.res" id="16_jk2hk"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/boss_attack.res" id="17_hp3oj"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/part_break.res" id="18_vg1ug"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/eruption.res" id="19_bc1vq"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/pickup.res" id="20_u7lm5"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/checkpoint.res" id="21_jja0c"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/ui_click.res" id="22_0iqra"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/lightning.res" id="23_m2paq"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/gust.res" id="24_f4igh"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/splash.res" id="25_1h5gw"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/vent.res" id="26_hbuc8"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/victory.res" id="27_8y6ii"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/timer_warning.res" id="28_136j5"]
+[ext_resource type="AudioStream" path="res://assets/audio/sfx/death.res" id="29_1x5fc"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/boss_drums.res" id="30_vmhwh"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/explore.res" id="31_4qxcb"]
+[ext_resource type="Script" path="res://scripts/audio/sound_bank.gd" id="32_pldpc"]
+
+[sub_resource type="Resource" id="Resource_yp0eu"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("6_vim1x")
+volume_db = -6.0
+pitch_jitter = 0.08
+
+[sub_resource type="Resource" id="Resource_h6ueu"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("7_4usny")
+volume_db = -3.0
+pitch_jitter = 0.06
+positional = true
+
+[sub_resource type="Resource" id="Resource_bgxmu"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("8_xfp70")
+volume_db = -1.0
+positional = true
+
+[sub_resource type="Resource" id="Resource_diwn6"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("9_8c2j0")
+volume_db = -4.0
+
+[sub_resource type="Resource" id="Resource_yxymc"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("10_7h2cj")
+volume_db = -7.0
+pitch_jitter = 0.06
+
+[sub_resource type="Resource" id="Resource_lsjfb"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("11_nkhbh")
+volume_db = -10.0
+pitch_jitter = 0.06
+
+[sub_resource type="Resource" id="Resource_a4aw3"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("12_gul8s")
+volume_db = -8.0
+pitch_jitter = 0.08
+
+[sub_resource type="Resource" id="Resource_mlt2x"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("13_fr0a0")
+volume_db = -16.0
+pitch_jitter = 0.15
+
+[sub_resource type="Resource" id="Resource_jwf6u"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("14_tqfst")
+volume_db = -5.0
+
+[sub_resource type="Resource" id="Resource_wt1u1"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("15_1s214")
+volume_db = -4.0
+pitch_jitter = 0.0
+positional = true
+
+[sub_resource type="Resource" id="Resource_cf8yt"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("16_jk2hk")
+volume_db = -2.0
+pitch_jitter = 0.04
+positional = true
+
+[sub_resource type="Resource" id="Resource_yyvqe"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("17_hp3oj")
+volume_db = -2.0
+pitch_jitter = 0.06
+positional = true
+
+[sub_resource type="Resource" id="Resource_cibdf"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("18_vg1ug")
+pitch_jitter = 0.03
+positional = true
+
+[sub_resource type="Resource" id="Resource_tbpgn"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("19_bc1vq")
+volume_db = -4.0
+pitch_jitter = 0.08
+positional = true
+
+[sub_resource type="Resource" id="Resource_vqjlk"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("20_u7lm5")
+volume_db = -6.0
+pitch_jitter = 0.0
+
+[sub_resource type="Resource" id="Resource_fuw6h"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("21_jja0c")
+volume_db = -4.0
+pitch_jitter = 0.0
+
+[sub_resource type="Resource" id="Resource_avd2k"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("22_0iqra")
+volume_db = -10.0
+
+[sub_resource type="Resource" id="Resource_uubna"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("23_m2paq")
+volume_db = -2.0
+pitch_jitter = 0.08
+positional = true
+
+[sub_resource type="Resource" id="Resource_3t7av"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("24_f4igh")
+volume_db = -6.0
+
+[sub_resource type="Resource" id="Resource_pw7uf"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("25_1h5gw")
+volume_db = -5.0
+pitch_jitter = 0.08
+
+[sub_resource type="Resource" id="Resource_0g573"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("26_hbuc8")
+volume_db = -5.0
+pitch_jitter = 0.08
+positional = true
+
+[sub_resource type="Resource" id="Resource_iuyaj"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("27_8y6ii")
+volume_db = -3.0
+pitch_jitter = 0.0
+
+[sub_resource type="Resource" id="Resource_bf341"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("28_136j5")
+volume_db = -6.0
+pitch_jitter = 0.0
+
+[sub_resource type="Resource" id="Resource_wb15n"]
+script = ExtResource("5_f5jwi")
+stream = ExtResource("29_1x5fc")
+volume_db = -3.0
+pitch_jitter = 0.0
+
+[resource]
+script = ExtResource("32_pldpc")
+cues = {
+&"boss_attack": SubResource("Resource_yyvqe"),
+&"boss_roar": SubResource("Resource_cf8yt"),
+&"checkpoint": SubResource("Resource_fuw6h"),
+&"death": SubResource("Resource_wb15n"),
+&"dodge": SubResource("Resource_yxymc"),
+&"eruption": SubResource("Resource_tbpgn"),
+&"gust": SubResource("Resource_3t7av"),
+&"hit": SubResource("Resource_h6ueu"),
+&"hit_heavy": SubResource("Resource_bgxmu"),
+&"hurt": SubResource("Resource_diwn6"),
+&"jump": SubResource("Resource_lsjfb"),
+&"land": SubResource("Resource_a4aw3"),
+&"lightning": SubResource("Resource_uubna"),
+&"part_break": SubResource("Resource_cibdf"),
+&"pickup": SubResource("Resource_vqjlk"),
+&"splash": SubResource("Resource_pw7uf"),
+&"step": SubResource("Resource_mlt2x"),
+&"swing": SubResource("Resource_yp0eu"),
+&"talisman": SubResource("Resource_jwf6u"),
+&"telegraph": SubResource("Resource_wt1u1"),
+&"timer_warning": SubResource("Resource_bf341"),
+&"ui_click": SubResource("Resource_avd2k"),
+&"vent": SubResource("Resource_0g573"),
+&"victory": SubResource("Resource_iuyaj")
+}
+ambience = {
+"emberwild": ExtResource("2_da57c"),
+"moonfen": ExtResource("3_46htt"),
+"stormcrag": ExtResource("4_8pmpq"),
+"verdant_canopy": ExtResource("1_sei3t")
+}
+music_explore = ExtResource("31_4qxcb")
+music_boss = ExtResource("30_vmhwh")

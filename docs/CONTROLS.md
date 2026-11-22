@@ -42,7 +42,7 @@ Checkpoint shrines light up (red → teal) as you pass and heal you the first ti
 In the dojo, switch between **Hunt board** and **Forge** with the buttons at the top (mouse, touch, or gamepad focus + A). Forge needs the listed materials; Equip puts owned gear on.
 Walk over glowing pickups (Glowcap, Ruin Shard) to gather them; walk up to a lore stone to read it. The arrow under the timer points to the arena.
 
-Pause menu options (saved between sessions): **Screen shake** On/Off, **Bold attack warnings** On/Off (brighter warning zones with thicker rims).
+**Settings** (dojo → Settings tab, and the pause menu; saved between sessions): **Graphics** Auto / Low / Medium / High (Auto = Low on phones, High on PC; applies from the next expedition), **Master / Music / Sound effects volume** sliders, **Screen shake** On/Off, **Bold attack warnings** On/Off (brighter warning zones with thicker rims). The dojo Settings tab also has **Run benchmark** (about a minute; tours all four jungles and shows frame rates).
 
 Moonfen: mud slows you and you cannot jump while in it; a stream current pushes you sideways; green-rimmed pools are poison; in the fog bank follow the cyan spirit lanterns; reed rafts sink while you stand on them — keep moving.
 

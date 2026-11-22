@@ -33,6 +33,8 @@ signal expedition_ended(result: Dictionary)
 @export_file("*.tscn") var scene_path: String = ""
 
 var timer := ExpeditionTimer.new()
+## Sound for this expedition (Phase 11); listens to gameplay signals.
+var audio: AudioDirector
 var config: ExpeditionConfig
 var is_debug_duration: bool = false
 var arena_entered: bool = false
@@ -54,6 +56,10 @@ var _player: PlayerController
 
 func _ready() -> void:
 	add_to_group("expedition")
+	QualityProfile.apply_to_scene.call_deferred(get_parent())  # Graphics preset (Phase 11).
+	audio = AudioDirector.new()
+	audio.name = "Audio"
+	add_child(audio)
 	objective = get_node_or_null(objective_path) as Node3D
 	_player = get_node_or_null(player_path) as PlayerController
 	var trigger := get_node_or_null(arena_trigger_path) as BossArenaTrigger
@@ -67,6 +73,7 @@ func _ready() -> void:
 		boss.part_broken.connect(_on_part_broken)
 		boss.defeated.connect(_on_boss_defeated)
 	start_expedition()
+	audio.setup.call_deferred(get_parent(), self)  # After every sibling is ready.
 
 
 func _process(delta: float) -> void:

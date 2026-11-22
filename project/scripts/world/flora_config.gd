@@ -31,8 +31,9 @@ extends Resource
 @export var log_count: int = 12
 @export var pillar_count: int = 16
 
-@export_group("Low quality (phones)")
-## Multiplier on ground-cover counts on the LOW tier (see QualityProfile).
+@export_group("Low quality (phones) — unused since Phase 11")
+## Unused since Phase 11: density/draw distance come from QualityPreset (data/quality/*.tres).
+## Kept so existing biome .tres files still load.
 @export var low_density_scale: float = 0.4
 ## Multiplier on ground-cover draw distances on the LOW tier.
 @export var low_draw_distance_scale: float = 0.65

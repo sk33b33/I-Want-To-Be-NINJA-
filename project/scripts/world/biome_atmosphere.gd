@@ -46,10 +46,6 @@ func _ready() -> void:
 	_sun = get_node_or_null(sun_path) as DirectionalLight3D
 	if _sun:
 		_sun_base_energy = _sun.light_energy
-		if QualityProfile.is_low():
-			# One shadow cascade over a short range: by far the cheapest useful moon shadow.
-			_sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-			_sun.directional_shadow_max_distance = 30.0
 	var env_node := get_node_or_null(environment_path) as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sky:
 		_sky_material = env_node.environment.sky.sky_material as ShaderMaterial
@@ -59,8 +55,7 @@ func _ready() -> void:
 		_terrain.rebuild()
 	_build_water()
 	_build_waterfalls()
-	if QualityProfile.is_low():
-		mist_cards = mist_cards / 2
+	mist_cards = int(mist_cards * QualityProfile.current().mist_scale)
 	_build_mist()
 	_build_shafts()
 

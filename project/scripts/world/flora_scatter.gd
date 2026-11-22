@@ -22,6 +22,7 @@ var _rng := RandomNumberGenerator.new()
 var _buckets: Dictionary = {}
 var _tree_positions: Array[Vector3] = []
 var _low: bool = false
+var _preset: QualityPreset
 
 
 func _ready() -> void:
@@ -39,6 +40,7 @@ func rebuild() -> void:
 		_terrain.rebuild()
 	_rng.seed = config.seed
 	_low = QualityProfile.is_low()
+	_preset = QualityProfile.current()
 	_buckets.clear()
 	_tree_positions.clear()
 	_place_trees()
@@ -99,7 +101,7 @@ func _place_trees() -> void:
 		dead_xf.append([])
 	var placed := 0
 	var attempts := 0
-	var tree_scale := cfg.low_tree_scale if _low else 1.0
+	var tree_scale := _preset.tree_density
 	var jungle_count := int(cfg.jungle_tree_count * tree_scale)
 	var total := jungle_count + int(cfg.dead_tree_count * tree_scale)
 	while placed < total and attempts < total * 40:
@@ -151,7 +153,7 @@ func _add_trunk_collision(at: Vector3, radius: float) -> void:
 
 func _place_ground_cover() -> void:
 	var cfg := config
-	var k := cfg.low_density_scale if _low else 1.0
+	var k := _preset.flora_density
 	_scatter("Grass", int(cfg.grass_count * k), 2.2, 0.8, 1.4)
 	_scatter("Fern", int(cfg.fern_count * k), 3.5, 0.7, 1.5)
 	_scatter("Broadleaf", int(cfg.broadleaf_count * k), 4.5, 0.8, 1.6)
@@ -181,8 +183,7 @@ func _place_ground_cover() -> void:
 		meshes["Mushroom%d" % i] = ProceduralMeshes.mushroom_cluster(_variant_rng(10 + i), cfg.mushroom_glows[i], fungus_material)
 	for kind: String in _buckets.keys():
 		var draw := cfg.rock_draw_distance if kind == "Rock" else cfg.ground_cover_draw_distance
-		if _low:
-			draw *= cfg.low_draw_distance_scale
+		draw *= _preset.draw_distance_scale
 		var per_chunk: Dictionary = _buckets[kind]
 		for chunk: Vector2i in per_chunk.keys():
 			_spawn_multimesh("%s_%d_%d" % [kind, chunk.x, chunk.y], meshes[kind], per_chunk[chunk], draw, kind == "Rock")

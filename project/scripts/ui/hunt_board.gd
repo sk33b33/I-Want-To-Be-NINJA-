@@ -18,6 +18,9 @@ var _hunt_page: Control
 var _gear_label: Label
 var _tab_hunt: Button
 var _tab_forge: Button
+var _tab_settings: Button
+var settings: SettingsPanel
+var benchmark_label: Label
 
 
 func _ready() -> void:
@@ -63,6 +66,10 @@ func _build() -> void:
 	_tab_forge.custom_minimum_size = Vector2(200, UiStyle.BUTTON_HEIGHT)
 	_tab_forge.pressed.connect(show_tab.bind("forge"))
 	header.add_child(_tab_forge)
+	_tab_settings = UiStyle.button("Settings", UiStyle.MUTED)
+	_tab_settings.custom_minimum_size = Vector2(200, UiStyle.BUTTON_HEIGHT)
+	_tab_settings.pressed.connect(show_tab.bind("settings"))
+	header.add_child(_tab_settings)
 	_gear_label = UiStyle.label("", 17, UiStyle.SPIRIT)
 	col.add_child(_gear_label)
 	_hunt_page = VBoxContainer.new()
@@ -79,6 +86,23 @@ func _build() -> void:
 		forge.equipped.connect(func(_g: GearDefinition) -> void: _refresh_summary())
 	else:
 		_tab_forge.visible = false
+	var settings_scroll := ScrollContainer.new()
+	settings_scroll.name = "SettingsPage"
+	settings_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	settings_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	settings_scroll.visible = false
+	col.add_child(settings_scroll)
+	var settings_col := VBoxContainer.new()
+	settings_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	settings_col.add_theme_constant_override("separation", 12)
+	settings_scroll.add_child(settings_col)
+	settings = SettingsPanel.new(true)
+	settings.benchmark_requested.connect(func() -> void: BenchmarkRunner.start(get_tree()))
+	settings_col.add_child(settings)
+	benchmark_label = UiStyle.label("", 15, UiStyle.MUTED)
+	benchmark_label.text = BenchmarkRunner.format_results(BenchmarkRunner.last_results, QualityProfile.tier()) \
+			if not BenchmarkRunner.last_results.is_empty() else "No benchmark run yet. Results are also saved to benchmark.txt."
+	settings_col.add_child(benchmark_label)
 	var page := _hunt_page
 	page.add_child(UiStyle.label("Choose a jungle and a beast. You have 45 minutes to reach its arena.", 20, UiStyle.MUTED))
 	materials_label = UiStyle.label(_materials_text(), 18, UiStyle.WARNING)
@@ -100,13 +124,17 @@ func _build() -> void:
 		grid.add_child(card)
 		if first == null and _start_buttons.has(biome.hunts[0].id if not biome.hunts.is_empty() else &""):
 			first = _start_buttons.get(biome.hunts[0].id)
-	if first:
+	if not BenchmarkRunner.last_results.is_empty() and BenchmarkRunner.show_results_once:
+		BenchmarkRunner.show_results_once = false
+		show_tab.call_deferred("settings")
+	elif first:
 		first.grab_focus.call_deferred()
 
 
 ## Switch between the "hunt" and "forge" tabs.
 func show_tab(tab: String) -> void:
 	_hunt_page.visible = tab == "hunt"
+	settings.get_parent().get_parent().visible = tab == "settings"
 	if forge:
 		forge.visible = tab == "forge"
 		if forge.visible:

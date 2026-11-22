@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="QualityPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/quality_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"medium"
+display_name = "Medium"
+render_scale = 0.85
+glow = true
+moon_shadows = true
+shadow_splits = 1
+shadow_distance = 32.0
+light_fade_distance = 32.0
+flora_density = 0.65
+tree_density = 0.85
+draw_distance_scale = 0.8
+terrain_mesh_step = 1
+mist_scale = 0.75
+rain_scale = 0.55
+particle_scale = 0.7
+effect_lights = true

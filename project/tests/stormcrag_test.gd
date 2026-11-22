@@ -154,8 +154,9 @@ func test_rain_follows_the_camera_and_thins_out_on_phones() -> void:
 	await process_frames(5)
 	var rain := main.get_node("Level/Rain") as RainFX
 	check(rain.emitting, "it is raining")
-	check(rain.amount == (rain.amount_low if QualityProfile.is_low() else rain.amount_high), "amount follows the quality tier")
-	check(rain.amount_low <= rain.amount_high / 4, "phone tier uses a quarter of the drops or fewer")
+	check(rain.amount == maxi(50, int(rain.amount_high * QualityProfile.current().rain_scale)), "amount follows the quality preset")
+	var low := load("res://data/quality/low.tres") as QualityPreset
+	check(low.rain_scale <= 0.25, "phone tier uses a quarter of the drops or fewer")
 	var cam := main.get_viewport().get_camera_3d()
 	check(cam != null and rain.global_position.distance_to(cam.global_position + Vector3.UP * rain.height) < 0.5, "rain hangs above the camera")
 	_done()

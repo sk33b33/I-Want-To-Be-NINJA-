@@ -97,7 +97,7 @@ func _fire(s: Dictionary) -> void:
 	var at: Vector3 = s["pos"]
 	(s["bolt"] as Node3D).visible = true
 	(s["ring"] as Node3D).visible = false
-	if not QualityProfile.is_low():
+	if QualityProfile.current().effect_lights:
 		var flash := OmniLight3D.new()
 		flash.light_color = Color(0.75, 0.85, 1.0)
 		flash.light_energy = 6.0

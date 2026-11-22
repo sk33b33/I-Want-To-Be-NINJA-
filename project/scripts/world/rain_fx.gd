@@ -3,14 +3,14 @@ extends CPUParticles3D
 ## Rain that follows the active camera (Stormcrag). CPU particles so it runs on the
 ## gl_compatibility renderer; fewer drops on the phone tier.
 
+## Drops at full quality; the preset's rain_scale thins it (LOW ~300).
 @export var amount_high: int = 1400
-@export var amount_low: int = 300
 @export var height: float = 9.0
 
 
 func _ready() -> void:
 	add_to_group("rain_fx")
-	amount = amount_low if QualityProfile.is_low() else amount_high
+	amount = maxi(50, int(amount_high * QualityProfile.current().rain_scale))
 	local_coords = false
 	emitting = true
 

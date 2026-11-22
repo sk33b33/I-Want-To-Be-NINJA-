@@ -142,19 +142,27 @@ func _grid_normal(ix: int, iz: int) -> Vector3:
 
 
 func _build_mesh() -> void:
-	var count := _width * _depth
+	# The render mesh may skip height samples (QualityPreset.terrain_mesh_step) to save triangles
+	# on phones; the last row/column is always kept so the edges line up. Collision uses every sample.
+	var step := QualityProfile.current().terrain_mesh_step if not Engine.is_editor_hint() else 1
+	var xs := _sample_indices(_width, step)
+	var zs := _sample_indices(_depth, step)
+	var w := xs.size()
+	var count := w * zs.size()
 	var verts := PackedVector3Array()
 	var normals := PackedVector3Array()
 	var colors := PackedColorArray()
 	verts.resize(count)
 	normals.resize(count)
 	colors.resize(count)
-	for iz in _depth:
-		for ix in _width:
-			var i := iz * _width + ix
+	for jz in zs.size():
+		for jx in w:
+			var ix: int = xs[jx]
+			var iz: int = zs[jz]
+			var i := jz * w + jx
 			var x := config.min_corner.x + ix * config.cell_size
 			var z := config.min_corner.y + iz * config.cell_size
-			var h := _heights[i]
+			var h := _heights[iz * _width + ix]
 			var n := _grid_normal(ix, iz)
 			verts[i] = Vector3(x, h, z)
 			normals[i] = n
@@ -168,13 +176,13 @@ func _build_mesh() -> void:
 			wet = maxf(wet, 1.0 - smoothstep(-2.0, 0.5, h - config.route_height))
 			colors[i] = Color(rock, path * (1.0 - rock), tint, wet)
 	var indices := PackedInt32Array()
-	indices.resize((_width - 1) * (_depth - 1) * 6)
+	indices.resize((w - 1) * (zs.size() - 1) * 6)
 	var k := 0
-	for iz in _depth - 1:
-		for ix in _width - 1:
-			var a := iz * _width + ix
+	for jz in zs.size() - 1:
+		for jx in w - 1:
+			var a := jz * w + jx
 			var b := a + 1
-			var c := a + _width
+			var c := a + w
 			var d := c + 1
 			indices[k] = a; indices[k + 1] = b; indices[k + 2] = c
 			indices[k + 3] = b; indices[k + 4] = d; indices[k + 5] = c
@@ -193,6 +201,24 @@ func _build_mesh() -> void:
 	mi.name = "TerrainMesh"
 	mi.mesh = mesh
 	add_child(mi)
+
+
+static func _sample_indices(n: int, step: int) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	var i := 0
+	while i < n - 1:
+		out.append(i)
+		i += maxi(step, 1)
+	out.append(n - 1)
+	return out
+
+
+## Triangles in the render mesh (for budgets/tests).
+func render_triangle_count() -> int:
+	var mi := get_node_or_null("TerrainMesh") as MeshInstance3D
+	if mi == null or mi.mesh == null:
+		return 0
+	return (mi.mesh as ArrayMesh).surface_get_array_index_len(0) / 3
 
 
 func _build_collision() -> void:

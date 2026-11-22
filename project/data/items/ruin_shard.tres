@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_2rw7k"]
+
+[resource]
+script = ExtResource("1_2rw7k")
+id = &"ruin_shard"
+display_name = "Ruin Shard"
+description = "A rune-cut stone from the drowned shrine. It hums faintly."
+color = Color(0.7, 0.6, 0.9, 1)
+rarity = 1

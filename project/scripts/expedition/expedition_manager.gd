@@ -11,6 +11,8 @@ signal boss_arena_entered(remaining: float)
 signal timer_expired
 ## Emitted when a boss part breaks and its reward is granted (once per part per run).
 signal part_reward_granted(part: BossPartDefinition, item: ItemDefinition, count: int)
+## A material was gathered from a Pickup.
+signal item_collected(item: ItemDefinition, count: int)
 ## Boss defeated (the victory results follow after the death animation).
 signal hunt_completed
 ## result: {"outcome": "escaped"|"victory", "hunt", "elapsed", and for victory:
@@ -23,6 +25,8 @@ signal expedition_ended(result: Dictionary)
 @export var player_path: NodePath = ^"../Player"
 @export var arena_trigger_path: NodePath = ^"../Level/BossArenaTrigger"
 @export var boss_path: NodePath = ^"../Level/Boss"
+## Where the HUD's objective arrow points before the arena (the boss gate).
+@export var objective_path: NodePath = ^"../Level/ArenaGateMarker"
 ## The biome scene this expedition runs in (for Retry).
 @export_file("*.tscn") var scene_path: String = ""
 
@@ -38,11 +42,17 @@ var run_items: Dictionary = {}
 var parts_broken: Array[StringName] = []
 ## True once victory rewards were written to the player profile.
 var rewards_recorded: bool = false
+## Countdown left when the arena was entered (for the results screen).
+var remaining_at_arena: float = -1.0
+var gathered: Dictionary = {}
+var objective: Node3D
 
 var _player: PlayerController
 
 
 func _ready() -> void:
+	add_to_group("expedition")
+	objective = get_node_or_null(objective_path) as Node3D
 	_player = get_node_or_null(player_path) as PlayerController
 	var trigger := get_node_or_null(arena_trigger_path) as BossArenaTrigger
 	if trigger:
@@ -92,6 +102,7 @@ func enter_boss_arena() -> void:
 		return
 	arena_entered = true
 	timer.stop()
+	remaining_at_arena = timer.remaining
 	boss_arena_entered.emit(timer.remaining)
 	if boss:
 		boss.awaken()
@@ -109,6 +120,15 @@ func restart() -> void:
 
 func return_to_hunt_board() -> void:
 	SceneFlow.go_to_hunt_board(get_tree())
+
+
+## Gather a material on the way (Pickup). Kept even if the beast escapes.
+func collect(item: ItemDefinition, count: int) -> void:
+	if item == null or ended:
+		return
+	gathered[item.id] = int(gathered.get(item.id, 0)) + count
+	_grant(item, count)
+	item_collected.emit(item, count)
 
 
 func _grant(item: ItemDefinition, count: int) -> void:
@@ -138,7 +158,8 @@ func _on_boss_defeated() -> void:
 	if _player:
 		_player.input_enabled = false
 	expedition_ended.emit({"outcome": "victory", "hunt": hunt, "elapsed": timer.elapsed(),
-			"parts_broken": parts_broken.duplicate(), "rewards": run_rewards.duplicate(), "items": run_items.duplicate()})
+			"remaining_at_arena": remaining_at_arena, "parts_broken": parts_broken.duplicate(),
+			"rewards": run_rewards.duplicate(), "items": run_items.duplicate()})
 
 
 ## Write this run's rewards to the persistent player profile (exactly once per run).
@@ -149,7 +170,7 @@ func _record_rewards() -> void:
 	var profile := PlayerProfile.load_profile()
 	for id in run_rewards:
 		profile.add_material(id, int(run_rewards[id]))
-	if hunt:
+	if hunt and boss and not boss.is_alive():
 		profile.record_hunt(hunt.id)
 	profile.save()
 
@@ -165,4 +186,6 @@ func _on_timer_expired() -> void:
 			ended = true
 			if _player:
 				_player.input_enabled = false
-			expedition_ended.emit({"outcome": "escaped", "hunt": hunt, "elapsed": timer.elapsed()})
+			_record_rewards()  # Gathered materials are kept even though the beast escaped.
+			expedition_ended.emit({"outcome": "escaped", "hunt": hunt, "elapsed": timer.elapsed(),
+					"rewards": run_rewards.duplicate(), "items": run_items.duplicate()})

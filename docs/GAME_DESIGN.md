@@ -100,6 +100,7 @@ Boss part rewards: horns, scales, claws, cores, membranes, fangs, essence. Parts
 - HUD shows `MM:SS` (45:00 initially) during expedition.
 - Timer counts down only while expedition is active and player is not in pause/settings.
 - On arena entry: stop timer, hide UI, store elapsed/remaining run time for results.
+- Gathered materials (optional-path pickups) are kept even when the beast escapes; part and victory rewards require the hunt.
 - Timer expiration: **decided in Phase 3 — the expedition ends** ("The trail went cold — <beast> escaped") with Retry / Hunt board. Returning to the last checkpoint with a fresh timer is available as `ExpeditionConfig.timeout_behavior = RETURN_TO_CHECKPOINT`. Do not make boss timer expire.
 - The minimum design requirement is **45 minutes per run**; do not shorten it for production gameplay without owner approval.
 

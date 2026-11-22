@@ -37,6 +37,9 @@ func activate(player: PlayerController) -> void:
 	player.set_checkpoint(get_respawn_transform())
 	if not is_active:
 		is_active = true
+		# First light of a shrine restores the hunter (a "supply" on the route).
+		if player.combat and player.combat.health and not player.combat.health.dead:
+			player.combat.health.heal(player.combat.health.max_health)
 		_apply_visual()
 		activated.emit(self)
 

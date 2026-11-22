@@ -14,9 +14,18 @@ var _status: Label
 var _banner: Label
 var _banner_timer: float = 0.0
 var _pulse: float = 0.0
+var _objective: Label
+var _arrow: Label
+var _toast: Label
+var _toast_t: float = 0.0
+var _lore: PanelContainer
+var _lore_title: Label
+var _lore_text: Label
+var _lore_t: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("lore_display")
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build()
@@ -26,6 +35,10 @@ func _ready() -> void:
 		_manager.boss_arena_entered.connect(_on_arena)
 		_manager.timer_expired.connect(_on_expired)
 		_manager.pause_changed.connect(func(p: bool) -> void: _status.text = "PAUSED" if p else "")
+		_manager.item_collected.connect(func(item: ItemDefinition, n: int) -> void:
+			_toast.text = "+%d %s" % [n, item.display_name]
+			_toast.add_theme_color_override("font_color", item.color.lightened(0.3))
+			_toast_t = 2.5)
 		if _manager.timer.is_active():
 			_on_started(_manager.hunt, _manager.timer.duration)
 
@@ -35,8 +48,15 @@ func _process(delta: float) -> void:
 		_banner_timer -= delta
 		_banner.modulate.a = clampf(_banner_timer, 0.0, 1.0)
 		_banner.visible = _banner_timer > 0.0
+	_toast_t = maxf(_toast_t - delta, 0.0)
+	_toast.modulate.a = clampf(_toast_t, 0.0, 1.0)
+	if _lore_t > 0.0:
+		_lore_t -= delta
+		_lore.modulate.a = clampf(_lore_t, 0.0, 1.0)
+		_lore.visible = _lore_t > 0.0
 	if _manager == null or not _box.visible:
 		return
+	_update_objective()
 	var remaining := _manager.timer.remaining
 	_time.text = ExpeditionTimer.format_time(remaining)
 	var color := UiStyle.BONE
@@ -61,6 +81,37 @@ func is_timer_visible() -> bool:
 	return _box.visible
 
 
+## Show a lore tablet's text (called by LoreStone through the "lore_display" group).
+func show_lore(title: String, text: String) -> void:
+	_lore_title.text = title
+	_lore_text.text = text
+	_lore.visible = true
+	_lore.modulate.a = 1.0
+	_lore_t = 7.0
+
+
+func objective_text() -> String:
+	return _objective.text
+
+
+func _update_objective() -> void:
+	var target := _manager.objective
+	var player := get_tree().get_first_node_in_group("player") as PlayerController
+	if target == null or player == null:
+		_objective.text = ""
+		_arrow.text = ""
+		return
+	var to := target.global_position - player.global_position
+	to.y = 0.0
+	_objective.text = "Arena  %d m" % int(round(to.length()))
+	# Arrow relative to the camera: up = straight ahead on screen.
+	var cam_fwd := -player.get_camera_basis().z
+	var angle := atan2(cam_fwd.x * to.z - cam_fwd.z * to.x, cam_fwd.x * to.x + cam_fwd.z * to.z)
+	_arrow.text = "▲"
+	_arrow.pivot_offset = _arrow.size * 0.5
+	_arrow.rotation = angle
+
+
 func _build() -> void:
 	_box = VBoxContainer.new()
 	_box.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -75,6 +126,19 @@ func _build() -> void:
 	_time = UiStyle.label("45:00", 44)
 	_time.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(_time)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_box.add_child(row)
+	_arrow = UiStyle.label("▲", 20, UiStyle.SPIRIT)
+	_arrow.custom_minimum_size = Vector2(26, 26)
+	_arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_arrow.autowrap_mode = TextServer.AUTOWRAP_OFF
+	row.add_child(_arrow)
+	_objective = UiStyle.label("", 18, UiStyle.SPIRIT)
+	_objective.autowrap_mode = TextServer.AUTOWRAP_OFF
+	row.add_child(_objective)
 	_status = UiStyle.label("", 18, UiStyle.SPIRIT)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_box.add_child(_status)
@@ -86,6 +150,26 @@ func _build() -> void:
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.visible = false
 	add_child(_banner)
+	_toast = UiStyle.label("", 24, UiStyle.BONE)
+	_toast.set_anchors_preset(Control.PRESET_CENTER)
+	_toast.position = Vector2(-300, -40)  # Above the lore panel and below the banners.
+	_toast.custom_minimum_size = Vector2(600, 0)
+	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.modulate.a = 0.0
+	add_child(_toast)
+	_lore = UiStyle.panel(Color(0.03, 0.04, 0.045, 0.82), Color(0.6, 0.55, 0.4, 0.4))
+	_lore.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_lore.position = Vector2(-330, -250)
+	_lore.custom_minimum_size = Vector2(660, 0)
+	_lore.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var lcol := VBoxContainer.new()
+	_lore.add_child(lcol)
+	_lore_title = UiStyle.label("", 22, Color(0.85, 0.75, 0.5))
+	lcol.add_child(_lore_title)
+	_lore_text = UiStyle.label("", 18, UiStyle.BONE)
+	lcol.add_child(_lore_text)
+	_lore.visible = false
+	add_child(_lore)
 
 
 func _on_started(hunt: HuntDefinition, _duration: float) -> void:

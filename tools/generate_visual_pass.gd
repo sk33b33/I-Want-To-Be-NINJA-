@@ -17,6 +17,7 @@ func _initialize() -> void:
 	_boss_scenes()
 	_player_scene()
 	_checkpoint_scene()
+	_phase6_scenes()
 	_level_scene()
 	_main_scene()
 	_hunt_board_scene()
@@ -411,12 +412,12 @@ func _level_scene() -> void:
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.24, 0.3, 0.32)
-	env.ambient_light_energy = 3.5
+	env.ambient_light_energy = 4.3
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_exposure = 1.35
+	env.tonemap_exposure = 1.5
 	env.fog_enabled = true
-	env.fog_light_color = Color(0.15, 0.19, 0.21)
+	env.fog_light_color = Color(0.17, 0.21, 0.23)
 	env.fog_density = 0.016
 	env.fog_sky_affect = 0.3
 	env.fog_height = 0.5
@@ -436,7 +437,7 @@ func _level_scene() -> void:
 	moon.name = "Moonlight"
 	moon.rotation_degrees = Vector3(-38, 35, 0)
 	moon.light_color = Color(0.55, 0.64, 0.82)
-	moon.light_energy = 1.2
+	moon.light_energy = 1.35
 	moon.shadow_enabled = true
 	moon.shadow_opacity = 0.7
 	moon.directional_shadow_max_distance = 55.0
@@ -596,6 +597,42 @@ func _level_scene() -> void:
 	boss.rotation.y = PI
 	_root.add_child(boss)
 
+	# Phase 6: objective marker, gatherables on the optional paths, lore stones.
+	var marker := Marker3D.new()
+	marker.name = "ArenaGateMarker"
+	marker.position = Vector3(0, 0, -94)
+	_root.add_child(marker)
+	var gather := Node3D.new()
+	gather.name = "Gatherables"
+	_root.add_child(gather)
+	var spots := [
+		# [scene, position, snap to ground]
+		["glowcap", Vector3(-24, 0, -22), true], ["glowcap", Vector3(-27.5, 0, -18.5), true],
+		["glowcap", Vector3(-21, 0, -26.5), true],                          # Thornling hollow
+		["glowcap", Vector3(11.5, 3.25, -23), false], ["glowcap", Vector3(10, 4.05, -42), false],  # High route
+		["glowcap", Vector3(2.2, 0.35, -60.5), false],                      # Gorge stepping stone
+		["glowcap", Vector3(8, 2.55, -72.5), false],                        # Far-bank wall top
+		["ruin_shard", Vector3(6.5, 0, -37), true], ["ruin_shard", Vector3(-19, 0, -46.5), true],
+	]
+	for i in spots.size():
+		var spot: Array = spots[i]
+		var pk: Node3D = (load("res://scenes/world/pickup_%s.tscn" % spot[0]) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		pk.name = "%s_%d" % [spot[0], i]
+		pk.position = spot[1]
+		pk.set("snap_to_ground", spot[2])
+		gather.add_child(pk)
+	var lore := [
+		["The Drowned Way", "Before the canopy closed, pilgrims walked this road to the stag-shrine. The waters rose, the shrine sank, and only the thorns remember the way.", Vector3(-7.5, 0, 3.5)],
+		["Of Kurogale", "It sheds no antler and forgets no trespass. Strike while its head is bowed: the crown of thorn breaks only then. It fears the ember.", Vector3(6.5, 0, -82)],
+	]
+	for i in lore.size():
+		var ls: Node3D = (load("res://scenes/world/lore_stone.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		ls.name = "LoreStone%d" % i
+		ls.set("title", lore[i][0])
+		ls.set("text", lore[i][1])
+		ls.position = lore[i][2]
+		gather.add_child(ls)
+
 	_omni("GateGlow", Vector3(0, 4, -91), Color(1.0, 0.2, 0.08), 2.5, 16.0)
 	_omni("ShrineGlow", Vector3(-9, 2.5, -8), Color(0.2, 0.9, 0.8), 1.2, 9.0)
 	_omni("GorgeGlow", Vector3(0, -12, -60), Color(0.15, 0.6, 0.7), 2.0, 22.0)
@@ -733,7 +770,8 @@ func _hunt_board_scene() -> void:
 	for id in ["verdant_canopy", "emberwild", "moonfen", "stormcrag"]:
 		list.append(load("res://data/biomes/biome_%s.tres" % id))
 	board.set("biomes", list)
-	var items: Array[ItemDefinition] = [load("res://data/items/thornback_antler.tres"), load("res://data/items/kurogale_hide.tres")]
+	var items: Array[ItemDefinition] = [load("res://data/items/thornback_antler.tres"), load("res://data/items/kurogale_hide.tres"),
+			load("res://data/items/glowcap.tres"), load("res://data/items/ruin_shard.tres")]
 	board.set("known_items", items)
 	board.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pack(board, "res://scenes/ui/hunt_board.tscn")
@@ -1092,3 +1130,72 @@ func _boss_scenes_talisman_only() -> void:
 	sphere.radius = 0.45
 	tal.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"player", sphere, Vector3.ZERO))
 	_pack(tal, "res://scenes/combat/fire_talisman.tscn")
+
+
+func _phase6_scenes() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/world")
+	var glow := _item("glowcap", "Glowcap", "A mushroom that drinks moonlight. Alchemists prize its spores.",
+			Color(0.2, 0.95, 0.8), 0)
+	var shard := _item("ruin_shard", "Ruin Shard", "A rune-cut stone from the drowned shrine. It hums faintly.",
+			Color(0.7, 0.6, 0.9), 1)
+	for spec in [["glowcap", glow], ["ruin_shard", shard]]:
+		var a := Area3D.new()
+		a.name = "Pickup"
+		a.set_script(load("res://scripts/world/pickup.gd"))
+		a.set("item", spec[1])
+		var sphere := SphereShape3D.new()
+		sphere.radius = 1.0
+		var col := CollisionShape3D.new()
+		col.shape = sphere
+		col.position.y = 0.6
+		a.add_child(col)
+		var vis := Node3D.new()
+		vis.name = "Visual"
+		a.add_child(vis)
+		var mi := MeshInstance3D.new()
+		mi.name = "Mesh"
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 600
+		if spec[0] == "glowcap":
+			mi.mesh = ProceduralMeshes.mushroom_cluster(rng, Color(0.25, 1.0, 0.85), load(MAT + "glow_fungus.tres"))
+			mi.scale = Vector3.ONE * 1.4
+		else:
+			var bm := BoxMesh.new()
+			bm.size = Vector3(0.35, 0.5, 0.25)
+			bm.material = load(MAT + "gate_stone.tres")
+			mi.mesh = bm
+			mi.rotation_degrees = Vector3(15, 0, 20)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		vis.add_child(mi)
+		# Soft sparkle so pickups read in the dark from a distance.
+		var mote := MeshInstance3D.new()
+		mote.name = "Mote"
+		var q := QuadMesh.new()
+		q.size = Vector2(0.9, 0.9)
+		q.material = load(MAT + "spirit_flame.tres")
+		mote.mesh = q
+		mote.position.y = 0.6
+		mote.set_instance_shader_parameter("flame_color", (spec[1] as ItemDefinition).color * 0.6)
+		mote.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		vis.add_child(mote)
+		_pack(a, "res://scenes/world/pickup_%s.tscn" % spec[0])
+
+	var ls := Area3D.new()
+	ls.name = "LoreStone"
+	ls.set_script(load("res://scripts/world/lore_stone.gd"))
+	var lcol := CollisionShape3D.new()
+	var ls_shape := SphereShape3D.new()
+	ls_shape.radius = 3.5
+	lcol.shape = ls_shape
+	lcol.position.y = 1.0
+	ls.add_child(lcol)
+	var tablet := MeshInstance3D.new()
+	tablet.name = "Tablet"
+	var tb := BoxMesh.new()
+	tb.size = Vector3(1.1, 1.7, 0.28)
+	tb.material = load(MAT + "climb_stone.tres")
+	tablet.mesh = tb
+	tablet.position.y = 0.75
+	tablet.rotation_degrees = Vector3(-6, 20, 3)
+	ls.add_child(tablet)
+	_pack(ls, "res://scenes/world/lore_stone.tscn")

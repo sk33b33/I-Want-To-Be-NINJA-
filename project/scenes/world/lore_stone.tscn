@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/lore_stone.gd" id="1_3chuy"]
+[ext_resource type="Material" path="res://data/materials/climb_stone.tres" id="2_str3i"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_fgits"]
+radius = 3.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_lngd6"]
+material = ExtResource("2_str3i")
+size = Vector3(1.1, 1.7, 0.28)
+
+[node name="LoreStone" type="Area3D"]
+script = ExtResource("1_3chuy")
+
+[node name="@CollisionShape3D@19" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("SphereShape3D_fgits")
+
+[node name="Tablet" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.93653375, -0.08488156, 0.3401465, 0.052049257, 0.99315894, 0.104528464, -0.3466921, -0.080190055, 0.9345449, 0, 0.75, 0)
+mesh = SubResource("BoxMesh_lngd6")

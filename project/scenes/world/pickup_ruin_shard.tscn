@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/pickup.gd" id="1_2n4eu"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="2_qmy6k"]
+[ext_resource type="Material" path="res://data/materials/gate_stone.tres" id="3_fy5w2"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="4_6ww76"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_lx07d"]
+radius = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_3h2oa"]
+material = ExtResource("3_fy5w2")
+size = Vector3(0.35, 0.5, 0.25)
+
+[sub_resource type="QuadMesh" id="QuadMesh_anv1c"]
+material = ExtResource("4_6ww76")
+size = Vector2(0.9, 0.9)
+
+[node name="Pickup" type="Area3D"]
+script = ExtResource("1_2n4eu")
+item = ExtResource("2_qmy6k")
+
+[node name="@CollisionShape3D@18" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("SphereShape3D_lx07d")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Mesh" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(0.9396926, -0.34202012, 0, 0.33036608, 0.90767336, -0.25881904, 0.088521324, 0.24321035, 0.9659258, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_3h2oa")
+
+[node name="Mote" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_anv1c")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_nb00t"]
+
+[resource]
+script = ExtResource("1_nb00t")
+id = &"glowcap"
+display_name = "Glowcap"
+description = "A mushroom that drinks moonlight. Alchemists prize its spores."
+color = Color(0.2, 0.95, 0.8, 1)

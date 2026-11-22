@@ -69,3 +69,13 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Cause: `NinjaAnimator._ready()` runs before the player's own `_ready()` (children first), so `player.combat` / `player.traversal` were still null and the animator never connected to them. Attack (Dual_Weapon_Combo slices), roll (Quick_Roll_To_Run), hurt/death and the Phase 2 climb/hang/mantle animations were all silently skipped.
 - Fix: the animator looks the components up directly on the player.
 - Regression tests (seen failing before the fix): light, heavy, roll and climb each check the AnimationPlayer's current clip. 93/93 tests pass.
+
+## 2026-11-22 — Phase 6: Verdant Canopy vertical slice
+- Lighting lifted slightly at the owner's request (ambient 3.5 → 4.3, exposure 1.35 → 1.5, moon 1.2 → 1.35, lighter fog); still dark and moody (mean screen brightness ~20 → ~31 / 255).
+- Gatherables (`Pickup`): Glowcap (Thornling hollow ×3, high route ×2, gorge stone, far-bank wall top) and Ruin Shard (behind the ruin wall, by the gorge waterfall). Collected once; kept even if the beast escapes; saved to the profile.
+- Two lore stones (`LoreStone`): "The Drowned Way" (spawn) and "Of Kurogale" (gate clearing, a fight hint). Text shown once on the HUD.
+- Shrines heal the hunter to full the first time they are lit.
+- HUD: objective arrow + distance to the arena under the timer; "+1 item" pickup note.
+- Results: time to spare at the arena; on escape, lists what you gathered and kept.
+- Hunt credit (`hunts_completed`) only for a defeated beast.
+- Tests: `biome_slice_test.gd` (7) incl. the gate — one full expedition from the hunt board to saved rewards; bots moved to `tests/bot_helpers.gd`.

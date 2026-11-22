@@ -30,6 +30,8 @@ func show_result(result: Dictionary) -> void:
 			_title.add_theme_color_override("font_color", UiStyle.SPIRIT)
 			var lines: PackedStringArray = ["%s has fallen." % who,
 					"Time in the jungle: %s" % ExpeditionTimer.format_time(float(result.get("elapsed", 0.0)))]
+			if float(result.get("remaining_at_arena", -1.0)) >= 0.0:
+				lines.append("Time to spare at the arena: %s" % ExpeditionTimer.format_time(float(result["remaining_at_arena"])))
 			var parts: Array = result.get("parts_broken", [])
 			lines.append("Parts broken: %s" % (", ".join(parts.map(func(p: StringName) -> String: return String(p).capitalize())) if not parts.is_empty() else "none"))
 			var rewards: Dictionary = result.get("rewards", {})
@@ -44,6 +46,13 @@ func show_result(result: Dictionary) -> void:
 			_title.text = "The trail went cold"
 			_body.text = "%s escaped into the jungle.\nYou searched for %s." % [
 				who, ExpeditionTimer.format_time(float(result.get("elapsed", 0.0)))]
+			var kept: Dictionary = result.get("rewards", {})
+			if not kept.is_empty():
+				var names: PackedStringArray = []
+				for id in kept:
+					var it := (result.get("items", {}) as Dictionary).get(id) as ItemDefinition
+					names.append("%d %s" % [int(kept[id]), it.display_name if it else String(id)])
+				_body.text += "\nYou kept what you gathered: " + ", ".join(names)
 		_:
 			_title.text = "Expedition over"
 			_body.text = ""

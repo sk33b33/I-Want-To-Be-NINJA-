@@ -38,7 +38,8 @@ Same controls on every device (keyboard / gamepad / touch):
 | Drop from a ledge | Back |
 | Shimmy along a ledge | Left / right |
 
-Checkpoint shrines light up (red → teal) as you pass; falling respawns you at the last lit shrine.
+Checkpoint shrines light up (red → teal) as you pass and heal you the first time; falling respawns you at the last lit shrine.
+Walk over glowing pickups (Glowcap, Ruin Shard) to gather them; walk up to a lore stone to read it. The arrow under the timer points to the arena.
 
 Notes:
 - Mouse look: click the game window to capture the mouse; Esc releases it. Mouse wheel zooms in top-down mode.

@@ -46,6 +46,8 @@ Pause menu options (saved between sessions): **Screen shake** On/Off, **Bold att
 
 Moonfen: mud slows you and you cannot jump while in it; a stream current pushes you sideways; green-rimmed pools are poison; in the fog bank follow the cyan spirit lanterns; reed rafts sink while you stand on them — keep moving.
 
+Stormcrag: on the storm plateau a pale ring appears where you stand — move on (or roll) before the bolt falls, or rest under a rock overhang. On the gale ridge, white chevrons show which way the next gust will blow; cross in the calm. Wet stone is slippery: you speed up and stop slowly.
+
 Notes:
 - Mouse look: click the game window to capture the mouse; Esc releases it. Mouse wheel zooms in top-down mode.
 - Touch controls appear automatically on touchscreens. To test them on a PC, run with `-- --touch` (mouse emulates touch).

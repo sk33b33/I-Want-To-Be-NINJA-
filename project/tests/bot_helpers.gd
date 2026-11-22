@@ -195,3 +195,33 @@ static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: fl
 			return true
 	release_moves()
 	return false
+
+
+## Stormcrag route: jumps onto the cliff and climbs to the storm plateau, keeps running across it
+## (lightning lands where you WERE), drops off the far edge, waits at the gale ridge until a gust
+## has just blown past, then sprints the slick ridge in the calm.
+static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	if not await _walk_to_z(tc, player, -7.9, 0.0):
+		return false
+	tc.press("jump")
+	await tc.physics_frames(12)
+	tc.release("jump")
+	if not await _walk_to_z(tc, player, -47.5, 0.0, 1500):  # Climb, plateau, drop.
+		return false
+	release_moves()
+	var gust := level.get_node("Hazards/GaleGust") as GustZone
+	var waited := false
+	for i in 900:
+		await tc.tree.physics_frame
+		if gust.phase == GustZone.Phase.CALM and gust.phase_time() < 0.1:
+			waited = true
+			break
+	if not waited:
+		return false
+	tc.press("sprint")
+	if not await _walk_to_z(tc, player, -73.0, 0.0, 400):
+		return false
+	tc.release("sprint")
+	var ok := await _walk_to_z(tc, player, stop_z, 0.0)
+	release_moves()
+	return ok

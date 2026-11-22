@@ -11,6 +11,8 @@ extends Area3D
 @export var blocks_jump: bool = false
 ## World-space push in m/s (a stream current). Applied on the ground and in the air.
 @export var current: Vector3 = Vector3.ZERO
+## Grip on the ground (Stormcrag rain-slick stone 0.35): scales how fast you speed up and stop.
+@export var traction: float = 1.0
 @export var damage_per_tick: float = 0.0
 @export var tick_time: float = 0.5
 @export var element: StringName = &""

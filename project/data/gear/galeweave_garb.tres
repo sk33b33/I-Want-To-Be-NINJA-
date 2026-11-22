@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_ho8n7"]
+
+[resource]
+script = ExtResource("1_ho8n7")
+id = &"galeweave_garb"
+display_name = "Galeweave Garb"
+description = "Roc plumes woven over a storm-glass mail. Light enough to run in, hard enough to stop a talon."
+slot = 1
+color = Color(0.45, 0.5, 0.65, 1)
+max_health_bonus = 45.0
+damage_reduction = 0.25

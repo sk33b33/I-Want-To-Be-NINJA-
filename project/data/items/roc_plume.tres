@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_t4q7g"]
+
+[resource]
+script = ExtResource("1_t4q7g")
+id = &"roc_plume"
+display_name = "Roc Plume"
+description = "A long flight feather from the Sky Roc. Wind will not tear it."
+color = Color(0.35, 0.4, 0.5, 1)

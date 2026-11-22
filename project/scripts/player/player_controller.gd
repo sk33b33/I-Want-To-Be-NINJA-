@@ -187,6 +187,14 @@ func surface_speed_multiplier() -> float:
 	return m
 
 
+## Least grip wins (wet stone). Scales ground acceleration and braking.
+func surface_traction() -> float:
+	var t := 1.0
+	for z in _surface_zones:
+		t = minf(t, float(z.get("traction")))
+	return t
+
+
 func surface_blocks_jump() -> bool:
 	for z in _surface_zones:
 		if z.get("blocks_jump"):
@@ -221,6 +229,7 @@ func _update_horizontal(wish: Vector3, on_floor: bool, delta: float) -> void:
 
 	if on_floor:
 		var accel := config.ground_acceleration if has_input else config.ground_deceleration
+		accel *= surface_traction()
 		# A current moves the target velocity, so standing still in a stream drifts with it.
 		horizontal = horizontal.move_toward(wish * top_speed + drift, accel * delta)
 	elif has_input or drift != Vector3.ZERO:

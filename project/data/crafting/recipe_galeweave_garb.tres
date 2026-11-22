@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_ojllo"]
+[ext_resource type="Resource" path="res://data/items/roc_plume.tres" id="2_3q4m8"]
+[ext_resource type="Resource" path="res://data/items/storm_glass.tres" id="3_1k374"]
+[ext_resource type="Resource" path="res://data/gear/galeweave_garb.tres" id="4_u3fvc"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_enp65"]
+
+[resource]
+script = ExtResource("5_enp65")
+id = &"galeweave_garb"
+result = ExtResource("4_u3fvc")
+inputs = Array[ExtResource("1_ojllo")]([ExtResource("2_3q4m8"), ExtResource("3_1k374")])
+counts = PackedInt32Array(1, 2)

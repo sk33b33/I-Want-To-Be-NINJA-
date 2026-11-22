@@ -1,0 +1,37 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/pickup.gd" id="1_fpbsy"]
+[ext_resource type="Resource" path="res://data/items/storm_glass.tres" id="2_jmkcl"]
+[ext_resource type="Material" path="res://data/materials/roc_crest.tres" id="3_crb16"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="4_3nly3"]
+[ext_resource type="Script" path="res://scripts/world/instance_tint.gd" id="5_raj48"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_5qy75"]
+radius = 1.0
+
+[sub_resource type="PrismMesh" id="PrismMesh_yvxb3"]
+material = ExtResource("3_crb16")
+size = Vector3(0.3, 0.7, 0.3)
+
+[sub_resource type="QuadMesh" id="QuadMesh_3eceq"]
+material = ExtResource("4_3nly3")
+size = Vector2(0.9, 0.9)
+
+[node name="Pickup" type="Area3D"]
+script = ExtResource("1_fpbsy")
+item = ExtResource("2_jmkcl")
+
+[node name="@CollisionShape3D@73" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("SphereShape3D_5qy75")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="@MeshInstance3D@74" type="MeshInstance3D" parent="Visual"]
+mesh = SubResource("PrismMesh_yvxb3")
+
+[node name="@MeshInstance3D@75" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+mesh = SubResource("QuadMesh_3eceq")
+script = ExtResource("5_raj48")
+color = Color(0.36, 0.45000002, 0.6, 0.6)

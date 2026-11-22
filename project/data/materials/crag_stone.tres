@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/stone.gdshader" id="1_3hfy1"]
+[ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_bjkrj"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_3hfy1")
+shader_parameter/detail_noise = ExtResource("2_bjkrj")
+shader_parameter/stone_light = Color(0.3, 0.32, 0.36, 1)
+shader_parameter/stone_dark = Color(0.1, 0.11, 0.13, 1)
+shader_parameter/moss = Color(0.08, 0.12, 0.1, 1)
+shader_parameter/scale = null
+shader_parameter/moss_amount = 0.3
+shader_parameter/rune_color = null
+shader_parameter/rune_strength = null
+shader_parameter/climb_marks = null
+shader_parameter/climb_glow = null

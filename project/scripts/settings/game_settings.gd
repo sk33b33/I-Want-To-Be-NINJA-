@@ -12,6 +12,7 @@ const WARNING_MATERIALS: Array[String] = [
 	"res://data/materials/snare_warning.tres", "res://data/materials/lava_warning.tres",
 	"res://data/materials/vent_glow.tres", "res://data/materials/heat_shimmer.tres",
 	"res://data/materials/poison_warning.tres", "res://data/materials/flood_warning.tres",
+	"res://data/materials/gust_warning.tres", "res://data/materials/lightning_warning.tres",
 ]
 const BOLD_BOOST := 1.8
 

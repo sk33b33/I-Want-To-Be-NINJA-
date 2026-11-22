@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_2408r"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="2_20rxi"]
+[ext_resource type="Resource" path="res://data/items/spirit_moss.tres" id="3_ptmqn"]
+[ext_resource type="Resource" path="res://data/gear/stone_charm.tres" id="4_o5ss1"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_tavm0"]
+
+[resource]
+script = ExtResource("5_tavm0")
+id = &"stone_charm"
+result = ExtResource("4_o5ss1")
+inputs = Array[ExtResource("1_2408r")]([ExtResource("2_20rxi"), ExtResource("3_ptmqn")])
+counts = PackedInt32Array(2, 2)

@@ -23,6 +23,7 @@ func _initialize() -> void:
 	_main_scene()
 	_emberwild()  # Phase 8
 	_moonfen()  # Phase 9
+	_stormcrag()  # Phase 10
 	_hunt_board_scene()
 	print("GENERATED")
 	quit(0)
@@ -2567,3 +2568,566 @@ func _moonfen_unlock() -> void:
 	var items: Array[ItemDefinition] = (load("res://data/crafting/catalog.tres") as CraftingCatalog).items
 	inst.set("known_items", items)
 	_pack(inst, "res://scenes/ui/hunt_board.tscn")
+
+
+# ================================================================ Phase 10: Stormcrag
+
+func _stormcrag() -> void:
+	_stormcrag_materials()
+	_stormcrag_data()
+	_stormcrag_scenes()
+	_stormcrag_level()
+	_main_scene("res://scenes/biomes/stormcrag.tscn", "res://data/hunts/raijins_echo.tres",
+			"res://scenes/main/expedition_stormcrag.tscn")
+	_stormcrag_unlock()
+
+
+func _stormcrag_materials() -> void:
+	var detail: Resource = load(MAT + "noise_detail.tres")
+	_save(_shader_mat("terrain", {"detail_noise": detail, "macro_noise": load(MAT + "noise_macro.tres"),
+			"moss_dark": Color(0.06, 0.08, 0.07), "moss_light": Color(0.13, 0.17, 0.14), "mud": Color(0.11, 0.11, 0.12),
+			"rock": Color(0.24, 0.26, 0.3), "rock_dark": Color(0.08, 0.09, 0.11)}), MAT + "terrain_crag.tres")
+	_save(_shader_mat("stone", {"detail_noise": detail, "stone_light": Color(0.3, 0.32, 0.36),
+			"stone_dark": Color(0.1, 0.11, 0.13), "moss": Color(0.08, 0.12, 0.1), "moss_amount": 0.3}), MAT + "crag_stone.tres")
+	_save(_shader_mat("stone", {"detail_noise": detail, "stone_light": Color(0.24, 0.27, 0.32),
+			"stone_dark": Color(0.06, 0.07, 0.09), "moss": Color(0.1, 0.13, 0.16), "moss_amount": 0.15,
+			"rune_color": Color(0.5, 0.7, 1.0), "rune_strength": 0.25}), MAT + "wet_stone.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.35, "wind_speed": 2.4, "translucency": 0.25,
+			"tint": Color(0.75, 0.85, 0.9), "brightness": 1.7}), MAT + "foliage_crag.tres")
+	_save(_shader_mat("foliage", {"wind_strength": 0.25, "wind_speed": 2.2, "translucency": 0.25,
+			"tint": Color(0.7, 0.8, 0.85), "brightness": 1.6}), MAT + "leaf_crag.tres")
+	_save(_shader_mat("sky_gloom", {"cloud_noise": load(MAT + "noise_clouds.tres"), "zenith": Color(0.03, 0.04, 0.06),
+			"horizon": Color(0.18, 0.21, 0.27), "glow_tint": Color(0.3, 0.35, 0.5), "flash_color": Color(0.75, 0.85, 1.0),
+			"cloud_speed": 0.03, "moon_dir": Vector3(-0.2, 0.25, -0.95)}), MAT + "sky_storm.tres")
+	_save(_shader_mat("mist_card", {"mist_noise": load(MAT + "noise_mist.tres"), "color": Color(0.3, 0.33, 0.38),
+			"opacity": 0.3}), MAT + "mist_storm.tres")
+	_save(_shader_mat("light_shaft", {"color": Color(0.55, 0.65, 0.85), "strength": 0.025}), MAT + "shaft_storm.tres")
+	_save(_shader_mat("attack_warning", {"color": Color(0.7, 0.9, 1.0)}), MAT + "gust_warning.tres")
+	_save(_shader_mat("area_warning", {"color": Color(0.5, 0.65, 1.0)}), MAT + "lightning_warning.tres")
+	_save(_shader_mat("spirit_flame", {"energy": 6.0}), MAT + "bolt_flame.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.12, 0.13, 0.17), "glow_color": Color(0.7, 0.9, 1.0),
+			"glow_energy": 5.0, "spine_idle": Color(0.25, 0.3, 0.42), "spine_color": Color(0.7, 0.85, 1.0),
+			"spine_strength": 3.0, "flap_amount": 0.18, "flap_speed": 2.2}), MAT + "roc_body.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.2, 0.22, 0.3), "glow_color": Color(0.7, 0.9, 1.0),
+			"glow_energy": 1.5, "spine_idle": Color(0.35, 0.45, 0.7), "spine_color": Color(0.75, 0.9, 1.0),
+			"spine_strength": 2.0}), MAT + "roc_crest.tres")
+	var rain := StandardMaterial3D.new()
+	rain.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	rain.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	rain.albedo_color = Color(0.7, 0.8, 0.95, 0.35)
+	rain.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	rain.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_save(rain, MAT + "rain.tres")
+
+
+func _stormcrag_data() -> void:
+	var terrain := TerrainConfig.new()
+	terrain.seed = 8484
+	terrain.hill_height = 9.0
+	terrain.hill_frequency = 0.035
+	terrain.valley_wall_height = 26.0
+	terrain.border_height = 40.0
+	terrain.stream_z = -1000.0  # No stream.
+	terrain.stream_depth = 0.0
+	terrain.gorge_depth = -40.0  # The chasm under the gale ridge: falling = back to safe ground.
+	_save(terrain, "res://data/biomes/stormcrag_terrain.tres")
+	var flora := FloraConfig.new()
+	flora.seed = 9595
+	flora.grass_count = 2600
+	flora.fern_count = 300
+	flora.broadleaf_count = 60
+	flora.mushroom_count = 120
+	flora.rock_count = 1400
+	flora.jungle_tree_count = 30
+	flora.dead_tree_count = 70
+	flora.log_count = 12
+	flora.pillar_count = 22
+	flora.mushroom_glows = [Color(0.55, 0.75, 1.0), Color(0.8, 0.85, 1.0)] as Array[Color]
+	_save(flora, "res://data/biomes/stormcrag_flora.tres")
+	var fauna := FaunaConfig.new()
+	fauna.seed = 1010
+	fauna.bat_flocks = [Vector3(0, 22, -60), Vector3(-30, 25, -20), Vector3(30, 24, -90)] as Array[Vector3]
+	fauna.frog_count = 0
+	fauna.lurker_count = 8
+	fauna.lurker_glow = Color(0.6, 0.8, 1.0)
+	fauna.firefly_swarms = 8
+	fauna.firefly_color = Color(0.7, 0.85, 1.0)  # Static sparks.
+	_save(fauna, "res://data/biomes/stormcrag_fauna.tres")
+	# Items.
+	var glass := _item("storm_glass", "Storm Glass", "Sand fused by a lightning strike. It hums in your hand.",
+			Color(0.65, 0.8, 1.0), 0)
+	var crest := _item("storm_crest", "Storm Crest", "A crest feather of Raijin's Echo, still crackling.",
+			Color(0.75, 0.9, 1.0), 1)
+	var plume := _item("roc_plume", "Roc Plume", "A long flight feather from the Sky Roc. Wind will not tear it.",
+			Color(0.35, 0.4, 0.5), 0)
+	# Boss: Raijin's Echo, the Sky Roc (lightning; weak to earth).
+	var el := ElementProfile.new()
+	el.affinity = &"lightning"
+	el.multipliers = {&"earth": 1.5, &"lightning": 0.25, &"water": 0.75}
+	var shear := _boss_attack("wing_shear", "Wing Shear", 1.1, 0.4, 1.2, 26.0, 12.0, 0.0, 6.5, 3.0, 3.0,
+			"It raises both wings: back out of the wide zone in front, then strike the crest as it lunges low.")
+	shear.kind = BossAttackDefinition.Kind.FRONT
+	shear.hitbox_node = NodePath("Front/ShearHitbox")
+	shear.warning_node = NodePath("Front/ShearWarning")
+	shear.telegraph_pitch = 0.4
+	shear.glow = BossAttackDefinition.Glow.BODY
+	shear.weakened_by_part = &"crest"
+	shear.element = &"lightning"
+	var call := _boss_attack("storm_call", "Storm Call", 1.3, 0.4, 1.0, 22.0, 6.0, 3.0, 26.0, 2.0, 6.0,
+			"Its crest flares and pale circles open around you: step out before the bolts fall.")
+	call.kind = BossAttackDefinition.Kind.ERUPTIONS
+	call.eruption_offsets = PackedVector3Array([Vector3.ZERO, Vector3(3.0, 0, -1.0), Vector3(-3.0, 0, -1.0), Vector3(0, 0, 3.0)])
+	call.telegraph_pitch = 0.3
+	call.glow = BossAttackDefinition.Glow.PARTS
+	call.element = &"lightning"
+	var dive := _boss_attack("dive", "Thunder Dive", 1.0, 1.1, 1.5, 28.0, 13.0, 6.0, 26.0, 2.0, 6.0,
+			"It crouches and launches low along the line: roll sideways late; it stuns itself on the pillars.")
+	dive.kind = BossAttackDefinition.Kind.DASH
+	dive.hitbox_node = NodePath("Front/DiveHitbox")
+	dive.warning_node = NodePath("Front/DiveWarning")
+	dive.move_speed = 14.0
+	dive.dash_homing = 0.5
+	dive.stuns_on_wall = true
+	dive.stun_time = 2.6
+	dive.telegraph_pitch = -0.25
+	dive.telegraph_wobble = 0.05
+	dive.element = &"lightning"
+	var burst := _boss_attack("thunder_burst", "Thunder Burst", 1.2, 0.4, 1.0, 24.0, 10.0, 0.0, 6.5, 2.0, 7.0,
+			"Enraged: the ground around it crackles; get out of the ring.")
+	burst.kind = BossAttackDefinition.Kind.RADIAL
+	burst.enraged_only = true
+	burst.hitbox_node = NodePath("BurstHitbox")
+	burst.warning_node = NodePath("BurstWarning")
+	burst.telegraph_pitch = 0.2
+	burst.glow = BossAttackDefinition.Glow.BODY
+	burst.tracks_player = false
+	burst.element = &"lightning"
+	var part := BossPartDefinition.new()
+	part.id = &"crest"
+	part.display_name = "Crest"
+	part.break_health = 240.0
+	part.reward = crest
+	part.reward_count = 1
+	part.break_stagger_time = 2.3
+	part.intact_node = NodePath("Visual/Crest")
+	part.broken_node = NodePath("Visual/CrestStub")
+	var def := BossDefinition.new()
+	def.id = &"raijins_echo"
+	def.display_name = "Raijin's Echo, the Sky Roc"
+	def.max_health = 1050.0
+	def.poise = 130.0
+	def.stagger_time = 1.5
+	def.elements = el
+	def.attacks = [shear, call, dive, burst] as Array[BossAttackDefinition]
+	def.parts = [part] as Array[BossPartDefinition]
+	def.victory_rewards = [plume] as Array[ItemDefinition]
+	def.walk_speed = 3.2
+	def.turn_sharpness = 4.0
+	def.stalk_distance = 5.0
+	def.attack_interval = 1.25
+	def.head_down_pitch = -0.5
+	def.lock_offset = Vector3(0, 2.8, -1.6)
+	_save(def, "res://data/bosses/raijins_echo.tres")
+	var h := HuntDefinition.new()
+	h.id = &"raijins_echo"
+	h.beast_name = "Raijin's Echo"
+	h.epithet = "the Sky Roc"
+	h.element = "Lightning"
+	h.weakness = "Earth"
+	h.signature = "Wing shear, storm call, thunder dive"
+	h.description = "A storm bird the size of a temple roof. Where it lands, lightning follows. Old stone grounds it."
+	h.config = load("res://data/expedition/default_expedition.tres")
+	_save(h, "res://data/hunts/raijins_echo.tres")
+	# Crafting: Stone Charm (earth talisman from earlier materials) + two Stormcrag recipes.
+	var shard: ItemDefinition = load("res://data/items/ruin_shard.tres")
+	var moss: ItemDefinition = load("res://data/items/spirit_moss.tres")
+	var stone := _gear("stone_charm", "Stone Charm",
+			"Two ruin shards bound in spirit moss. Talismans strike like falling stone — they ground lightning.",
+			GearDefinition.Slot.CHARM, Color(0.85, 0.6, 0.3), {"skill_element": &"earth", "skill_cooldown_reduction": 0.5})
+	var thunder := _gear("thunderfang_blades", "Thunderfang Blades",
+			"Blades fused with storm glass around a crest feather. They spark on every cut — Nami fears them.",
+			GearDefinition.Slot.WEAPON, Color(0.7, 0.85, 1.0), {"blade_damage_multiplier": 1.45, "blade_element": &"lightning"})
+	var gale := _gear("galeweave_garb", "Galeweave Garb",
+			"Roc plumes woven over a storm-glass mail. Light enough to run in, hard enough to stop a talon.",
+			GearDefinition.Slot.ARMOR, Color(0.45, 0.5, 0.65), {"max_health_bonus": 45.0, "damage_reduction": 0.25})
+	var catalog: CraftingCatalog = load("res://data/crafting/catalog.tres")
+	catalog.recipes.append(_recipe("stone_charm", stone, [shard, moss] as Array[ItemDefinition], [2, 2]))
+	catalog.recipes.append(_recipe("thunderfang_blades", thunder, [crest, glass] as Array[ItemDefinition], [1, 2]))
+	catalog.recipes.append(_recipe("galeweave_garb", gale, [plume, glass] as Array[ItemDefinition], [1, 2]))
+	catalog.items.append_array([glass, crest, plume])
+	_save(catalog, "res://data/crafting/catalog.tres")
+
+
+func _stormcrag_scenes() -> void:
+	# Storm Call bolt (RootSnare behaviour: warn ring -> bolt rises -> hit).
+	var sb := Node3D.new()
+	sb.name = "StormBolt"
+	sb.set_script(load("res://scripts/bosses/root_snare.gd"))
+	sb.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "lightning_warning"))
+	var roots := Node3D.new()
+	roots.name = "Roots"
+	var rm := MeshInstance3D.new()
+	rm.mesh = ProceduralMeshes.lightning_bolt(load(MAT + "glow_fungus.tres"))
+	roots.add_child(rm)
+	sb.add_child(roots)
+	var cyl := CylinderShape3D.new()
+	cyl.radius = 1.6
+	cyl.height = 2.2
+	sb.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
+	_pack(sb, "res://scenes/bosses/storm_bolt.tscn")
+	var def: BossDefinition = load("res://data/bosses/raijins_echo.tres")
+	def.get_attack(&"storm_call").eruption_scene = load("res://scenes/bosses/storm_bolt.tscn")
+	_save(def, "res://data/bosses/raijins_echo.tres")
+
+	# Storm Glass pickup.
+	var a := Area3D.new()
+	a.name = "Pickup"
+	a.set_script(load("res://scripts/world/pickup.gd"))
+	a.set("item", load("res://data/items/storm_glass.tres"))
+	var ps := SphereShape3D.new()
+	ps.radius = 1.0
+	var pcol := CollisionShape3D.new()
+	pcol.shape = ps
+	pcol.position.y = 0.6
+	a.add_child(pcol)
+	var vis := Node3D.new()
+	vis.name = "Visual"
+	a.add_child(vis)
+	var gem := MeshInstance3D.new()
+	var gm := PrismMesh.new()
+	gm.size = Vector3(0.3, 0.7, 0.3)
+	gm.material = load(MAT + "roc_crest.tres")  # Pale glowing glass (creature shader, emissive).
+	gem.mesh = gm
+	vis.add_child(gem)
+	var mote := MeshInstance3D.new()
+	var mq := QuadMesh.new()
+	mq.size = Vector2(0.9, 0.9)
+	mq.material = load(MAT + "spirit_flame.tres")
+	mote.mesh = mq
+	mote.position.y = 0.6
+	mote.set_script(load("res://scripts/world/instance_tint.gd"))
+	mote.set("color", Color(0.6, 0.75, 1.0) * 0.6)
+	vis.add_child(mote)
+	_pack(a, "res://scenes/world/pickup_storm_glass.tscn")
+
+	# Raijin's Echo, the Sky Roc.
+	var k := CharacterBody3D.new()
+	k.name = "RaijinsEcho"
+	k.set_script(load("res://scripts/bosses/boss_controller.gd"))
+	k.set("definition", load("res://data/bosses/raijins_echo.tres"))
+	var col := CollisionShape3D.new()
+	col.name = "Collision"
+	col.shape = _box_shape(Vector3(2.6, 3.2, 3.8))
+	col.position = Vector3(0, 1.6, 0.2)
+	k.add_child(col)
+	var vis2 := Node3D.new()
+	vis2.name = "Visual"
+	k.add_child(vis2)
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = ProceduralMeshes.sky_roc_body(load(MAT + "roc_body.tres"))
+	vis2.add_child(body)
+	var crest := MeshInstance3D.new()
+	crest.name = "Crest"
+	crest.mesh = ProceduralMeshes.roc_crest(load(MAT + "roc_crest.tres"), false)
+	vis2.add_child(crest)
+	var stub := MeshInstance3D.new()
+	stub.name = "CrestStub"
+	stub.mesh = ProceduralMeshes.roc_crest(load(MAT + "roc_crest.tres"), true)
+	vis2.add_child(stub)
+	var ch := _area("CrestHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(2.8, 2.6, 2.4)), Vector3(0, 3.6, -2.4))
+	ch.set("part_id", &"crest")
+	ch.set("health_path", NodePath("../../Health"))
+	vis2.add_child(ch)
+	var front := Node3D.new()
+	front.name = "Front"
+	k.add_child(front)
+	front.add_child(_area("ShearHitbox", "res://scripts/combat/hitbox.gd", &"enemy", _box_shape(Vector3(8.0, 2.8, 4.5)), Vector3(0, 1.3, -3.8)))
+	front.add_child(_warning_quad("ShearWarning", Vector2(8.5, 5.0), Vector3(0, 0.12, -3.9), "area_warning"))
+	var dive_shape := SphereShape3D.new()
+	dive_shape.radius = 2.3
+	front.add_child(_area("DiveHitbox", "res://scripts/combat/hitbox.gd", &"enemy", dive_shape, Vector3(0, 1.3, -1.2)))
+	front.add_child(_warning_quad("DiveWarning", Vector2(3.0, 14.0), Vector3(0, 0.12, -8.5), "attack_warning"))
+	var hcomp := Node.new()
+	hcomp.name = "Health"
+	hcomp.set_script(load("res://scripts/combat/health_component.gd"))
+	k.add_child(hcomp)
+	var bh := _area("BodyHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(2.8, 3.2, 4.4)), Vector3(0, 1.8, 0.0))
+	bh.set("health_path", NodePath("../Health"))
+	k.add_child(bh)
+	var field := SphereShape3D.new()
+	field.radius = 6.5
+	k.add_child(_area("BurstHitbox", "res://scripts/combat/hitbox.gd", &"enemy", field, Vector3(0, 1.0, 0)))
+	k.add_child(_warning_quad("BurstWarning", Vector2(13.0, 13.0), Vector3(0, 0.12, 0), "area_warning"))
+	_pack(k, "res://scenes/bosses/raijins_echo.tscn")
+
+
+## A rock overhang: a slab on two stones with a StormShelter area underneath.
+func _overhang(node_name: String, pos: Vector3, parent: Node) -> void:
+	_box(node_name + "Roof", Vector3(3.6, 0.6, 3.0), pos + Vector3(0, 2.6, 0), "crag_stone")
+	_box(node_name + "PostA", Vector3(0.6, 2.4, 0.6), pos + Vector3(-1.4, 1.2, -1.0), "crag_stone")
+	_box(node_name + "PostB", Vector3(0.6, 2.4, 0.6), pos + Vector3(1.4, 1.2, 1.0), "crag_stone")
+	var sh := Area3D.new()
+	sh.name = node_name
+	sh.set_script(load("res://scripts/world/hazards/storm_shelter.gd"))
+	var c := CollisionShape3D.new()
+	c.shape = _box_shape(Vector3(3.2, 2.2, 2.6))
+	sh.add_child(c)
+	sh.position = pos + Vector3(0, 1.1, 0)
+	parent.add_child(sh)
+
+
+func _stormcrag_level() -> void:
+	_root = Node3D.new()
+	_root.name = "Stormcrag"
+	var env_node := WorldEnvironment.new()
+	env_node.name = "WorldEnvironment"
+	var env := Environment.new()
+	var sky := Sky.new()
+	sky.sky_material = load(MAT + "sky_storm.tres")
+	env.background_mode = Environment.BG_SKY
+	env.sky = sky
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.24, 0.27, 0.32)
+	env.ambient_light_energy = 4.2
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.5
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.2, 0.23, 0.28)
+	env.fog_density = 0.022
+	env.fog_sky_affect = 0.5
+	env.fog_height = 0.0
+	env.fog_height_density = 0.04
+	env.glow_enabled = true
+	env.glow_intensity = 0.9
+	env.glow_bloom = 0.05
+	env.glow_hdr_threshold = 0.85
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.15
+	env.adjustment_saturation = 0.75
+	env_node.environment = env
+	_root.add_child(env_node)
+	var moon := DirectionalLight3D.new()
+	moon.name = "Moonlight"
+	moon.rotation_degrees = Vector3(-45, -20, 0)
+	moon.light_color = Color(0.75, 0.82, 1.0)
+	moon.light_energy = 1.0
+	moon.shadow_enabled = true
+	moon.shadow_opacity = 0.65
+	moon.directional_shadow_max_distance = 55.0
+	moon.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+	_root.add_child(moon)
+
+	var terrain := Node3D.new()
+	terrain.name = "Terrain"
+	terrain.set_script(load("res://scripts/world/biome_terrain.gd"))
+	terrain.set("material", load(MAT + "terrain_crag.tres"))
+	terrain.set("config", load("res://data/biomes/stormcrag_terrain.tres"))
+	_root.add_child(terrain)
+	var flora := Node3D.new()
+	flora.name = "Flora"
+	flora.set_script(load("res://scripts/world/flora_scatter.gd"))
+	flora.set("terrain_path", NodePath("../Terrain"))
+	flora.set("grass_material", load(MAT + "foliage_crag.tres"))
+	flora.set("leaf_material", load(MAT + "leaf_crag.tres"))
+	flora.set("vine_material", load(MAT + "foliage_crag.tres"))
+	flora.set("bark_material", load(MAT + "bark_vertex.tres"))
+	flora.set("fungus_material", load(MAT + "glow_fungus.tres"))
+	flora.set("rock_material", load(MAT + "rock_vertex.tres"))
+	flora.set("stone_material", load(MAT + "crag_stone.tres"))
+	flora.set("config", load("res://data/biomes/stormcrag_flora.tres"))
+	_root.add_child(flora)
+	var fauna := Node3D.new()
+	fauna.name = "Fauna"
+	fauna.set_script(load("res://scripts/world/fauna/fauna_spawner.gd"))
+	fauna.set("terrain_path", NodePath("../Terrain"))
+	fauna.set("config", load("res://data/biomes/stormcrag_fauna.tres"))
+	fauna.set("bat_material", load(MAT + "bat.tres"))
+	fauna.set("frog_material", load(MAT + "frog.tres"))
+	fauna.set("eye_material", load(MAT + "lurker_eyes.tres"))
+	fauna.set("firefly_material", load(MAT + "firefly.tres"))
+	_root.add_child(fauna)
+	var atmos := Node3D.new()
+	atmos.name = "Atmosphere"
+	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("terrain_path", NodePath("../Terrain"))
+	atmos.set("sun_path", NodePath("../Moonlight"))
+	atmos.set("environment_path", NodePath("../WorldEnvironment"))
+	atmos.set("mist_material", load(MAT + "mist_storm.tres"))
+	atmos.set("shaft_material", load(MAT + "shaft_storm.tres"))
+	atmos.set("waterfall_material", load(MAT + "waterfall.tres"))
+	atmos.set("water_material", load(MAT + "water.tres"))
+	atmos.set("river_height", -30.0)
+	atmos.set("lightning_interval", Vector2(4.0, 11.0))  # The storm never stops.
+	atmos.set("lightning_sky_flash", 0.9)
+	atmos.set("lightning_sun_boost", 1.6)
+	_root.add_child(atmos)
+	var rain := CPUParticles3D.new()
+	rain.name = "Rain"
+	rain.set_script(load("res://scripts/world/rain_fx.gd"))
+	var drop := QuadMesh.new()
+	drop.size = Vector2(0.025, 0.7)
+	drop.material = load(MAT + "rain.tres")
+	rain.mesh = drop
+	rain.lifetime = 1.0
+	rain.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	rain.emission_box_extents = Vector3(16, 1, 16)
+	rain.direction = Vector3(0.15, -1, 0)
+	rain.spread = 4.0
+	rain.gravity = Vector3(0, -6, 0)
+	rain.initial_velocity_min = 14.0
+	rain.initial_velocity_max = 18.0
+	_root.add_child(rain)
+	var geo := Node3D.new()
+	geo.name = "RouteGeometry"
+	_root.add_child(geo)
+	var spawn := Marker3D.new()
+	spawn.name = "SpawnPoint"
+	spawn.position = Vector3(0, 0.1, 0)
+	_root.add_child(spawn)
+	var cps := Node3D.new()
+	cps.name = "Checkpoints"
+	_root.add_child(cps)
+	_checkpoint("CheckpointSpawn", Vector3(-4.5, 0, 1))
+	_checkpoint("CheckpointPlateau", Vector3(-4.5, 4.0, -13.5))
+	_checkpoint("CheckpointRidge", Vector3(-4.5, 0, -46))
+	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
+
+	var hazards := Node3D.new()
+	hazards.name = "Hazards"
+	_root.add_child(hazards)
+	# 1) Cliff: climbable face up to the storm plateau (top at y 4).
+	_climb_box("CragCliff", Vector3(16, 5, 2), Vector3(0, 1.5, -10.5))
+	_box("StormPlateau", Vector3(16, 5, 28), Vector3(0, 1.5, -25.5), "crag_stone")
+	# 2) Storm plateau: lightning chases anyone standing in the open; two overhangs give shelter.
+	var caller := Area3D.new()
+	caller.name = "StormCaller"
+	caller.set_script(load("res://scripts/world/hazards/storm_caller.gd"))
+	caller.set("warning_material", load(MAT + "lightning_warning.tres"))
+	caller.set("bolt_material", load(MAT + "bolt_flame.tres"))
+	var cc := CollisionShape3D.new()
+	cc.shape = _box_shape(Vector3(16, 4, 28))
+	caller.add_child(cc)
+	caller.position = Vector3(0, 6.0, -25.5)
+	hazards.add_child(caller)
+	_overhang("ShelterA", Vector3(-5.2, 4.0, -19), hazards)
+	_overhang("ShelterB", Vector3(5.2, 4.0, -31), hazards)
+	# 3) Gale ridge: a narrow, rain-slick stone spine over the chasm; gusts alternate sides.
+	_box("GaleRidge", Vector3(2.4, 1.0, 23), Vector3(0, -0.5, -60.5), "wet_stone")
+	var gust := Area3D.new()
+	gust.name = "GaleGust"
+	gust.set_script(load("res://scripts/world/hazards/gust_zone.gd"))
+	gust.set("traction", 0.35)
+	var gc := CollisionShape3D.new()
+	gc.shape = _box_shape(Vector3(8, 5, 23))
+	gust.add_child(gc)
+	gust.position = Vector3(0, 2.0, -60.5)
+	# Chevron strips along the ridge; GustZone turns them to sweep the way the wind will blow.
+	var warn := Node3D.new()
+	warn.name = "Warning"
+	warn.visible = false
+	for i in 5:
+		warn.add_child(_warning_quad("Strip%d" % i, Vector2(2.0, 6.0), Vector3(0, -1.9, -9.0 + 4.5 * i), "gust_warning"))
+	gust.add_child(warn)
+	hazards.add_child(gust)
+	for z in [-52.0, -60.5, -69.0]:
+		_box("RidgeCairn%d" % int(-z), Vector3(0.5, 0.9, 0.5), Vector3(-1.0, 0.45, z), "crag_stone")
+
+	# Gate + arena.
+	_box("GatePillarL", Vector3(1.6, 8, 1.6), Vector3(-4.2, 4, -94), "gate_stone")
+	_box("GatePillarR", Vector3(1.6, 8, 1.6), Vector3(4.2, 4, -94), "gate_stone")
+	_box("GateLintel", Vector3(11, 1.4, 2.0), Vector3(0, 8.5, -94), "gate_stone")
+	_box("ArenaWallL", Vector3(40, 8, 1.5), Vector3(-25.0, 2, -94), "crag_stone")
+	_box("ArenaWallR", Vector3(40, 8, 1.5), Vector3(25.0, 2, -94), "crag_stone")
+	var trigger := Area3D.new()
+	trigger.name = "BossArenaTrigger"
+	trigger.set_script(load("res://scripts/world/boss_arena_trigger.gd"))
+	var tcol := CollisionShape3D.new()
+	tcol.shape = _box_shape(Vector3(160, 80, 54))
+	trigger.add_child(tcol)
+	trigger.position = Vector3(0, 10, -123)
+	_root.add_child(trigger)
+	for i in 10:
+		var ang := TAU * float(i) / 10.0 + PI / 10.0
+		if absf(wrapf(ang - PI / 2.0, -PI, PI)) < 0.5:
+			continue
+		var p := Vector3(cos(ang) * 17.0, 0, -120.0 + sin(ang) * 17.0)
+		var c := CSGCylinder3D.new()
+		c.name = "ArenaPillar%d" % i
+		c.radius = 1.0
+		c.height = 8.0
+		c.sides = 7
+		c.position = p + Vector3.UP * 4.0
+		c.use_collision = true
+		c.collision_mask = 0
+		c.material = load(MAT + "crag_stone.tres")
+		geo.add_child(c)
+	# Landmark: the storm temple, a stepped pyramid beyond the arena (scenery, no collision).
+	for i in 6:
+		var step := CSGBox3D.new()
+		step.name = "TempleStep%d" % i
+		var w := 30.0 - i * 4.6
+		step.size = Vector3(w, 4.0, w)
+		step.position = Vector3(26, 2.0 + i * 4.0, -170)
+		step.material = load(MAT + "crag_stone.tres")
+		geo.add_child(step)
+	_omni("TempleBeacon", Vector3(26, 27, -170), Color(0.6, 0.8, 1.0), 4.0, 30.0)
+	var marker := Marker3D.new()
+	marker.name = "ArenaGateMarker"
+	marker.position = Vector3(0, 0, -94)
+	_root.add_child(marker)
+	_omni("ArenaGlow", Vector3(0, 5, -120), Color(0.55, 0.7, 1.0), 2.5, 24.0)
+	_omni("GateGlow", Vector3(0, 4, -91), Color(0.6, 0.8, 1.0), 2.0, 14.0)
+	var boss: Node3D = (load("res://scenes/bosses/raijins_echo.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	boss.name = "Boss"
+	boss.position = Vector3(0, 0.05, -121)
+	boss.rotation.y = PI
+	_root.add_child(boss)
+
+	# Enemies, gatherables, lore.
+	var enemies := Node3D.new()
+	enemies.name = "Enemies"
+	_root.add_child(enemies)
+	for spec in [["ThornlingA", Vector3(-18, 0.2, -82)], ["ThornlingB", Vector3(18, 0.2, -84)]]:
+		var e: Node3D = (load("res://scenes/enemies/thornling.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		e.name = spec[0]
+		e.position = spec[1]
+		enemies.add_child(e)
+	var gather := Node3D.new()
+	gather.name = "Gatherables"
+	_root.add_child(gather)
+	var spots := [
+		["storm_glass", Vector3(-5.2, 4.0, -19), false],   # Under shelter A
+		["storm_glass", Vector3(6.5, 4.0, -36), false],    # Open plateau corner (strikes!)
+		["storm_glass", Vector3(0, 0.0, -60.5), false],    # Middle of the gale ridge
+		["storm_glass", Vector3(-17, 0, -83), true],       # Thornling flank
+		["storm_glass", Vector3(9.0, 0, -45), true],
+		["ruin_shard", Vector3(-8.0, 0, -4), true], ["ruin_shard", Vector3(6.0, 0, -86), true],
+		["spirit_moss", Vector3(-7.5, 0, -47), true], ["glowcap", Vector3(8.5, 0, -6), true],
+	]
+	for i in spots.size():
+		var spot: Array = spots[i]
+		var pk: Node3D = (load("res://scenes/world/pickup_%s.tscn" % spot[0]) as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		pk.name = "%s_%d" % [spot[0], i]
+		pk.position = spot[1]
+		pk.set("snap_to_ground", spot[2])
+		gather.add_child(pk)
+	var ls: Node3D = (load("res://scenes/world/lore_stone.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	ls.name = "LoreStone0"
+	ls.set("title", "Raijin's Echo")
+	ls.set("text", "The storm god left; his echo stayed, and grew wings. Lightning cannot touch what is rooted in old stone — the dojo's stone-charms ground its fury. Strike the crest when it bows to shear.")
+	ls.position = Vector3(6.5, 0, -80)
+	gather.add_child(ls)
+	_pack(_root, "res://scenes/biomes/stormcrag.tscn")
+
+
+func _stormcrag_unlock() -> void:
+	var b: BiomeDefinition = load("res://data/biomes/biome_stormcrag.tres")
+	b.hunts = [load("res://data/hunts/raijins_echo.tres")] as Array[HuntDefinition]
+	b.unlocked = true
+	b.requires_hunt = &"nami"
+	b.expedition_scene = "res://scenes/main/expedition_stormcrag.tscn"
+	b.locked_note = "defeat Nami to unlock"
+	_save(b, "res://data/biomes/biome_stormcrag.tres")

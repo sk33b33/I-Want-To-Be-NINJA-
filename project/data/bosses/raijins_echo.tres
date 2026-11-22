@@ -1,0 +1,129 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_fyr3g"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="2_rojnh"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/storm_bolt.tscn" id="2_xm4d3"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="3_xm4d3"]
+[ext_resource type="Resource" path="res://data/items/storm_crest.tres" id="4_ybk45"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="5_w2nj3"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="6_ifvyn"]
+[ext_resource type="Resource" path="res://data/items/roc_plume.tres" id="7_mbfaf"]
+
+[sub_resource type="Resource" id="Resource_hwdmr"]
+script = ExtResource("1_fyr3g")
+id = &"wing_shear"
+hitbox_node = NodePath("Front/ShearHitbox")
+warning_node = NodePath("Front/ShearWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.4
+glow = 1
+element = &"lightning"
+weakened_by_part = &"crest"
+display_name = "Wing Shear"
+telegraph_time = 1.1
+recovery_time = 1.2
+damage = 26.0
+knockback = 12.0
+max_range = 6.5
+weight = 3.0
+cooldown = 3.0
+counterplay = "It raises both wings: back out of the wide zone in front, then strike the crest as it lunges low."
+
+[sub_resource type="Resource" id="Resource_l6y5j"]
+script = ExtResource("1_fyr3g")
+id = &"storm_call"
+kind = 2
+eruption_scene = ExtResource("2_xm4d3")
+eruption_offsets = PackedVector3Array(0, 0, 0, 3, 0, -1, -3, 0, -1, 0, 0, 3)
+telegraph_pitch = 0.3
+glow = 2
+element = &"lightning"
+display_name = "Storm Call"
+telegraph_time = 1.3
+damage = 22.0
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "Its crest flares and pale circles open around you: step out before the bolts fall."
+
+[sub_resource type="Resource" id="Resource_3mf7r"]
+script = ExtResource("1_fyr3g")
+id = &"dive"
+kind = 1
+hitbox_node = NodePath("Front/DiveHitbox")
+warning_node = NodePath("Front/DiveWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.25
+telegraph_wobble = 0.05
+dash_homing = 0.5
+stuns_on_wall = true
+stun_time = 2.6
+element = &"lightning"
+display_name = "Thunder Dive"
+active_time = 1.1
+recovery_time = 1.5
+damage = 28.0
+knockback = 13.0
+move_speed = 14.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It crouches and launches low along the line: roll sideways late; it stuns itself on the pillars."
+
+[sub_resource type="Resource" id="Resource_dv83x"]
+script = ExtResource("1_fyr3g")
+id = &"thunder_burst"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"lightning"
+display_name = "Thunder Burst"
+telegraph_time = 1.2
+damage = 24.0
+knockback = 10.0
+max_range = 6.5
+weight = 2.0
+cooldown = 7.0
+enraged_only = true
+counterplay = "Enraged: the ground around it crackles; get out of the ring."
+
+[sub_resource type="Resource" id="Resource_861f8"]
+script = ExtResource("2_rojnh")
+affinity = &"lightning"
+multipliers = {
+&"earth": 1.5,
+&"lightning": 0.25,
+&"water": 0.75
+}
+
+[sub_resource type="Resource" id="Resource_ron8u"]
+script = ExtResource("3_xm4d3")
+id = &"crest"
+display_name = "Crest"
+break_health = 240.0
+reward = ExtResource("4_ybk45")
+break_stagger_time = 2.3
+intact_node = NodePath("Visual/Crest")
+broken_node = NodePath("Visual/CrestStub")
+
+[resource]
+script = ExtResource("5_w2nj3")
+id = &"raijins_echo"
+display_name = "Raijin's Echo, the Sky Roc"
+max_health = 1050.0
+poise = 130.0
+stagger_time = 1.5
+elements = SubResource("Resource_861f8")
+attacks = Array[ExtResource("1_fyr3g")]([SubResource("Resource_hwdmr"), SubResource("Resource_l6y5j"), SubResource("Resource_3mf7r"), SubResource("Resource_dv83x")])
+parts = Array[ExtResource("3_xm4d3")]([SubResource("Resource_ron8u")])
+victory_rewards = Array[ExtResource("6_ifvyn")]([ExtResource("7_mbfaf")])
+walk_speed = 3.2
+attack_interval = 1.25
+head_down_pitch = -0.5
+lock_offset = Vector3(0, 2.8, -1.6)

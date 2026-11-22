@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_3ebuj"]
+[ext_resource type="Resource" path="res://data/items/storm_crest.tres" id="2_0e8d8"]
+[ext_resource type="Resource" path="res://data/items/storm_glass.tres" id="3_v2dav"]
+[ext_resource type="Resource" path="res://data/gear/thunderfang_blades.tres" id="4_550rx"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_4s7df"]
+
+[resource]
+script = ExtResource("5_4s7df")
+id = &"thunderfang_blades"
+result = ExtResource("4_550rx")
+inputs = Array[ExtResource("1_3ebuj")]([ExtResource("2_0e8d8"), ExtResource("3_v2dav")])
+counts = PackedInt32Array(1, 2)

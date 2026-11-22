@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/spirit_flame.gdshader" id="1_6nk5i"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_6nk5i")
+shader_parameter/energy = 6.0

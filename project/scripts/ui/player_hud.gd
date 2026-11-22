@@ -40,8 +40,8 @@ func _ready() -> void:
 
 
 ## The talisman is named and coloured after its element, so a charm swap is visible at a glance.
-const TALISMAN_NAMES := {&"fire": "Ember Talisman", &"water": "Mist Talisman", &"lightning": "Storm Talisman"}
-const TALISMAN_COLORS := {&"fire": Color(1.0, 0.6, 0.2), &"water": Color(0.45, 0.75, 1.0), &"lightning": Color(0.8, 0.85, 1.0)}
+const TALISMAN_NAMES := {&"fire": "Ember Talisman", &"water": "Mist Talisman", &"lightning": "Storm Talisman", &"earth": "Stone Talisman"}
+const TALISMAN_COLORS := {&"fire": Color(1.0, 0.6, 0.2), &"water": Color(0.45, 0.75, 1.0), &"lightning": Color(0.8, 0.85, 1.0), &"earth": Color(0.9, 0.7, 0.4)}
 
 
 ## Current talisman line (for tests and accessibility checks).

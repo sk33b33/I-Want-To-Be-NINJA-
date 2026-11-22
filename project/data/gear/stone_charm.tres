@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_na4rq"]
+
+[resource]
+script = ExtResource("1_na4rq")
+id = &"stone_charm"
+display_name = "Stone Charm"
+description = "Two ruin shards bound in spirit moss. Talismans strike like falling stone — they ground lightning."
+slot = 2
+color = Color(0.85, 0.6, 0.3, 1)
+skill_cooldown_reduction = 0.5
+skill_element = &"earth"

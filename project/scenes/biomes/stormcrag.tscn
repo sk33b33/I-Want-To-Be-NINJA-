@@ -1,0 +1,564 @@
+[gd_scene load_steps=57 format=3]
+
+[ext_resource type="Material" path="res://data/materials/sky_storm.tres" id="1_j0b01"]
+[ext_resource type="Script" path="res://scripts/world/biome_terrain.gd" id="2_6fvp6"]
+[ext_resource type="Resource" path="res://data/biomes/stormcrag_terrain.tres" id="3_aodgd"]
+[ext_resource type="Material" path="res://data/materials/terrain_crag.tres" id="4_v8spu"]
+[ext_resource type="Script" path="res://scripts/world/flora_scatter.gd" id="5_7xaly"]
+[ext_resource type="Resource" path="res://data/biomes/stormcrag_flora.tres" id="6_bwsto"]
+[ext_resource type="Material" path="res://data/materials/foliage_crag.tres" id="7_ax85r"]
+[ext_resource type="Material" path="res://data/materials/leaf_crag.tres" id="8_sucj4"]
+[ext_resource type="Material" path="res://data/materials/bark_vertex.tres" id="9_udnoo"]
+[ext_resource type="Material" path="res://data/materials/glow_fungus.tres" id="10_f8gdu"]
+[ext_resource type="Material" path="res://data/materials/rock_vertex.tres" id="11_4taoc"]
+[ext_resource type="Material" path="res://data/materials/crag_stone.tres" id="12_qxne4"]
+[ext_resource type="Script" path="res://scripts/world/fauna/fauna_spawner.gd" id="13_slg0h"]
+[ext_resource type="Resource" path="res://data/biomes/stormcrag_fauna.tres" id="14_gd22k"]
+[ext_resource type="Material" path="res://data/materials/bat.tres" id="15_onjgl"]
+[ext_resource type="Material" path="res://data/materials/frog.tres" id="16_4xeaq"]
+[ext_resource type="Material" path="res://data/materials/lurker_eyes.tres" id="17_3bo8n"]
+[ext_resource type="Material" path="res://data/materials/firefly.tres" id="18_aglbu"]
+[ext_resource type="Script" path="res://scripts/world/biome_atmosphere.gd" id="19_ckuwi"]
+[ext_resource type="Material" path="res://data/materials/mist_storm.tres" id="20_vxxxw"]
+[ext_resource type="Material" path="res://data/materials/shaft_storm.tres" id="21_5yvcu"]
+[ext_resource type="Material" path="res://data/materials/waterfall.tres" id="22_8on81"]
+[ext_resource type="Material" path="res://data/materials/water.tres" id="23_5gx3l"]
+[ext_resource type="Material" path="res://data/materials/rain.tres" id="24_cdwsd"]
+[ext_resource type="Script" path="res://scripts/world/rain_fx.gd" id="25_d6xnh"]
+[ext_resource type="Material" path="res://data/materials/climb_stone.tres" id="26_3fvnr"]
+[ext_resource type="Material" path="res://data/materials/wet_stone.tres" id="27_wfqut"]
+[ext_resource type="Material" path="res://data/materials/gate_stone.tres" id="28_y3wlj"]
+[ext_resource type="PackedScene" path="res://scenes/world/checkpoint.tscn" id="29_faxe6"]
+[ext_resource type="Script" path="res://scripts/world/hazards/storm_caller.gd" id="30_ktmqi"]
+[ext_resource type="Material" path="res://data/materials/lightning_warning.tres" id="31_ud6lr"]
+[ext_resource type="Material" path="res://data/materials/bolt_flame.tres" id="32_a58v8"]
+[ext_resource type="Script" path="res://scripts/world/hazards/storm_shelter.gd" id="33_umhc3"]
+[ext_resource type="Script" path="res://scripts/world/hazards/gust_zone.gd" id="34_37f1w"]
+[ext_resource type="Material" path="res://data/materials/gust_warning.tres" id="35_rsbsd"]
+[ext_resource type="Script" path="res://scripts/world/boss_arena_trigger.gd" id="36_hbm45"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/raijins_echo.tscn" id="37_0to3t"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/thornling.tscn" id="38_u3yhs"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_storm_glass.tscn" id="39_w25lk"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_ruin_shard.tscn" id="40_77x0r"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_spirit_moss.tscn" id="41_h4ec0"]
+[ext_resource type="PackedScene" path="res://scenes/world/pickup_glowcap.tscn" id="42_k3rhp"]
+[ext_resource type="PackedScene" path="res://scenes/world/lore_stone.tscn" id="43_oey2t"]
+
+[sub_resource type="Sky" id="Sky_27w1h"]
+sky_material = ExtResource("1_j0b01")
+
+[sub_resource type="Environment" id="Environment_4apsx"]
+background_mode = 2
+sky = SubResource("Sky_27w1h")
+ambient_light_source = 2
+ambient_light_color = Color(0.24, 0.27, 0.32, 1)
+ambient_light_energy = 4.2
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_exposure = 1.5
+glow_enabled = true
+glow_intensity = 0.9
+glow_bloom = 0.05
+glow_blend_mode = 0
+glow_hdr_threshold = 0.85
+fog_enabled = true
+fog_light_color = Color(0.2, 0.23, 0.28, 1)
+fog_density = 0.022
+fog_sky_affect = 0.5
+fog_height_density = 0.04
+adjustment_enabled = true
+adjustment_contrast = 1.15
+adjustment_saturation = 0.75
+
+[sub_resource type="QuadMesh" id="QuadMesh_mysj3"]
+material = ExtResource("24_cdwsd")
+size = Vector2(0.025, 0.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d84os"]
+size = Vector3(16, 4, 28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2nn0s"]
+size = Vector3(3.2, 2.2, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_s8l0w"]
+size = Vector3(3.2, 2.2, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pv18v"]
+size = Vector3(8, 5, 23)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ohfhf"]
+material = ExtResource("35_rsbsd")
+size = Vector2(2, 6)
+orientation = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_y8yv1"]
+material = ExtResource("35_rsbsd")
+size = Vector2(2, 6)
+orientation = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_rj6j0"]
+material = ExtResource("35_rsbsd")
+size = Vector2(2, 6)
+orientation = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_4yyrp"]
+material = ExtResource("35_rsbsd")
+size = Vector2(2, 6)
+orientation = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_o1sl1"]
+material = ExtResource("35_rsbsd")
+size = Vector2(2, 6)
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qa3df"]
+size = Vector3(160, 80, 54)
+
+[node name="Stormcrag" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_4apsx")
+
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.9396926, 0.24184474, -0.24184474, 0, 0.70710677, 0.70710677, 0.34202012, -0.664463, 0.664463, 0, 0, 0)
+light_color = Color(0.75, 0.82, 1, 1)
+shadow_enabled = true
+shadow_opacity = 0.65
+directional_shadow_mode = 1
+directional_shadow_max_distance = 55.0
+
+[node name="Terrain" type="Node3D" parent="."]
+script = ExtResource("2_6fvp6")
+config = ExtResource("3_aodgd")
+material = ExtResource("4_v8spu")
+
+[node name="Flora" type="Node3D" parent="."]
+script = ExtResource("5_7xaly")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("6_bwsto")
+grass_material = ExtResource("7_ax85r")
+leaf_material = ExtResource("8_sucj4")
+vine_material = ExtResource("7_ax85r")
+bark_material = ExtResource("9_udnoo")
+fungus_material = ExtResource("10_f8gdu")
+rock_material = ExtResource("11_4taoc")
+stone_material = ExtResource("12_qxne4")
+
+[node name="Fauna" type="Node3D" parent="."]
+script = ExtResource("13_slg0h")
+terrain_path = NodePath("../Terrain")
+config = ExtResource("14_gd22k")
+bat_material = ExtResource("15_onjgl")
+frog_material = ExtResource("16_4xeaq")
+eye_material = ExtResource("17_3bo8n")
+firefly_material = ExtResource("18_aglbu")
+
+[node name="Atmosphere" type="Node3D" parent="."]
+script = ExtResource("19_ckuwi")
+terrain_path = NodePath("../Terrain")
+sun_path = NodePath("../Moonlight")
+environment_path = NodePath("../WorldEnvironment")
+lightning_interval = Vector2(4, 11)
+mist_material = ExtResource("20_vxxxw")
+shaft_material = ExtResource("21_5yvcu")
+waterfall_material = ExtResource("22_8on81")
+water_material = ExtResource("23_5gx3l")
+river_height = -30.0
+
+[node name="Rain" type="CPUParticles3D" parent="."]
+mesh = SubResource("QuadMesh_mysj3")
+emission_shape = 3
+emission_box_extents = Vector3(16, 1, 16)
+direction = Vector3(0.15, -1, 0)
+spread = 4.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 14.0
+initial_velocity_max = 18.0
+script = ExtResource("25_d6xnh")
+
+[node name="RouteGeometry" type="Node3D" parent="."]
+
+[node name="CragCliff" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -10.5)
+use_collision = true
+collision_layer = 5
+collision_mask = 0
+size = Vector3(16, 5, 2)
+material = ExtResource("26_3fvnr")
+
+[node name="StormPlateau" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -25.5)
+use_collision = true
+collision_mask = 0
+size = Vector3(16, 5, 28)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterARoof" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 6.6, -19)
+use_collision = true
+collision_mask = 0
+size = Vector3(3.6, 0.6, 3)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterAPostA" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.6, 5.2, -20)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.6, 2.4, 0.6)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterAPostB" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.7999997, 5.2, -18)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.6, 2.4, 0.6)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterBRoof" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 6.6, -31)
+use_collision = true
+collision_mask = 0
+size = Vector3(3.6, 0.6, 3)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterBPostA" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7999997, 5.2, -32)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.6, 2.4, 0.6)
+material = ExtResource("12_qxne4")
+
+[node name="ShelterBPostB" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 5.2, -30)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.6, 2.4, 0.6)
+material = ExtResource("12_qxne4")
+
+[node name="GaleRidge" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -60.5)
+use_collision = true
+collision_mask = 0
+size = Vector3(2.4, 1, 23)
+material = ExtResource("27_wfqut")
+
+[node name="RidgeCairn52" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.45, -52)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.5, 0.9, 0.5)
+material = ExtResource("12_qxne4")
+
+[node name="RidgeCairn60" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.45, -60.5)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.5, 0.9, 0.5)
+material = ExtResource("12_qxne4")
+
+[node name="RidgeCairn69" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.45, -69)
+use_collision = true
+collision_mask = 0
+size = Vector3(0.5, 0.9, 0.5)
+material = ExtResource("12_qxne4")
+
+[node name="GatePillarL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("28_y3wlj")
+
+[node name="GatePillarR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 4, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(1.6, 8, 1.6)
+material = ExtResource("28_y3wlj")
+
+[node name="GateLintel" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(11, 1.4, 2)
+material = ExtResource("28_y3wlj")
+
+[node name="ArenaWallL" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(40, 8, 1.5)
+material = ExtResource("12_qxne4")
+
+[node name="ArenaWallR" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2, -94)
+use_collision = true
+collision_mask = 0
+size = Vector3(40, 8, 1.5)
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar0" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.167961, 4, -114.74671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar1" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.99235, 4, -106.24671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar3" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.99235, 4, -106.24671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar4" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.167961, 4, -114.74671)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar5" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.167961, 4, -125.25329)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar6" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.99235, 4, -133.7533)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar7" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1228493e-15, 4, -137)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar8" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.99235, 4, -133.7533)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="ArenaPillar9" type="CSGCylinder3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.167961, 4, -125.25329)
+use_collision = true
+collision_mask = 0
+radius = 1.0
+height = 8.0
+sides = 7
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep0" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 2, -170)
+size = Vector3(30, 4, 30)
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep1" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 6, -170)
+size = Vector3(25.4, 4, 25.4)
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep2" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 10, -170)
+size = Vector3(20.8, 4, 20.8)
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep3" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 14, -170)
+size = Vector3(16.2, 4, 16.2)
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep4" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 18, -170)
+size = Vector3(11.6, 4, 11.6)
+material = ExtResource("12_qxne4")
+
+[node name="TempleStep5" type="CSGBox3D" parent="RouteGeometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 22, -170)
+size = Vector3(7, 4, 7)
+material = ExtResource("12_qxne4")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+
+[node name="Checkpoints" type="Node3D" parent="."]
+
+[node name="CheckpointSpawn" parent="Checkpoints" instance=ExtResource("29_faxe6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 1)
+
+[node name="CheckpointPlateau" parent="Checkpoints" instance=ExtResource("29_faxe6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 4, -13.5)
+
+[node name="CheckpointRidge" parent="Checkpoints" instance=ExtResource("29_faxe6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -46)
+
+[node name="CheckpointGate" parent="Checkpoints" instance=ExtResource("29_faxe6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -78)
+
+[node name="Hazards" type="Node3D" parent="."]
+
+[node name="StormCaller" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -25.5)
+script = ExtResource("30_ktmqi")
+warning_material = ExtResource("31_ud6lr")
+bolt_material = ExtResource("32_a58v8")
+
+[node name="@CollisionShape3D@81" type="CollisionShape3D" parent="Hazards/StormCaller"]
+shape = SubResource("BoxShape3D_d84os")
+
+[node name="ShelterA" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 5.1, -19)
+script = ExtResource("33_umhc3")
+
+[node name="@CollisionShape3D@82" type="CollisionShape3D" parent="Hazards/ShelterA"]
+shape = SubResource("BoxShape3D_2nn0s")
+
+[node name="ShelterB" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 5.1, -31)
+script = ExtResource("33_umhc3")
+
+[node name="@CollisionShape3D@83" type="CollisionShape3D" parent="Hazards/ShelterB"]
+shape = SubResource("BoxShape3D_s8l0w")
+
+[node name="GaleGust" type="Area3D" parent="Hazards"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -60.5)
+script = ExtResource("34_37f1w")
+traction = 0.35
+
+[node name="@CollisionShape3D@84" type="CollisionShape3D" parent="Hazards/GaleGust"]
+shape = SubResource("BoxShape3D_pv18v")
+
+[node name="Warning" type="Node3D" parent="Hazards/GaleGust"]
+visible = false
+
+[node name="Strip0" type="MeshInstance3D" parent="Hazards/GaleGust/Warning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, -9)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_ohfhf")
+
+[node name="Strip1" type="MeshInstance3D" parent="Hazards/GaleGust/Warning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, -4.5)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_y8yv1")
+
+[node name="Strip2" type="MeshInstance3D" parent="Hazards/GaleGust/Warning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, 0)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_rj6j0")
+
+[node name="Strip3" type="MeshInstance3D" parent="Hazards/GaleGust/Warning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, 4.5)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_4yyrp")
+
+[node name="Strip4" type="MeshInstance3D" parent="Hazards/GaleGust/Warning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.9, 9)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_o1sl1")
+
+[node name="BossArenaTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -123)
+script = ExtResource("36_hbm45")
+
+[node name="@CollisionShape3D@85" type="CollisionShape3D" parent="BossArenaTrigger"]
+shape = SubResource("BoxShape3D_qa3df")
+
+[node name="TempleBeacon" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 27, -170)
+light_color = Color(0.6, 0.8, 1, 1)
+light_energy = 4.0
+omni_range = 30.0
+
+[node name="ArenaGateMarker" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -94)
+
+[node name="ArenaGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -120)
+light_color = Color(0.55, 0.7, 1, 1)
+light_energy = 2.5
+omni_range = 24.0
+
+[node name="GateGlow" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -91)
+light_color = Color(0.6, 0.8, 1, 1)
+light_energy = 2.0
+omni_range = 14.0
+
+[node name="Boss" parent="." instance=ExtResource("37_0to3t")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.05, -121)
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="ThornlingA" parent="Enemies" instance=ExtResource("38_u3yhs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.2, -82)
+
+[node name="ThornlingB" parent="Enemies" instance=ExtResource("38_u3yhs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.2, -84)
+
+[node name="Gatherables" type="Node3D" parent="."]
+
+[node name="storm_glass_0" parent="Gatherables" instance=ExtResource("39_w25lk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 4, -19)
+snap_to_ground = false
+
+[node name="storm_glass_1" parent="Gatherables" instance=ExtResource("39_w25lk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 4, -36)
+snap_to_ground = false
+
+[node name="storm_glass_2" parent="Gatherables" instance=ExtResource("39_w25lk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -60.5)
+snap_to_ground = false
+
+[node name="storm_glass_3" parent="Gatherables" instance=ExtResource("39_w25lk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, -83)
+
+[node name="storm_glass_4" parent="Gatherables" instance=ExtResource("39_w25lk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -45)
+
+[node name="ruin_shard_5" parent="Gatherables" instance=ExtResource("40_77x0r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -4)
+
+[node name="ruin_shard_6" parent="Gatherables" instance=ExtResource("40_77x0r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -86)
+
+[node name="spirit_moss_7" parent="Gatherables" instance=ExtResource("41_h4ec0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, -47)
+
+[node name="glowcap_8" parent="Gatherables" instance=ExtResource("42_k3rhp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0, -6)
+
+[node name="LoreStone0" parent="Gatherables" instance=ExtResource("43_oey2t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -80)
+title = "Raijin's Echo"
+text = "The storm god left; his echo stayed, and grew wings. Lightning cannot touch what is rooted in old stone — the dojo's stone-charms ground its fury. Strike the crest when it bows to shear."

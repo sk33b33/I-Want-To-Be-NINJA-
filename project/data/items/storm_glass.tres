@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_2wiuw"]
+
+[resource]
+script = ExtResource("1_2wiuw")
+id = &"storm_glass"
+display_name = "Storm Glass"
+description = "Sand fused by a lightning strike. It hums in your hand."
+color = Color(0.65, 0.8, 1, 1)

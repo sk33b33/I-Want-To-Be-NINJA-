@@ -771,3 +771,83 @@ static func spirit_spout(material: Material) -> ArrayMesh:
 			pts.append(Vector3(cos(a + k * 0.5) * r, h - 0.2, sin(a + k * 0.5) * r))
 		_tube(st, pts, PackedFloat32Array([0.2, 0.17, 0.13, 0.08, 0.01]), PackedColorArray([c, c, c, c, c]), 5, rng)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- Stormcrag (Phase 10)
+
+## Raijin's Echo, the Sky Roc: a great storm bird standing on the ground, wings half-spread
+## (faces -Z). COLOR.r = 1 marks wing vertices (they beat slowly via the creature shader),
+## COLOR.g = 1 the feather edges that glow in telegraphs, COLOR.a = 1 the eyes.
+static func sky_roc_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 140
+	var hide := Color(0, 0, 0, 0)
+	var wing := Color(1, 0, 0, 0)
+	var edge := Color(1, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 2.4, 0.3), Vector3(1.1, 1.0, 1.7), rng, hide, hide, 6, 10, 0.08)      # Body.
+	_tube(st, PackedVector3Array([Vector3(0, 2.9, -1.1), Vector3(0, 3.5, -1.7), Vector3(0, 3.8, -2.1)]),
+			PackedFloat32Array([0.6, 0.42, 0.36]), PackedColorArray([hide, hide, hide]), 8, rng, 0.05)  # Neck.
+	_blob(st, Vector3(0, 3.95, -2.35), Vector3(0.42, 0.4, 0.5), rng, hide, hide, 5, 8, 0.05)  # Head.
+	var beak := Vector3(0, 3.85, -2.8)
+	_tri(st, beak + Vector3(-0.18, 0.12, 0), beak + Vector3(0.18, 0.12, 0), beak + Vector3(0, -0.2, -0.75), edge, edge, edge)
+	_tri(st, beak + Vector3(-0.18, -0.05, 0), beak + Vector3(0.18, -0.05, 0), beak + Vector3(0, -0.2, -0.75), edge, edge, edge)
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.3 * sgn, 4.05, -2.6), Vector3(0.07, 0.06, 0.06), rng, eye, eye, 2, 5, 0.0)
+		# Legs with talons.
+		var hip := Vector3(0.45 * sgn, 1.7, 0.4)
+		_tube(st, PackedVector3Array([hip, hip + Vector3(0.05 * sgn, -0.9, 0.2), Vector3(0.5 * sgn, 0.05, 0.1)]),
+				PackedFloat32Array([0.28, 0.14, 0.12]), PackedColorArray([hide, hide, hide]), 6, rng)
+		for t in 3:
+			var f := Vector3(0.5 * sgn, 0.05, 0.1)
+			_tri(st, f, f + Vector3(0.1, 0, 0), f + Vector3((t - 1) * 0.25, 0, -0.55), hide, hide, hide)
+		# Wing: three long feathered panels from the shoulder.
+		var sh := Vector3(0.9 * sgn, 2.9, -0.3)
+		var tip := sh + Vector3(3.6 * sgn, 1.3, 1.0)
+		var mid := sh + Vector3(1.9 * sgn, 1.1, -0.2)
+		_tri(st, sh, mid, sh + Vector3(0.3 * sgn, -0.3, 1.6), wing, wing, wing)
+		_tri(st, mid, tip, sh + Vector3(0.3 * sgn, -0.3, 1.6), wing, edge, wing)
+		for k in 5:
+			var a := mid.lerp(tip, float(k) / 4.0)
+			_tri(st, a, a + Vector3(0.25 * sgn, 0, 0.1), a + Vector3(0.4 * sgn, -0.9 - k * 0.15, 1.1), edge, edge, edge)
+	# Tail fan.
+	for k in 5:
+		var ang := lerpf(-0.6, 0.6, float(k) / 4.0)
+		var base := Vector3(0, 2.3, 1.8)
+		var end := base + Vector3(sin(ang) * 1.2, -0.6, cos(ang) * 1.8)
+		_tri(st, base + Vector3(-0.15, 0, 0), base + Vector3(0.15, 0, 0), end, hide, hide, edge)
+	return _finish(st, null, material)
+
+
+## The Sky Roc's storm crest (the breakable part): a fan of tall crest feathers on the head.
+static func roc_crest(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 141
+	var c := Color(0, 1, 0, 1)
+	var base := Vector3(0, 4.25, -2.3)
+	for k in 5:
+		var ang := lerpf(-0.5, 0.5, float(k) / 4.0)
+		var length := 0.25 if broken else rng.randf_range(0.9, 1.3)
+		var end := base + Vector3(sin(ang) * length * 0.6, length, length * 0.55)
+		_tube(st, PackedVector3Array([base + Vector3(ang * 0.3, 0, 0), end]), PackedFloat32Array([0.09, 0.01]),
+				PackedColorArray([c, c]), 5, rng, 0.1 if broken else 0.0)
+	return _finish(st, null, material)
+
+
+## Storm Call bolt: a jagged column of light rising from the ground.
+static func lightning_bolt(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 142
+	var c := Color(0.6, 0.72, 1.0, 0.3)  # Low glow amount: readable, not blinding.
+	var pts := PackedVector3Array()
+	var radii := PackedFloat32Array()
+	var cols := PackedColorArray()
+	for k in 8:
+		pts.append(Vector3(rng.randf_range(-0.35, 0.35), float(k) * 1.4 - 0.2, rng.randf_range(-0.35, 0.35)))
+		radii.append(0.22 - k * 0.02)
+		cols.append(c)
+	_tube(st, pts, radii, cols, 5, rng)
+	return _finish(st, null, material)

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TerrainConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/terrain_config.gd" id="1_330wp"]
+
+[resource]
+script = ExtResource("1_330wp")
+seed = 8484
+route_points = PackedVector2Array(0, 30, 0, -50, 0, -71, 0, -130)
+hill_height = 9.0
+hill_frequency = 0.035
+valley_wall_height = 26.0
+border_height = 40.0
+stream_z = -1000.0
+stream_depth = 0.0

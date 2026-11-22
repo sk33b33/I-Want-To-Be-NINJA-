@@ -28,7 +28,7 @@ var _buttons: Array[Dictionary] = [
 	{"action": "dodge", "label": "ROLL", "anchor": Vector2(-4.6, -4.2), "scale": 0.95, "touch": -1},
 	{"action": "sprint", "label": "DASH", "anchor": Vector2(-7.5, -2.7), "scale": 0.85, "touch": -1},
 	{"action": "lock_on", "label": "LOCK", "anchor": Vector2(-1.4, -7.9), "scale": 0.75, "touch": -1},
-	{"action": "skill", "label": "FIRE", "anchor": Vector2(-4.0, -6.9), "scale": 0.8, "touch": -1},
+	{"action": "skill", "label": "CHARM", "anchor": Vector2(-4.0, -6.9), "scale": 0.8, "touch": -1},
 	# Top-right system buttons.
 	{"action": "camera_toggle", "label": "CAM", "anchor": Vector2(-3.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 	{"action": "pause", "label": "II", "anchor": Vector2(-1.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
@@ -120,15 +120,15 @@ func _short_side() -> float:
 
 
 func _stick_radius() -> float:
-	return _short_side() * joystick_radius_ratio
+	return _short_side() * joystick_radius_ratio * GameSettings.touch_scale
 
 
 func _button_radius(button: Dictionary) -> float:
-	return _short_side() * button_radius_ratio * float(button["scale"])
+	return _short_side() * button_radius_ratio * float(button["scale"]) * GameSettings.touch_scale
 
 
 func _button_center(button: Dictionary) -> Vector2:
-	var unit := _short_side() * button_radius_ratio
+	var unit := _short_side() * button_radius_ratio * GameSettings.touch_scale  # Spacing grows with the buttons.
 	var anchor := button["anchor"] as Vector2
 	if button.get("top", false):
 		return Vector2(size.x + anchor.x * unit, anchor.y * unit)  # Measured from the top-right corner.

@@ -20,6 +20,7 @@ var _tab_hunt: Button
 var _tab_forge: Button
 var _tab_settings: Button
 var settings: SettingsPanel
+var controls: ControlsPanel
 var benchmark_label: Label
 
 
@@ -99,6 +100,8 @@ func _build() -> void:
 	settings = SettingsPanel.new(true)
 	settings.benchmark_requested.connect(func() -> void: BenchmarkRunner.start(get_tree()))
 	settings_col.add_child(settings)
+	controls = ControlsPanel.new()
+	settings_col.add_child(controls)
 	benchmark_label = UiStyle.label("", 15, UiStyle.MUTED)
 	benchmark_label.text = BenchmarkRunner.format_results(BenchmarkRunner.last_results, QualityProfile.tier()) \
 			if not BenchmarkRunner.last_results.is_empty() else "No benchmark run yet. Results are also saved to benchmark.txt."

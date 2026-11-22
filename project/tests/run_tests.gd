@@ -2,6 +2,8 @@ extends SceneTree
 ## Headless test runner. Usage (from the repo root):
 ##   godot --headless --path project -s res://tests/run_tests.gd
 ## Exits with code 1 if any test fails.
+## Focused run (no file edits): ... -s res://tests/run_tests.gd -- --only=qa,options
+## Every tests/*_test.gd file must be listed in SUITES — a missing one fails the run.
 
 const SUITES: Array[String] = [
 	"res://tests/config_data_test.gd",
@@ -22,6 +24,8 @@ const SUITES: Array[String] = [
 	"res://tests/quality_test.gd",
 	"res://tests/audio_test.gd",
 	"res://tests/settings_benchmark_test.gd",
+	"res://tests/qa_test.gd",
+	"res://tests/options_test.gd",
 	"res://tests/accessibility_test.gd",
 	"res://tests/main_scene_test.gd",
 ]
@@ -34,7 +38,17 @@ func _initialize() -> void:
 func _run() -> void:
 	var total := 0
 	var failures := 0
-	for path in SUITES:
+	for f in DirAccess.get_files_at("res://tests"):
+		if f.ends_with("_test.gd") and not SUITES.has("res://tests/" + f):
+			print("FAIL  %s is not listed in run_tests.gd SUITES" % f)
+			failures += 1
+	var suites := SUITES
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--only="):
+			suites = []
+			for name in arg.get_slice("=", 1).split(","):
+				suites.append("res://tests/%s_test.gd" % name.strip_edges())
+	for path in suites:
 		var script := load(path) as GDScript
 		if script == null:
 			print("FAIL  %s could not be loaded" % path)

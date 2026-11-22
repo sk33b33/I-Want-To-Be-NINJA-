@@ -20,6 +20,8 @@ signal defeated
 enum State { DORMANT, INTRO, STALK, TELEGRAPH, ATTACK, RECOVER, STAGGER, PART_BREAK, STUNNED, DEFEATED }
 
 @export var definition: BossDefinition
+## Difficulty: multiplies every telegraph (>= 1.0; DifficultyPreset.telegraph_multiplier).
+var telegraph_scale: float = 1.0
 ## Seed for attack selection (deterministic tests); 0 = random.
 @export var ai_seed: int = 0
 
@@ -116,7 +118,7 @@ func is_part_broken(part_id: StringName) -> bool:
 
 ## Total telegraph seconds for an attack right now (shorter when enraged).
 func telegraph_seconds(attack: BossAttackDefinition) -> float:
-	return attack.telegraph_time * (definition.enrage_tempo if is_enraged else 1.0)
+	return attack.telegraph_time * telegraph_scale * (definition.enrage_tempo if is_enraged else 1.0)
 
 
 func state_time() -> float:

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DifficultyPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/settings/difficulty_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"hard"
+display_name = "Hard"
+description = "Take 40% more damage and beasts have 35% more health. Warnings stay fair."
+damage_taken_multiplier = 1.4
+boss_health_multiplier = 1.35
+telegraph_multiplier = 1.0

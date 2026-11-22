@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Original app icon (Phase 12): a ninja's masked face in front of a pale moon. -->
+  <rect width="256" height="256" rx="48" fill="#0c1416"/>
+  <circle cx="164" cy="92" r="62" fill="#d8d2b8"/>
+  <circle cx="190" cy="74" r="56" fill="#0c1416"/>
+  <path d="M128 52c-46 0-78 34-78 80 0 50 34 84 78 84s78-34 78-84c0-46-32-80-78-80z" fill="#1d2a3a"/>
+  <path d="M62 118c18-10 42-14 66-14s48 4 66 14v32c-18 8-42 12-66 12s-48-4-66-12z" fill="#e9dfc4"/>
+  <path d="M84 128c10-6 22-7 32-2-8 9-22 11-32 2zM140 126c10-5 22-4 32 2-10 9-24 7-32-2z" fill="#0c1416"/>
+  <circle cx="100" cy="128" r="4" fill="#5fe0c8"/>
+  <circle cx="156" cy="128" r="4" fill="#5fe0c8"/>
+  <path d="M196 112l40-18-30 30z M200 140l44 6-40 8z" fill="#c0392b"/>
+</svg>

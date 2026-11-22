@@ -32,6 +32,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+## Switching to another app (or a phone call) pauses the hunt so the countdown is not lost.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_APPLICATION_PAUSED:
+		if not visible:
+			open()
+
+
 func toggle() -> void:
 	if visible:
 		close()

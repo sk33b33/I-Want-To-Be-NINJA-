@@ -35,6 +35,7 @@ signal expedition_ended(result: Dictionary)
 var timer := ExpeditionTimer.new()
 ## Sound for this expedition (Phase 11); listens to gameplay signals.
 var audio: AudioDirector
+var difficulty: DifficultyPreset
 var config: ExpeditionConfig
 var is_debug_duration: bool = false
 var arena_entered: bool = false
@@ -69,6 +70,7 @@ func _ready() -> void:
 	if _player and crafting:
 		GearLoadout.apply(_player, Forge.equipped_gear(PlayerProfile.load_profile(), crafting))
 	boss = get_node_or_null(boss_path) as BossController
+	_apply_difficulty(GameSettings.difficulty_preset())
 	if boss:
 		boss.part_broken.connect(_on_part_broken)
 		boss.defeated.connect(_on_boss_defeated)
@@ -89,6 +91,18 @@ func start_expedition() -> void:
 	ended = false
 	timer.start(resolved[0])
 	expedition_started.emit(hunt, timer.duration)
+
+
+## Difficulty (Phase 12): after gear, so armor and difficulty multiply. Never touches the timer.
+func _apply_difficulty(d: DifficultyPreset) -> void:
+	difficulty = d
+	if _player and _player.combat and _player.combat.health:
+		_player.combat.health.damage_taken_multiplier *= d.damage_taken_multiplier
+	if boss:
+		var h := boss.get_health()
+		h.max_health *= d.boss_health_multiplier
+		h.current = h.max_health
+		boss.telegraph_scale = maxf(d.telegraph_multiplier, 1.0)
 
 
 ## Pause or resume the whole game (and the countdown). Called by the pause menu.
@@ -124,13 +138,29 @@ func debug_set_remaining(seconds: float) -> void:
 	timer.remaining = seconds
 
 
-## Restart this expedition from scratch with the same hunt.
+## Restart this expedition from scratch with the same hunt. What was gathered (and any part
+## already broken) is kept, exactly as when the beast escapes.
 func restart() -> void:
+	abandon()
 	SceneFlow.start_expedition(get_tree(), scene_path, hunt)
 
 
 func return_to_hunt_board() -> void:
+	abandon()
 	SceneFlow.go_to_hunt_board(get_tree())
+
+
+## Leaving mid-hunt (dojo, restart, closing the app): save this run's gathered materials and
+## part rewards once; no hunt credit. No-op if the run already ended and saved.
+func abandon() -> void:
+	if not ended:
+		ended = true
+		_record_rewards()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		abandon()  # Closing the game window / app keeps what was gathered.
 
 
 ## Gather a material on the way (Pickup). Kept even if the beast escapes.

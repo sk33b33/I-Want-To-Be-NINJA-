@@ -127,3 +127,17 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - **Polish:** dust puffs on landing and rolling; hit spark counts follow the preset.
 - **Fixes found on the way:** the benchmark tool never started its run (hung) — found before release; audio players now release their sounds when a scene closes.
 - Tests: `quality_test.gd` (5), `audio_test.gd` (6), `settings_benchmark_test.gd` (2); stormcrag rain test updated to the preset. 172 total.
+
+## 2026-11-22 — Phase 12: QA, accessibility, release preparation (v0.12.0)
+- **QA pass** (`qa_test.gd`, 14 edge-case tests; each fix seen failing first):
+  - a damaged/torn save loaded as empty and the next save overwrote it — all progress lost. Saves are now atomic (`.tmp` → rename), the previous good save is kept as `.bak`, and an unreadable file is set aside as `.corrupt` while the backup loads;
+  - a save with wrong field types crashed loading — every field is now type-checked;
+  - quitting to the dojo, restarting or closing the game mid-hunt lost the gathered materials — now kept exactly like an escape (`ExpeditionManager.abandon()`, no hunt credit);
+  - switching to another app let the 45:00 countdown run — the pause menu now opens on focus loss / app pause.
+  - Verified (no change needed): arena entry after a timeout, dying in the arena, lock-on after a kill, a boss killed mid-telegraph, top-down camera across respawns, old saves with removed gear, mud/climb state after respawn.
+- **Control remapping** (`InputRemap`, dojo Settings → Controls): keyboard/mouse and gamepad per action, conflicts swap, saved in `settings.cfg`, reset to defaults; a damaged entry never unbinds an action; screen touches are never taken as mouse clicks.
+- **Difficulty** Easy/Normal/Hard (`DifficultyPreset`, `data/difficulty/`): damage taken, boss health, boss warning time (Easy +30%, never shorter). No timer field — 45:00 on every difficulty (test).
+- **Accessibility:** touch button size (0.8–1.4×, spacing grows with it, stays on screen), touch talisman button renamed CHARM.
+- **Release:** version 0.12.0, original app icon, `export_presets.cfg` (Android arm64 / Windows / Linux; tests excluded), `tools/build.sh` (checks → data-pack export for every preset → boots the exported game; installable builds when templates/SDK/keystore exist, otherwise lists what is missing). `docs/RELEASE_CHECKLIST.md`, `docs/KNOWN_ISSUES.md`.
+- Test runner: every `tests/*_test.gd` must be listed (a missing suite fails the run — a focused run had nearly committed a cut-down suite list); focused runs use `-- --only=qa,options` instead of editing the file.
+- Tests: `qa_test.gd` (14), `options_test.gd` (9). 195 total.

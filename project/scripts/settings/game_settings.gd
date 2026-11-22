@@ -22,6 +22,9 @@ static var path: String = DEFAULT_PATH
 static var screen_shake: bool = true
 static var bold_warnings: bool = false
 static var quality: String = "auto"
+static var difficulty: String = "normal"
+## Touch button size multiplier (accessibility; 0.8 .. 1.4).
+static var touch_scale: float = 1.0
 static var master_volume: float = 1.0
 static var music_volume: float = 0.7
 static var sfx_volume: float = 1.0
@@ -43,6 +46,9 @@ static func load_settings() -> void:
 		screen_shake = bool(cfg.get_value("comfort", "screen_shake", true))
 		bold_warnings = bool(cfg.get_value("readability", "bold_warnings", false))
 		quality = String(cfg.get_value("graphics", "quality", "auto"))
+		difficulty = String(cfg.get_value("game", "difficulty", "normal"))
+		touch_scale = float(cfg.get_value("controls", "touch_scale", 1.0))
+		InputRemap.load_from(cfg)
 		master_volume = float(cfg.get_value("audio", "master", 1.0))
 		music_volume = float(cfg.get_value("audio", "music", 0.7))
 		sfx_volume = float(cfg.get_value("audio", "sfx", 1.0))
@@ -50,6 +56,9 @@ static func load_settings() -> void:
 		screen_shake = true
 		bold_warnings = false
 		quality = "auto"
+		difficulty = "normal"
+		touch_scale = 1.0
+		InputRemap.reset_to_defaults(false)
 		master_volume = 1.0
 		music_volume = 0.7
 		sfx_volume = 1.0
@@ -61,6 +70,9 @@ static func save_settings() -> void:
 	cfg.set_value("comfort", "screen_shake", screen_shake)
 	cfg.set_value("readability", "bold_warnings", bold_warnings)
 	cfg.set_value("graphics", "quality", quality)
+	cfg.set_value("game", "difficulty", difficulty)
+	cfg.set_value("controls", "touch_scale", touch_scale)
+	InputRemap.save_to(cfg)
 	cfg.set_value("audio", "master", master_volume)
 	cfg.set_value("audio", "music", music_volume)
 	cfg.set_value("audio", "sfx", sfx_volume)
@@ -83,6 +95,24 @@ static func get_quality() -> String:
 	if not _loaded:
 		load_settings()
 	return quality
+
+
+static func set_difficulty(d: String) -> void:
+	difficulty = d
+	save_settings()
+
+
+## The DifficultyPreset in effect (normal if the setting names an unknown file).
+static func difficulty_preset() -> DifficultyPreset:
+	if not _loaded:
+		load_settings()
+	var p := "res://data/difficulty/%s.tres" % difficulty
+	return load(p if ResourceLoader.exists(p) else "res://data/difficulty/normal.tres") as DifficultyPreset
+
+
+static func set_touch_scale(v: float) -> void:
+	touch_scale = clampf(v, 0.8, 1.4)
+	save_settings()
 
 
 static func set_quality(q: String) -> void:

@@ -1,17 +1,29 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=12 format=3]
 
-[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_6q06x"]
-[ext_resource type="PackedScene" path="res://scenes/biomes/verdant_canopy.tscn" id="2_ow5a4"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_hujxm"]
-[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="4_yyfjg"]
-[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="5_b1x3f"]
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_ouso4"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/verdant_canopy.tscn" id="2_blune"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_th5th"]
+[ext_resource type="Script" path="res://scripts/expedition/expedition_manager.gd" id="4_7smn1"]
+[ext_resource type="Resource" path="res://data/hunts/kurogale.tres" id="5_raeie"]
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="6_hxu8e"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="7_nvumn"]
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="8_ou6is"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_hud.gd" id="9_necax"]
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="10_r4lks"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_results.gd" id="11_pg34l"]
 
 [node name="Main" type="Node3D"]
-script = ExtResource("1_6q06x")
+script = ExtResource("1_ouso4")
 
-[node name="Level" parent="." instance=ExtResource("2_ow5a4")]
+[node name="Level" parent="." instance=ExtResource("2_blune")]
 
-[node name="Player" parent="." instance=ExtResource("3_hujxm")]
+[node name="Player" parent="." instance=ExtResource("3_th5th")]
+
+[node name="Expedition" type="Node" parent="."]
+script = ExtResource("4_7smn1")
+hunt = ExtResource("5_raeie")
+default_config = ExtResource("6_hxu8e")
+scene_path = "res://scenes/main/main.tscn"
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -24,7 +36,7 @@ theme_override_colors/font_color = Color(0.85, 0.85, 0.8, 0.85)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-script = ExtResource("4_yyfjg")
+script = ExtResource("7_nvumn")
 camera_rig_path = NodePath("../../Player/CameraRig")
 
 [node name="TouchControls" type="Control" parent="UI"]
@@ -33,4 +45,29 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-script = ExtResource("5_b1x3f")
+script = ExtResource("8_ou6is")
+
+[node name="ExpeditionHud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("9_necax")
+manager_path = NodePath("../../Expedition")
+
+[node name="PauseMenu" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("10_r4lks")
+manager_path = NodePath("../../Expedition")
+
+[node name="ExpeditionResults" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("11_pg34l")
+manager_path = NodePath("../../Expedition")

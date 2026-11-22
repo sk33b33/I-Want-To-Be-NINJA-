@@ -17,7 +17,7 @@ Not yet implemented: dodge, attacks, lock-on, interact.
 | Lock-on | Q | Right-stick click | — (Phase 4) |
 | Interact | E | X / Square (context-sensitive) | — (later) |
 | Switch camera | V | D-pad down | CAM button |
-| Pause | Esc | Menu | — (Phase 3) |
+| Pause (freezes the expedition timer) | Esc | Start / Menu | **II** button (top right) |
 
 These are defaults only. Implement remapping in a later phase. Avoid conflicting context actions.
 

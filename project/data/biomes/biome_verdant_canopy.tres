@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="1_lvj6i"]
+[ext_resource type="Resource" path="res://data/hunts/kurogale.tres" id="2_dt4yy"]
+[ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="3_p6xxs"]
+
+[resource]
+script = ExtResource("3_p6xxs")
+id = &"verdant_canopy"
+display_name = "Verdant Canopy"
+mood = "Drowned ruins under a storm-dark canopy."
+expedition_scene = "res://scenes/main/main.tscn"
+hunts = Array[ExtResource("1_lvj6i")]([ExtResource("2_dt4yy")])
+unlocked = true
+accent = Color(0.35, 0.95, 0.75, 1)

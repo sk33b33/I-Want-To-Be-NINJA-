@@ -24,6 +24,7 @@ var _buttons: Array[Dictionary] = [
 	{"action": "jump", "label": "JUMP", "anchor": Vector2(-2.0, -2.0), "scale": 1.35, "touch": -1},
 	{"action": "sprint", "label": "DASH", "anchor": Vector2(-4.8, -1.5), "scale": 1.0, "touch": -1},
 	{"action": "camera_toggle", "label": "CAM", "anchor": Vector2(-1.6, -4.7), "scale": 0.8, "touch": -1},
+	{"action": "pause", "label": "II", "anchor": Vector2(-1.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 ]
 
 var _stick_touch: int = -1
@@ -121,7 +122,10 @@ func _button_radius(button: Dictionary) -> float:
 
 func _button_center(button: Dictionary) -> Vector2:
 	var unit := _short_side() * button_radius_ratio
-	return size + (button["anchor"] as Vector2) * unit
+	var anchor := button["anchor"] as Vector2
+	if button.get("top", false):
+		return Vector2(size.x + anchor.x * unit, anchor.y * unit)  # Measured from the top-right corner.
+	return size + anchor * unit
 
 
 func _draw() -> void:

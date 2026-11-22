@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="HuntDefinition" load_steps=3 format=3]
+
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="1_y72ac"]
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="2_qb48e"]
+
+[resource]
+script = ExtResource("2_qb48e")
+id = &"kurogale"
+beast_name = "Kurogale"
+epithet = "the Thornback Stag"
+element = "Nature"
+weakness = "Fire"
+description = "A stag of living thorn that rules the drowned ruins. Its antlers can be broken."
+signature = "Root snare, antler sweep"
+config = ExtResource("1_y72ac")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HuntDefinition" load_steps=3 format=3]
+
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="1_kj374"]
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="2_rxud8"]
+
+[resource]
+script = ExtResource("2_rxud8")
+id = &"ashen_oni_tortoise"
+beast_name = "Ashen Oni-Tortoise"
+element = "Fire"
+weakness = "Water"
+signature = "Shell slam, lava burst"
+config = ExtResource("1_kj374")

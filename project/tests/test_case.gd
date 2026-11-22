@@ -56,6 +56,7 @@ func release(action: String) -> void:
 
 
 func cleanup() -> void:
+	tree.paused = false
 	for action in InputMap.get_actions():
 		Input.action_release(action)
 	for node in _nodes:

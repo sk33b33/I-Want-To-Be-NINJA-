@@ -4,4 +4,4 @@
 
 [resource]
 script = ExtResource("1_joal5")
-route_points = PackedVector2Array(0, 30, 0, -50, 0, -71, 0, -110)
+route_points = PackedVector2Array(0, 30, 0, -50, 0, -71, 0, -130)

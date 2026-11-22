@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HuntDefinition" load_steps=3 format=3]
+
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="1_56flh"]
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="2_rireg"]
+
+[resource]
+script = ExtResource("2_rireg")
+id = &"nami"
+beast_name = "Nami"
+epithet = "the Lantern Serpent"
+element = "Water / Spirit"
+weakness = "Lightning"
+signature = "Flood wave, illusion"
+config = ExtResource("1_56flh")

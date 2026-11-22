@@ -16,6 +16,7 @@ func _initialize() -> void:
 	_checkpoint_scene()
 	_level_scene()
 	_main_scene()
+	_hunt_board_scene()
 	print("GENERATED")
 	quit(0)
 
@@ -80,6 +81,7 @@ func _materials() -> void:
 	_save(_shader_mat("ring_marker", {}), MAT + "ring_marker.tres")
 	_save(_shader_mat("stone", {"detail_noise": detail, "climb_marks": 1.0}), MAT + "climb_stone.tres")
 	_save(_shader_mat("spirit_flame", {}), MAT + "spirit_flame.tres")
+	_save(_shader_mat("ring_marker", {"color": Color(1.0, 0.15, 0.05), "strength": 0.7}), MAT + "arena_sigil.tres")
 	_save(_shader_mat("sky_gloom", {"cloud_noise": clouds}), MAT + "sky_gloom.tres")
 
 	var bark := StandardMaterial3D.new()
@@ -104,6 +106,7 @@ func _data() -> void:
 	_save(load("res://scripts/world/fauna/fauna_config.gd").new(), "res://data/biomes/verdant_canopy_fauna.tres")
 	_save(load("res://scripts/player/ninja_animation_config.gd").new(), "res://data/player/ninja_animations.tres")
 	_save(load("res://scripts/traversal/traversal_config.gd").new(), "res://data/player/traversal.tres")
+	_expedition_data()
 
 
 func _own(node: Node, owner: Node) -> void:
@@ -471,6 +474,39 @@ func _level_scene() -> void:
 	_checkpoint("CheckpointGorge", Vector3(-4.5, 0, -48))
 	_checkpoint("CheckpointGate", Vector3(-4.5, 0, -78))
 
+	# Phase 3: boss arena behind the gate. Walls funnel the player through the gate.
+	_box("ArenaWallL", Vector3(40, 8, 1.5), Vector3(-25.0, 2, -94), "stone")
+	_box("ArenaWallR", Vector3(40, 8, 1.5), Vector3(25.0, 2, -94), "stone")
+	var trigger := Area3D.new()
+	trigger.name = "BossArenaTrigger"
+	trigger.set_script(load("res://scripts/world/boss_arena_trigger.gd"))
+	var tcol := CollisionShape3D.new()
+	var tbox := BoxShape3D.new()
+	# Covers the whole arena region (gate line z -96 to the map edge), so even a teleport or
+	# respawn inside it counts as entry.
+	tbox.size = Vector3(160, 80, 54)
+	tcol.shape = tbox
+	trigger.add_child(tcol)
+	trigger.position = Vector3(0, 10, -123)
+	_root.add_child(trigger)
+	for i in 10:
+		var ang := TAU * float(i) / 10.0 + PI / 10.0
+		if absf(wrapf(ang - PI / 2.0, -PI, PI)) < 0.5:
+			continue  # Leave the entrance (facing the gate, +Z) open.
+		var p := Vector3(cos(ang) * 17.0, 0, -120.0 + sin(ang) * 17.0)
+		_column("ArenaPillar%d" % i, p + Vector3.UP * (4.0 + float(i % 3) * 1.5), 0.9, 8.0)
+	var sigil := MeshInstance3D.new()
+	sigil.name = "ArenaSigil"
+	var sq := QuadMesh.new()
+	sq.size = Vector2(16, 16)
+	sq.orientation = PlaneMesh.FACE_Y
+	sq.material = load(MAT + "arena_sigil.tres")
+	sigil.mesh = sq
+	sigil.position = Vector3(0, 0.06, -120)
+	sigil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_root.add_child(sigil)
+	_omni("ArenaGlow", Vector3(0, 5, -120), Color(1.0, 0.15, 0.05), 3.0, 22.0)
+
 	_omni("GateGlow", Vector3(0, 4, -91), Color(1.0, 0.2, 0.08), 2.5, 16.0)
 	_omni("ShrineGlow", Vector3(-9, 2.5, -8), Color(0.2, 0.9, 0.8), 1.2, 9.0)
 	_omni("GorgeGlow", Vector3(0, -12, -60), Color(0.15, 0.6, 0.7), 2.0, 22.0)
@@ -490,6 +526,15 @@ func _main_scene() -> void:
 	player.name = "Player"
 	main.add_child(player)
 	player.owner = main
+	var expedition := Node.new()
+	expedition.name = "Expedition"
+	expedition.set_script(load("res://scripts/expedition/expedition_manager.gd"))
+	expedition.set("hunt", load("res://data/hunts/kurogale.tres"))
+	expedition.set("default_config", load("res://data/expedition/default_expedition.tres"))
+	expedition.set("scene_path", "res://scenes/main/main.tscn")
+	main.add_child(expedition)
+	expedition.owner = main
+
 	var ui := CanvasLayer.new()
 	ui.name = "UI"
 	main.add_child(ui)
@@ -512,7 +557,77 @@ func _main_scene() -> void:
 	touch.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(touch)
 	touch.owner = main
+	for spec in [["ExpeditionHud", "res://scripts/ui/expedition_hud.gd"], ["PauseMenu", "res://scripts/ui/pause_menu.gd"],
+			["ExpeditionResults", "res://scripts/ui/expedition_results.gd"]]:
+		var c := Control.new()
+		c.name = spec[0]
+		c.set_script(load(spec[1]))
+		c.set("manager_path", NodePath("../../Expedition"))
+		c.set_anchors_preset(Control.PRESET_FULL_RECT)
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE if spec[0] == "ExpeditionHud" else Control.MOUSE_FILTER_STOP
+		ui.add_child(c)
+		c.owner = main
 	var ps := PackedScene.new()
 	ps.pack(main)
 	_save(ps, "res://scenes/main/main.tscn")
 	main.free()
+
+
+func _hunt(id: String, beast: String, epithet: String, element: String, weakness: String, signature: String,
+		description: String, config: ExpeditionConfig) -> HuntDefinition:
+	var h := HuntDefinition.new()
+	h.id = StringName(id)
+	h.beast_name = beast
+	h.epithet = epithet
+	h.element = element
+	h.weakness = weakness
+	h.signature = signature
+	h.description = description
+	h.config = config
+	return _save(h, "res://data/hunts/%s.tres" % id)
+
+
+func _biome(id: String, name: String, mood: String, hunts: Array[HuntDefinition], unlocked: bool, note: String,
+		accent: Color) -> BiomeDefinition:
+	var b := BiomeDefinition.new()
+	b.id = StringName(id)
+	b.display_name = name
+	b.mood = mood
+	b.hunts = hunts
+	b.unlocked = unlocked
+	b.locked_note = note
+	b.accent = accent
+	b.expedition_scene = "res://scenes/main/main.tscn" if unlocked else ""
+	return _save(b, "res://data/biomes/biome_%s.tres" % id)
+
+
+func _expedition_data() -> void:
+	DirAccess.make_dir_recursive_absolute("res://data/expedition")
+	DirAccess.make_dir_recursive_absolute("res://data/hunts")
+	var cfg: ExpeditionConfig = _save(ExpeditionConfig.new(), "res://data/expedition/default_expedition.tres")
+	var k := _hunt("kurogale", "Kurogale", "the Thornback Stag", "Nature", "Fire", "Root snare, antler sweep",
+			"A stag of living thorn that rules the drowned ruins. Its antlers can be broken.", cfg)
+	var a := _hunt("ashen_oni_tortoise", "Ashen Oni-Tortoise", "", "Fire", "Water", "Shell slam, lava burst", "", cfg)
+	var n := _hunt("nami", "Nami", "the Lantern Serpent", "Water / Spirit", "Lightning", "Flood wave, illusion", "", cfg)
+	var r := _hunt("raijins_echo", "Raijin's Echo", "Sky Roc", "Lightning", "Earth", "Dive, wind shear", "", cfg)
+	_biome("verdant_canopy", "Verdant Canopy", "Drowned ruins under a storm-dark canopy.", [k] as Array[HuntDefinition],
+			true, "", Color(0.35, 0.95, 0.75))
+	_biome("emberwild", "Emberwild", "Volcanic jungle of black spires and lava.", [a] as Array[HuntDefinition],
+			false, "arrives in Phase 8", Color(1.0, 0.45, 0.15))
+	_biome("moonfen", "Moonfen", "Bioluminescent swamp in violet night.", [n] as Array[HuntDefinition],
+			false, "arrives in Phase 9", Color(0.7, 0.35, 1.0))
+	_biome("stormcrag", "Stormcrag", "Temple peaks under endless lightning.", [r] as Array[HuntDefinition],
+			false, "arrives in Phase 10", Color(0.45, 0.7, 1.0))
+
+
+func _hunt_board_scene() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/ui")
+	var board := Control.new()
+	board.name = "HuntBoard"
+	board.set_script(load("res://scripts/ui/hunt_board.gd"))
+	var list: Array[BiomeDefinition] = []
+	for id in ["verdant_canopy", "emberwild", "moonfen", "stormcrag"]:
+		list.append(load("res://data/biomes/biome_%s.tres" % id))
+	board.set("biomes", list)
+	board.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_pack(board, "res://scenes/ui/hunt_board.tscn")

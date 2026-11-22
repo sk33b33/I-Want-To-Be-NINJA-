@@ -76,3 +76,12 @@ func _run_route(mode: CameraRig.Mode) -> void:
 	check(respawns[0] == 0, "never fell (respawns=%d)" % respawns[0])
 	var gate_cp := main.get_node("Level/Checkpoints/CheckpointGate") as Checkpoint
 	check(gate_cp.is_active, "passed the gate checkpoint")
+	# Phase 3: walking on through the gate enters the arena and stops the countdown.
+	var expedition := main.get_node("Expedition") as ExpeditionManager
+	check(expedition.timer.remaining < expedition.timer.duration, "the countdown ran during the route")
+	for i in 120:
+		await tree.physics_frame
+		if expedition.arena_entered:
+			break
+	check(expedition.arena_entered, "entered the boss arena through the gate")
+	check(expedition.timer.state == ExpeditionTimer.State.STOPPED, "timer stopped in the arena")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HuntDefinition" load_steps=3 format=3]
+
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="1_rr4kt"]
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="2_gj3g7"]
+
+[resource]
+script = ExtResource("2_gj3g7")
+id = &"raijins_echo"
+beast_name = "Raijin's Echo"
+epithet = "Sky Roc"
+element = "Lightning"
+weakness = "Earth"
+signature = "Dive, wind shear"
+config = ExtResource("1_rr4kt")

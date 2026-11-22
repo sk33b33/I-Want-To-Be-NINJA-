@@ -6,7 +6,7 @@ extends Resource
 
 @export_group("Extent")
 ## Minimum X/Z corner of the terrain in world metres.
-@export var min_corner: Vector2 = Vector2(-80, -125)
+@export var min_corner: Vector2 = Vector2(-80, -150)
 ## Maximum X/Z corner of the terrain in world metres.
 @export var max_corner: Vector2 = Vector2(80, 35)
 ## Metres between heightmap vertices. 1.0 keeps cliffs sharp and stays cheap on phones.
@@ -16,10 +16,10 @@ extends Resource
 @export_group("Route corridor")
 ## Polyline segments (pairs of X/Z points) the corridor follows.
 @export var route_points: PackedVector2Array = PackedVector2Array([
-	Vector2(0, 30), Vector2(0, -50), Vector2(0, -71), Vector2(0, -110)])
+	Vector2(0, 30), Vector2(0, -50), Vector2(0, -71), Vector2(0, -130)])
 ## Circular flat clearings: x, z, radius (one Vector3 each).
 @export var clearings: Array[Vector3] = [
-	Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -16, 10), Vector3(0, -30, 9), Vector3(0, -46, 12), Vector3(0, -84, 15)]
+	Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -16, 10), Vector3(0, -30, 9), Vector3(0, -46, 12), Vector3(0, -84, 15), Vector3(0, -120, 18)]
 @export var route_height: float = 0.0
 ## Half width of the perfectly flat part of the corridor.
 @export var corridor_half_width: float = 6.0

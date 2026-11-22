@@ -32,3 +32,14 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Route: climbable rampart across the path, optional high route (raised ledge → broken bridge with a jump → rampart top), far-bank wall over the gorge that must be ledge-grabbed, boulders, three shrines.
 - Animator: CLIMB / HANG / MANTLE states using stand-in clips (Crouch_Walk, Jump poses) until real Mixamo climbing clips are added.
 - Tests: 42 (was 33). Phase 2 gate bot run passes in third-person and top-down.
+
+## 2026-11-22 — Phase 3: expedition flow & timer
+- Game now opens on the **hunt board** (`scenes/ui/hunt_board.tscn`): four jungles from `data/biomes/biome_*.tres`; Verdant Canopy / Kurogale playable, the others locked until Phases 8–10.
+- `ExpeditionManager` + pure `ExpeditionTimer`: 45:00 countdown (`data/expedition/default_expedition.tres`, never below 45 min; test-only override `-- --expedition-seconds=N`, shown as "debug timer").
+- HUD timer (top centre): amber under 5:00, red pulsing under 1:00, "PAUSED" while paused, hidden for good on boss-arena entry.
+- Pause menu (Esc / Start / touch II button): freezes game and timer; Resume, Restart expedition, Back to hunt board.
+- Boss arena behind the rune gate: ruin ring and red sigil (boss arrives in Phase 5); entry trigger covers the whole arena so any way in counts.
+- Timeout: expedition ends with a results screen (Retry / Hunt board). Decision recorded in the GDD; configurable.
+- Chosen hunt is injected into the expedition scene by `SceneFlow` (no global state singleton).
+- Debug overlay moved to bottom centre so it never covers the timer.
+- Tests: 57 (was 42).

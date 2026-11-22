@@ -38,6 +38,7 @@ You are the lead game-development assistant for **I want to be NINJA**, a 3D jun
 - Tests: dependency-free runner `project/tests/run_tests.gd` (base class `TestCase`). Add new suites to its `SUITES` list.
 - Tunable values live in `project/data/**.tres` Resources (`PlayerMovementConfig`, `CameraRigConfig`).
 - Physics layers: 1 = world, 2 = player, 3 = climbable (put climbable walls on layers 1 + 3 and use `climb_stone.tres` so players can see them).
+- Expedition flow (Phase 3): game boots to `scenes/ui/hunt_board.tscn`; `SceneFlow` injects the chosen `HuntDefinition` into the expedition scene's `Expedition` node (`ExpeditionManager`). Countdown logic is the pure `ExpeditionTimer`; rules in `data/expedition/default_expedition.tres` (never below 45:00 — a test enforces it). Test-only shorter timer: `-- --expedition-seconds=N`.
 - Traversal lives in `TraversalComponent` (tuning: `data/player/traversal.tres`); checkpoints are `scenes/world/checkpoint.tscn`.
 - World is procedural: `BiomeTerrain` (heightmap + collision), `FloraScatter`, `FaunaSpawner`, `BiomeAtmosphere`, driven by `project/data/biomes/*.tres`. Shaders in `project/shaders/` must stay `gl_compatibility`-safe (no screen/depth texture reads).
 - `QualityProfile.is_low()` = phone tier (auto on Android, `-- --low-quality` on PC). New heavy features must scale down on LOW.

@@ -27,6 +27,8 @@ signal expedition_ended(result: Dictionary)
 @export var boss_path: NodePath = ^"../Level/Boss"
 ## Where the HUD's objective arrow points before the arena (the boss gate).
 @export var objective_path: NodePath = ^"../Level/ArenaGateMarker"
+## Gear catalog used to apply the player's equipped (forged) gear at the start.
+@export var crafting: CraftingCatalog
 ## The biome scene this expedition runs in (for Retry).
 @export_file("*.tscn") var scene_path: String = ""
 
@@ -58,6 +60,8 @@ func _ready() -> void:
 	if trigger:
 		trigger.player_entered.connect(enter_boss_arena)
 	timer.expired.connect(_on_timer_expired)
+	if _player and crafting:
+		GearLoadout.apply(_player, Forge.equipped_gear(PlayerProfile.load_profile(), crafting))
 	boss = get_node_or_null(boss_path) as Kurogale
 	if boss:
 		boss.part_broken.connect(_on_part_broken)

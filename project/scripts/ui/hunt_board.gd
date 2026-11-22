@@ -1,15 +1,23 @@
 class_name HuntBoard
 extends Control
-## Biome / hunt selection (Phase 3 stub of the dojo hunt board). One card per biome from
-## BiomeDefinition data; unlocked biomes list their hunts with a "Begin expedition" button.
+## The dojo (placeholder hub): a Hunt tab (biome / hunt selection from BiomeDefinition data) and,
+## from Phase 7, a Forge tab (ForgePanel) to craft and equip gear from hunt materials.
 
 @export var biomes: Array[BiomeDefinition] = []
 
 ## Display names for material ids shown on the board (data, not code).
 @export var known_items: Array[ItemDefinition] = []
 
+## Recipes and item names for the forge.
+@export var crafting: CraftingCatalog
+
 var _start_buttons: Dictionary = {}  # hunt id -> Button
 var materials_label: Label
+var forge: ForgePanel
+var _hunt_page: Control
+var _gear_label: Label
+var _tab_hunt: Button
+var _tab_forge: Button
 
 
 func _ready() -> void:
@@ -40,14 +48,45 @@ func _build() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 16)
 	margin.add_child(col)
-	col.add_child(UiStyle.label("I want to be NINJA", 46))
-	col.add_child(UiStyle.label("Hunt board — choose a jungle and a beast. You have 45 minutes to reach its arena.", 20, UiStyle.MUTED))
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 16)
+	col.add_child(header)
+	var title := UiStyle.label("I want to be NINJA  ·  Dojo", 40)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(title)
+	_tab_hunt = UiStyle.button("Hunt board")
+	_tab_hunt.custom_minimum_size = Vector2(200, UiStyle.BUTTON_HEIGHT)
+	_tab_hunt.pressed.connect(show_tab.bind("hunt"))
+	header.add_child(_tab_hunt)
+	_tab_forge = UiStyle.button("Forge", UiStyle.WARNING)
+	_tab_forge.custom_minimum_size = Vector2(200, UiStyle.BUTTON_HEIGHT)
+	_tab_forge.pressed.connect(show_tab.bind("forge"))
+	header.add_child(_tab_forge)
+	_gear_label = UiStyle.label("", 17, UiStyle.SPIRIT)
+	col.add_child(_gear_label)
+	_hunt_page = VBoxContainer.new()
+	_hunt_page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	(_hunt_page as VBoxContainer).add_theme_constant_override("separation", 12)
+	col.add_child(_hunt_page)
+	if crafting:
+		forge = ForgePanel.new()
+		forge.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		forge.visible = false
+		col.add_child(forge)
+		forge.setup(crafting)
+		forge.forged.connect(func(_g: GearDefinition) -> void: _refresh_summary())
+		forge.equipped.connect(func(_g: GearDefinition) -> void: _refresh_summary())
+	else:
+		_tab_forge.visible = false
+	var page := _hunt_page
+	page.add_child(UiStyle.label("Choose a jungle and a beast. You have 45 minutes to reach its arena.", 20, UiStyle.MUTED))
 	materials_label = UiStyle.label(_materials_text(), 18, UiStyle.WARNING)
-	col.add_child(materials_label)
+	page.add_child(materials_label)
+	_refresh_summary()
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	col.add_child(scroll)
+	page.add_child(scroll)
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 16)
@@ -62,6 +101,28 @@ func _build() -> void:
 			first = _start_buttons.get(biome.hunts[0].id)
 	if first:
 		first.grab_focus.call_deferred()
+
+
+## Switch between the "hunt" and "forge" tabs.
+func show_tab(tab: String) -> void:
+	_hunt_page.visible = tab == "hunt"
+	if forge:
+		forge.visible = tab == "forge"
+		if forge.visible:
+			forge.refresh()
+	materials_label.text = _materials_text()
+
+
+func _refresh_summary() -> void:
+	if materials_label:
+		materials_label.text = _materials_text()
+	if crafting == null:
+		_gear_label.text = ""
+		return
+	var names: PackedStringArray = []
+	for g in Forge.equipped_gear(PlayerProfile.load_profile(), crafting):
+		names.append("%s: %s" % [GearDefinition.slot_name(g.slot), g.display_name])
+	_gear_label.text = "Equipped: " + (",  ".join(names) if not names.is_empty() else "starter blades, no armor, no charm")
 
 
 func _materials_text() -> String:

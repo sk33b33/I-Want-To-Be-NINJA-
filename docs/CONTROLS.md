@@ -39,6 +39,7 @@ Same controls on every device (keyboard / gamepad / touch):
 | Shimmy along a ledge | Left / right |
 
 Checkpoint shrines light up (red → teal) as you pass and heal you the first time; falling respawns you at the last lit shrine.
+In the dojo, switch between **Hunt board** and **Forge** with the buttons at the top (mouse, touch, or gamepad focus + A). Forge needs the listed materials; Equip puts owned gear on.
 Walk over glowing pickups (Glowcap, Ruin Shard) to gather them; walk up to a lore stone to read it. The arrow under the timer points to the arena.
 
 Notes:

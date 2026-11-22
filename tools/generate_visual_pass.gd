@@ -18,6 +18,7 @@ func _initialize() -> void:
 	_player_scene()
 	_checkpoint_scene()
 	_phase6_scenes()
+	_crafting_data()
 	_level_scene()
 	_main_scene()
 	_hunt_board_scene()
@@ -658,6 +659,7 @@ func _main_scene() -> void:
 	expedition.set("hunt", load("res://data/hunts/kurogale.tres"))
 	expedition.set("default_config", load("res://data/expedition/default_expedition.tres"))
 	expedition.set("scene_path", "res://scenes/main/main.tscn")
+	expedition.set("crafting", load("res://data/crafting/catalog.tres"))
 	main.add_child(expedition)
 	expedition.owner = main
 
@@ -773,6 +775,7 @@ func _hunt_board_scene() -> void:
 	var items: Array[ItemDefinition] = [load("res://data/items/thornback_antler.tres"), load("res://data/items/kurogale_hide.tres"),
 			load("res://data/items/glowcap.tres"), load("res://data/items/ruin_shard.tres")]
 	board.set("known_items", items)
+	board.set("crafting", load("res://data/crafting/catalog.tres"))
 	board.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pack(board, "res://scenes/ui/hunt_board.tscn")
 
@@ -1199,3 +1202,51 @@ func _phase6_scenes() -> void:
 	tablet.rotation_degrees = Vector3(-6, 20, 3)
 	ls.add_child(tablet)
 	_pack(ls, "res://scenes/world/lore_stone.tscn")
+
+
+func _gear(id: String, name: String, desc: String, slot: GearDefinition.Slot, color: Color, stats: Dictionary) -> GearDefinition:
+	var g := GearDefinition.new()
+	g.id = StringName(id)
+	g.display_name = name
+	g.description = desc
+	g.slot = slot
+	g.color = color
+	for k: String in stats:
+		g.set(k, stats[k])
+	return _save(g, "res://data/gear/%s.tres" % id)
+
+
+func _recipe(id: String, result: GearDefinition, inputs: Array[ItemDefinition], counts: Array) -> RecipeDefinition:
+	var r := RecipeDefinition.new()
+	r.id = StringName(id)
+	r.result = result
+	r.inputs = inputs
+	r.counts = PackedInt32Array(counts)
+	return _save(r, "res://data/crafting/recipe_%s.tres" % id)
+
+
+func _crafting_data() -> void:
+	DirAccess.make_dir_recursive_absolute("res://data/gear")
+	DirAccess.make_dir_recursive_absolute("res://data/crafting")
+	var antler: ItemDefinition = load("res://data/items/thornback_antler.tres")
+	var hide: ItemDefinition = load("res://data/items/kurogale_hide.tres")
+	var glow: ItemDefinition = load("res://data/items/glowcap.tres")
+	var shard: ItemDefinition = load("res://data/items/ruin_shard.tres")
+	var blades := _gear("thornfang_blades", "Thornfang Blades",
+			"Twin blades edged with Kurogale's antler. They bite deeper.", GearDefinition.Slot.WEAPON,
+			Color(0.55, 0.95, 0.45), {"blade_damage_multiplier": 1.25})
+	var garb := _gear("barkhide_garb", "Barkhide Garb",
+			"Ninja garb lined with the Thornback's bark-hide, stitched with glowcap thread.", GearDefinition.Slot.ARMOR,
+			Color(0.65, 0.5, 0.32), {"max_health_bonus": 25.0, "damage_reduction": 0.15})
+	var charm := _gear("ember_charm", "Ember Charm",
+			"A rune shard that keeps a glowcap's light burning. Talismans ignite faster and hotter.",
+			GearDefinition.Slot.CHARM, Color(1.0, 0.55, 0.2),
+			{"skill_cooldown_reduction": 1.5, "skill_damage_multiplier": 1.3})
+	var catalog := CraftingCatalog.new()
+	catalog.recipes = [
+		_recipe("thornfang_blades", blades, [antler, shard] as Array[ItemDefinition], [1, 1]),
+		_recipe("barkhide_garb", garb, [hide, glow] as Array[ItemDefinition], [1, 2]),
+		_recipe("ember_charm", charm, [glow, shard] as Array[ItemDefinition], [3, 1]),
+	] as Array[RecipeDefinition]
+	catalog.items = [antler, hide, glow, shard] as Array[ItemDefinition]
+	_save(catalog, "res://data/crafting/catalog.tres")

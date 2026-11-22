@@ -32,3 +32,19 @@ func _ready() -> void:
 		blade.rotation_degrees = grip_rotation_degrees
 		att.add_child(blade)
 		blades.append(blade)
+
+
+## Recolour the blades (forged weapons). Multiplies the blade's vertex colours.
+func set_tint(color: Color) -> void:
+	for blade in blades:
+		var mat := (blade_material as StandardMaterial3D).duplicate() as StandardMaterial3D
+		mat.albedo_color = color
+		mat.emission_enabled = true
+		mat.emission = color * 0.25
+		blade.material_override = mat
+
+
+func current_tint() -> Color:
+	if blades.is_empty() or blades[0].material_override == null:
+		return Color(1, 1, 1)
+	return (blades[0].material_override as StandardMaterial3D).albedo_color

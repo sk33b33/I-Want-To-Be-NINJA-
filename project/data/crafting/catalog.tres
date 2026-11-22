@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CraftingCatalog" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_xdif1"]
+[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="2_nrpnu"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="3_p3yp2"]
+[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="4_rrhiq"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="5_5g8hp"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="6_a6yit"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_thornfang_blades.tres" id="7_ar6xg"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_barkhide_garb.tres" id="8_fq8v7"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_ember_charm.tres" id="9_wxoic"]
+[ext_resource type="Script" path="res://scripts/crafting/crafting_catalog.gd" id="10_msck7"]
+
+[resource]
+script = ExtResource("10_msck7")
+recipes = Array[ExtResource("6_a6yit")]([ExtResource("7_ar6xg"), ExtResource("8_fq8v7"), ExtResource("9_wxoic")])
+items = Array[ExtResource("1_xdif1")]([ExtResource("2_nrpnu"), ExtResource("3_p3yp2"), ExtResource("4_rrhiq"), ExtResource("5_5g8hp")])

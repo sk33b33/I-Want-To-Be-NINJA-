@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_7cydg"]
+
+[resource]
+script = ExtResource("1_7cydg")
+id = &"barkhide_garb"
+display_name = "Barkhide Garb"
+description = "Ninja garb lined with the Thornback's bark-hide, stitched with glowcap thread."
+slot = 1
+color = Color(0.65, 0.5, 0.32, 1)
+max_health_bonus = 25.0
+damage_reduction = 0.15

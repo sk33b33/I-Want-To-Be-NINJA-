@@ -79,3 +79,12 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Results: time to spare at the arena; on escape, lists what you gathered and kept.
 - Hunt credit (`hunts_completed`) only for a defeated beast.
 - Tests: `biome_slice_test.gd` (7) incl. the gate — one full expedition from the hunt board to saved rewards; bots moved to `tests/bot_helpers.gd`.
+
+## 2026-11-22 — Phase 7: crafting & progression
+- Data: `GearDefinition` (weapon/armor/charm + readable stats), `RecipeDefinition`, `CraftingCatalog` (`data/gear/`, `data/crafting/`).
+- Recipes: **Thornfang Blades** (Thornback Antler + Ruin Shard → blade damage +25%, thorn-green blades), **Barkhide Garb** (Kurogale's Hide + 2 Glowcap → +25 max health, 15% less damage), **Ember Charm** (3 Glowcap + Ruin Shard → talisman cooldown −1.5 s, damage +30%).
+- `Forge` rules: craft only when all materials are owned; consumes them exactly once; each gear forged once; equip owned gear per slot.
+- Dojo hub (placeholder, UI-based): the hunt board gains Hunt board / Forge tabs, an "Equipped:" summary, and a forge panel with have/need costs, stat lines, Forge/Equip buttons and a "Forged!" flash.
+- `GearLoadout` applies equipped gear at expedition start (damage, health, armor, talisman); HUD shows the loadout.
+- `PlayerProfile` v2: `gear_owned`, `equipped`; v1 saves still load.
+- Tests: `crafting_test.gd` (11) incl. the gate.

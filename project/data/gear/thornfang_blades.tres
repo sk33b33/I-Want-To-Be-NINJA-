@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_2ip17"]
+
+[resource]
+script = ExtResource("1_2ip17")
+id = &"thornfang_blades"
+display_name = "Thornfang Blades"
+description = "Twin blades edged with Kurogale's antler. They bite deeper."
+color = Color(0.55, 0.95, 0.45, 1)
+blade_damage_multiplier = 1.25

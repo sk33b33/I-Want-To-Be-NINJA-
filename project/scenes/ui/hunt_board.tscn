@@ -1,22 +1,24 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/hunt_board.gd" id="1_7yslh"]
-[ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="2_24xak"]
-[ext_resource type="Resource" path="res://data/biomes/biome_verdant_canopy.tres" id="3_j8x1f"]
-[ext_resource type="Resource" path="res://data/biomes/biome_emberwild.tres" id="4_8bmgq"]
-[ext_resource type="Resource" path="res://data/biomes/biome_moonfen.tres" id="5_xu7b4"]
-[ext_resource type="Resource" path="res://data/biomes/biome_stormcrag.tres" id="6_x03km"]
-[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_f4ar6"]
-[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="8_mko4v"]
-[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="9_i22nq"]
-[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="10_75ymq"]
-[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="11_r7162"]
+[ext_resource type="Script" path="res://scripts/ui/hunt_board.gd" id="1_24xak"]
+[ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="2_j8x1f"]
+[ext_resource type="Resource" path="res://data/biomes/biome_verdant_canopy.tres" id="3_8bmgq"]
+[ext_resource type="Resource" path="res://data/biomes/biome_emberwild.tres" id="4_xu7b4"]
+[ext_resource type="Resource" path="res://data/biomes/biome_moonfen.tres" id="5_x03km"]
+[ext_resource type="Resource" path="res://data/biomes/biome_stormcrag.tres" id="6_f4ar6"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_mko4v"]
+[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="8_i22nq"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="9_75ymq"]
+[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="10_r7162"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="11_c50l0"]
+[ext_resource type="Resource" path="res://data/crafting/catalog.tres" id="12_e1icd"]
 
 [node name="HuntBoard" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_7yslh")
-biomes = Array[ExtResource("2_24xak")]([ExtResource("3_j8x1f"), ExtResource("4_8bmgq"), ExtResource("5_xu7b4"), ExtResource("6_x03km")])
-known_items = Array[ExtResource("7_f4ar6")]([ExtResource("8_mko4v"), ExtResource("9_i22nq"), ExtResource("10_75ymq"), ExtResource("11_r7162")])
+script = ExtResource("1_24xak")
+biomes = Array[ExtResource("2_j8x1f")]([ExtResource("3_8bmgq"), ExtResource("4_xu7b4"), ExtResource("5_x03km"), ExtResource("6_f4ar6")])
+known_items = Array[ExtResource("7_mko4v")]([ExtResource("8_i22nq"), ExtResource("9_75ymq"), ExtResource("10_r7162"), ExtResource("11_c50l0")])
+crafting = ExtResource("12_e1icd")

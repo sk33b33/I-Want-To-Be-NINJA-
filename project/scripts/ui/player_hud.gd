@@ -13,6 +13,7 @@ var _flash: ColorRect
 var _lock: Label
 var _down: Label
 var _skill: Label
+var _gear: Label
 
 
 func _ready() -> void:
@@ -30,6 +31,11 @@ func _ready() -> void:
 	_combat.player_respawned.connect(func() -> void: _down.visible = false)
 	_combat.lock_target_changed.connect(func(t: Node3D) -> void: _lock.visible = t != null)
 	_skill.visible = _combat.config.skill != null
+	var names: PackedStringArray = []
+	for g in _combat.equipped_gear:
+		names.append(g.display_name)
+	_gear.text = " · ".join(names)
+	_gear.visible = not names.is_empty()
 	_on_health_changed(_health.current, _health.max_health)
 
 
@@ -78,6 +84,9 @@ func _build() -> void:
 	_skill = UiStyle.label("", 16, Color(1.0, 0.6, 0.2))
 	_skill.visible = false
 	box.add_child(_skill)
+	_gear = UiStyle.label("", 14, UiStyle.MUTED)
+	_gear.visible = false
+	box.add_child(_gear)
 	_down = UiStyle.label("Defeated — returning to the last shrine…", 30, UiStyle.DANGER)
 	_down.set_anchors_preset(Control.PRESET_CENTER)
 	_down.position = Vector2(-360, 60)

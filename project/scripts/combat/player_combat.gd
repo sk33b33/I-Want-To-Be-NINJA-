@@ -52,6 +52,11 @@ var _knockback: Vector3 = Vector3.ZERO
 var _hit_active: bool = false
 var _skill_buffer: float = 0.0
 var skill_cooldown_left: float = 0.0
+## Gear modifiers (set by GearLoadout at expedition start).
+var blade_damage_multiplier: float = 1.0
+var skill_damage_multiplier: float = 1.0
+var skill_cooldown_reduction: float = 0.0
+var equipped_gear: Array[GearDefinition] = []
 
 
 func _ready() -> void:
@@ -135,11 +140,15 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 		return true
 	if _skill_buffer > 0.0 and config.skill and skill_cooldown_left <= 0.0:
 		_skill_buffer = 0.0
-		skill_cooldown_left = config.skill_cooldown
+		skill_cooldown_left = effective_skill_cooldown()
 		_start_attack(config.skill, -2, wish)
-		skill_used.emit(config.skill_cooldown)
+		skill_used.emit(skill_cooldown_left)
 		return true
 	return false
+
+
+func effective_skill_cooldown() -> float:
+	return maxf(config.skill_cooldown - skill_cooldown_reduction, 0.5)
 
 
 func is_busy() -> bool:
@@ -245,7 +254,7 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 	if not _hit_active and _t >= windup and _t < windup + a.active_time:
 		_hit_active = true
 		var info := DamageInfo.new()
-		info.amount = a.damage
+		info.amount = a.damage * (skill_damage_multiplier if a.projectile_scene else blade_damage_multiplier)
 		info.stagger = a.stagger
 		info.knockback = a.knockback
 		info.element = a.element

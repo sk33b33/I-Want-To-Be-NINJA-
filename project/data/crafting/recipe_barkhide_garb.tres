@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_opufg"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="2_w03i0"]
+[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="3_ysdir"]
+[ext_resource type="Resource" path="res://data/gear/barkhide_garb.tres" id="4_dbgdy"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_70xk3"]
+
+[resource]
+script = ExtResource("5_70xk3")
+id = &"barkhide_garb"
+result = ExtResource("4_dbgdy")
+inputs = Array[ExtResource("1_opufg")]([ExtResource("2_w03i0"), ExtResource("3_ysdir")])
+counts = PackedInt32Array(1, 2)

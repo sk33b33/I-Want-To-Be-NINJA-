@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_i1naj"]
+[ext_resource type="Resource" path="res://data/items/glowcap.tres" id="2_m56x1"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="3_7k5nm"]
+[ext_resource type="Resource" path="res://data/gear/ember_charm.tres" id="4_kthcj"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="5_v7oel"]
+
+[resource]
+script = ExtResource("5_v7oel")
+id = &"ember_charm"
+result = ExtResource("4_kthcj")
+inputs = Array[ExtResource("1_i1naj")]([ExtResource("2_m56x1"), ExtResource("3_7k5nm")])
+counts = PackedInt32Array(3, 1)

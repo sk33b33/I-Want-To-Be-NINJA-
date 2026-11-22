@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_7lvg1"]
+
+[resource]
+script = ExtResource("1_7lvg1")
+id = &"ember_charm"
+display_name = "Ember Charm"
+description = "A rune shard that keeps a glowcap's light burning. Talismans ignite faster and hotter."
+slot = 2
+color = Color(1, 0.55, 0.2, 1)
+skill_cooldown_reduction = 1.5
+skill_damage_multiplier = 1.3

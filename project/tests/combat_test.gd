@@ -393,3 +393,36 @@ func test_gate_random_input_never_softlocks() -> void:
 	await _tap("attack_light")
 	await physics_frames(3)
 	check(p.combat.state == PlayerCombat.State.ATTACK, "still responds to input")
+
+
+## Regression (owner report, Phase 9): on phones every touch also arrives as an emulated left
+## mouse click, and left mouse is the light attack — so touching the joystick to start moving
+## made the ninja attack. Touch input must never trigger mouse-bound actions.
+func test_touching_the_screen_does_not_attack() -> void:
+	var p := _arena()
+	await physics_frames(10)
+	var touch := InputEventScreenTouch.new()
+	touch.index = 0
+	touch.position = Vector2(200, 500)  # Left side: the joystick.
+	touch.pressed = true
+	Input.parse_input_event(touch)
+	await physics_frames(3)
+	var up := InputEventScreenTouch.new()
+	up.index = 0
+	up.position = Vector2(200, 500)
+	up.pressed = false
+	Input.parse_input_event(up)
+	await physics_frames(10)
+	check(p.combat.state == PlayerCombat.State.READY, "no attack from a touch (state %d)" % p.combat.state)
+	# A real mouse click (device 0) still attacks on PC.
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.device = 0
+	Input.parse_input_event(click)
+	await physics_frames(3)
+	var click_up := click.duplicate() as InputEventMouseButton
+	click_up.pressed = false
+	Input.parse_input_event(click_up)
+	await physics_frames(2)
+	check(p.combat.state == PlayerCombat.State.ATTACK, "a real mouse click still attacks")

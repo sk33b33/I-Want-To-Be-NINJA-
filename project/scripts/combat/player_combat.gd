@@ -79,6 +79,11 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not body.input_enabled or state == State.DEAD:
 		return
+	# Phones emulate a left mouse click from every touch (emulate_mouse_from_touch), and left
+	# mouse is the light attack — so touching the joystick made the ninja attack. Touch actions
+	# come from TouchControls; only a real mouse may trigger mouse-bound actions.
+	if event is InputEventMouse and (event as InputEventMouse).device == InputEvent.DEVICE_ID_EMULATION:
+		return
 	if event.is_action_pressed("attack_light"):
 		_light_buffer = config.input_buffer
 	elif event.is_action_pressed("attack_heavy"):

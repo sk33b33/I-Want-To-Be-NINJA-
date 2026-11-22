@@ -9,7 +9,12 @@ signal expedition_started(hunt: HuntDefinition, duration: float)
 signal pause_changed(paused: bool)
 signal boss_arena_entered(remaining: float)
 signal timer_expired
-## result: {"outcome": "escaped", "hunt": HuntDefinition, "elapsed": float}
+## Emitted when a boss part breaks and its reward is granted (once per part per run).
+signal part_reward_granted(part: BossPartDefinition, item: ItemDefinition, count: int)
+## Boss defeated (the victory results follow after the death animation).
+signal hunt_completed
+## result: {"outcome": "escaped"|"victory", "hunt", "elapsed", and for victory:
+##          "parts_broken": Array[StringName], "rewards": {item id: count}, "items": {item id: ItemDefinition}}
 signal expedition_ended(result: Dictionary)
 
 @export var hunt: HuntDefinition
@@ -17,6 +22,7 @@ signal expedition_ended(result: Dictionary)
 @export var default_config: ExpeditionConfig
 @export var player_path: NodePath = ^"../Player"
 @export var arena_trigger_path: NodePath = ^"../Level/BossArenaTrigger"
+@export var boss_path: NodePath = ^"../Level/Boss"
 ## The biome scene this expedition runs in (for Retry).
 @export_file("*.tscn") var scene_path: String = ""
 
@@ -25,6 +31,13 @@ var config: ExpeditionConfig
 var is_debug_duration: bool = false
 var arena_entered: bool = false
 var ended: bool = false
+var boss: Kurogale
+## Rewards earned this run: item id -> count, and their definitions.
+var run_rewards: Dictionary = {}
+var run_items: Dictionary = {}
+var parts_broken: Array[StringName] = []
+## True once victory rewards were written to the player profile.
+var rewards_recorded: bool = false
 
 var _player: PlayerController
 
@@ -35,6 +48,10 @@ func _ready() -> void:
 	if trigger:
 		trigger.player_entered.connect(enter_boss_arena)
 	timer.expired.connect(_on_timer_expired)
+	boss = get_node_or_null(boss_path) as Kurogale
+	if boss:
+		boss.part_broken.connect(_on_part_broken)
+		boss.defeated.connect(_on_boss_defeated)
 	start_expedition()
 
 
@@ -76,6 +93,8 @@ func enter_boss_arena() -> void:
 	arena_entered = true
 	timer.stop()
 	boss_arena_entered.emit(timer.remaining)
+	if boss:
+		boss.awaken()
 
 
 ## Test/debug hook: jump the countdown to `seconds` remaining.
@@ -90,6 +109,49 @@ func restart() -> void:
 
 func return_to_hunt_board() -> void:
 	SceneFlow.go_to_hunt_board(get_tree())
+
+
+func _grant(item: ItemDefinition, count: int) -> void:
+	if item == null or count <= 0:
+		return
+	run_rewards[item.id] = int(run_rewards.get(item.id, 0)) + count
+	run_items[item.id] = item
+
+
+func _on_part_broken(part: BossPartDefinition) -> void:
+	if parts_broken.has(part.id):
+		return  # A part can only reward once.
+	parts_broken.append(part.id)
+	_grant(part.reward, part.reward_count)
+	part_reward_granted.emit(part, part.reward, part.reward_count)
+
+
+func _on_boss_defeated() -> void:
+	if ended:
+		return
+	ended = true
+	for item in boss.definition.victory_rewards:
+		_grant(item, 1)
+	_record_rewards()
+	hunt_completed.emit()
+	await get_tree().create_timer(boss.definition.death_time, false, true).timeout
+	if _player:
+		_player.input_enabled = false
+	expedition_ended.emit({"outcome": "victory", "hunt": hunt, "elapsed": timer.elapsed(),
+			"parts_broken": parts_broken.duplicate(), "rewards": run_rewards.duplicate(), "items": run_items.duplicate()})
+
+
+## Write this run's rewards to the persistent player profile (exactly once per run).
+func _record_rewards() -> void:
+	if rewards_recorded:
+		return
+	rewards_recorded = true
+	var profile := PlayerProfile.load_profile()
+	for id in run_rewards:
+		profile.add_material(id, int(run_rewards[id]))
+	if hunt:
+		profile.record_hunt(hunt.id)
+	profile.save()
 
 
 func _on_timer_expired() -> void:

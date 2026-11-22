@@ -3,6 +3,7 @@
 Implemented in Phase 1: move, camera, jump, sprint (dash-run), switch camera, pause (frees the mouse).
 Implemented in Phase 2: climbing, ledge grab, mantle, wall jump — all automatic, no extra buttons (see "Traversal" below).
 Implemented in Phase 4: light attack (3-hit combo), heavy attack, dodge roll, lock-on.
+Implemented in Phase 5: Ember Talisman (fire skill).
 Not yet implemented: interact.
 
 | Action | Keyboard | Controller | Phone (touch) |
@@ -17,6 +18,7 @@ Not yet implemented: interact.
 | Heavy attack (breaks enemy poise) | Right mouse | Y / Triangle | HVY button |
 | Lock-on (press again to release) | Q or middle mouse | Right-stick click | LOCK button |
 | Interact | E | X / Square (context-sensitive) | — (later) |
+| Ember Talisman (fire charm, 4 s cooldown) | F | RB / R1 | FIRE button |
 | Switch camera | V | D-pad down | CAM button |
 | Pause (freezes the expedition timer) | Esc | Start / Menu | **II** button (top right) |
 

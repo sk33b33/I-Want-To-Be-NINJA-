@@ -11,6 +11,10 @@ extends Resource
 ## How long an attack/dodge press is remembered while busy.
 @export var input_buffer: float = 0.3
 
+@export_group("Ember Talisman (fire skill)")
+@export var skill: AttackDefinition
+@export var skill_cooldown: float = 4.0
+
 @export_group("Health")
 @export var max_health: float = 100.0
 ## Seconds of hit-stun after being hurt.

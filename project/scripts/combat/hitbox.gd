@@ -1,7 +1,9 @@
 class_name Hitbox
 extends Area3D
-## An attack's damage volume. While active it hits every overlapping enemy Hurtbox once per
-## activation (never its own team). Lives on physics layer 5 "hitbox", scanning layer 6.
+## An attack's damage volume. While active it hits every overlapping enemy once per activation
+## (never its own team). Several hurtboxes of one creature (body + a breakable part) share a
+## HealthComponent: they count as ONE hit, landing on the part hurtbox when it is overlapped.
+## Lives on physics layer 5 "hitbox", scanning layer 6.
 
 signal hit_landed(hurtbox: Hurtbox, info: DamageInfo)
 
@@ -17,7 +19,6 @@ func _ready() -> void:
 	collision_mask = 32   # layer 6: hurtbox
 	monitoring = true
 	monitorable = false
-	area_entered.connect(_try_hit)
 
 
 func activate(info: DamageInfo) -> void:
@@ -25,8 +26,7 @@ func activate(info: DamageInfo) -> void:
 	_template.team = team
 	_already_hit.clear()
 	active = true
-	for area in get_overlapping_areas():
-		_try_hit(area)
+	_scan()
 
 
 func deactivate() -> void:
@@ -35,20 +35,25 @@ func deactivate() -> void:
 
 func _physics_process(_delta: float) -> void:
 	if active:
-		for area in get_overlapping_areas():
-			_try_hit(area)
+		_scan()
 
 
-func _try_hit(area: Area3D) -> void:
-	if not active or not area is Hurtbox:
-		return
-	var hurtbox := area as Hurtbox
-	if hurtbox.team == team:
-		return
-	var key := hurtbox.get_instance_id()
-	if _already_hit.has(key):
-		return
-	_already_hit[key] = true
-	var info := _template.copy()
-	if hurtbox.receive(info):
-		hit_landed.emit(hurtbox, info)
+func _scan() -> void:
+	# Group overlapped hurtboxes by the creature (health) they belong to; prefer part hurtboxes.
+	var best: Dictionary = {}
+	for area in get_overlapping_areas():
+		var hurtbox := area as Hurtbox
+		if hurtbox == null or hurtbox.team == team or hurtbox.health == null:
+			continue
+		var key := hurtbox.health.get_instance_id()
+		if _already_hit.has(key):
+			continue
+		var current := best.get(key) as Hurtbox
+		if current == null or (current.part_id == &"" and hurtbox.part_id != &""):
+			best[key] = hurtbox
+	for key in best:
+		_already_hit[key] = true
+		var hurtbox := best[key] as Hurtbox
+		var info := _template.copy()
+		if hurtbox.receive(info):
+			hit_landed.emit(hurtbox, info)

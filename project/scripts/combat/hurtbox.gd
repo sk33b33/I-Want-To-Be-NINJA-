@@ -6,11 +6,15 @@ extends Area3D
 signal hit_received(info: DamageInfo)
 ## Emitted when a hit arrives during invulnerability (e.g. a perfectly timed dodge).
 signal hit_evaded(info: DamageInfo)
+## Emitted for hurtboxes with a part_id after the hit lands (Phase 5 part breaks).
+signal part_hit(part_id: StringName, info: DamageInfo)
 
 @export var team: StringName = &"enemy"
 @export var health_path: NodePath
 ## Breakable part this hurtbox belongs to (Phase 5). Empty = main body.
 @export var part_id: StringName = &""
+## Optional elemental weaknesses/resistances of the owner.
+@export var elements: ElementProfile
 
 var health: HealthComponent
 
@@ -31,9 +35,13 @@ func receive(info: DamageInfo) -> bool:
 	if health.invulnerable:
 		hit_evaded.emit(info)
 		return false
+	if elements:
+		info.amount *= elements.multiplier(info.element)
 	if not health.apply_damage(info):
 		return false
 	hit_received.emit(info)
+	if part_id != &"":
+		part_hit.emit(part_id, info)
 	var fx := get_tree().get_first_node_in_group("combat_fx")
 	if fx and fx.has_method("spawn_hit"):
 		fx.spawn_hit(global_position + Vector3.UP * 0.3, info.amount, team == &"player")

@@ -66,6 +66,15 @@ func spawn_hit(at: Vector3, amount: float, on_player: bool) -> void:
 	p.emitting = true
 
 
+## Spark burst without a number (talisman explosions and similar).
+func spawn_burst(at: Vector3, _color: Color) -> void:
+	var p := _sparks[_next]
+	_next = (_next + 1) % pool_size
+	p.global_position = at
+	p.restart()
+	p.emitting = true
+
+
 func _process(delta: float) -> void:
 	for i in pool_size:
 		if _label_time[i] <= 0.0:

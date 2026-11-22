@@ -1,7 +1,7 @@
 class_name ExpeditionResults
 extends Control
-## End-of-expedition screen. Phase 3 only has the timeout outcome ("the beast escaped");
-## victory/part rewards arrive with the boss (Phase 5) and crafting (Phase 7).
+## End-of-expedition screen: timeout ("the beast escaped") or victory (time used, parts broken,
+## materials earned — already saved to the player profile by ExpeditionManager).
 
 @export var manager_path: NodePath
 
@@ -25,6 +25,21 @@ func show_result(result: Dictionary) -> void:
 	var hunt := result.get("hunt") as HuntDefinition
 	var who := hunt.beast_name if hunt else "The beast"
 	match result.get("outcome", ""):
+		"victory":
+			_title.text = "Hunt complete"
+			_title.add_theme_color_override("font_color", UiStyle.SPIRIT)
+			var lines: PackedStringArray = ["%s has fallen." % who,
+					"Time in the jungle: %s" % ExpeditionTimer.format_time(float(result.get("elapsed", 0.0)))]
+			var parts: Array = result.get("parts_broken", [])
+			lines.append("Parts broken: %s" % (", ".join(parts.map(func(p: StringName) -> String: return String(p).capitalize())) if not parts.is_empty() else "none"))
+			var rewards: Dictionary = result.get("rewards", {})
+			var items: Dictionary = result.get("items", {})
+			lines.append("Materials:")
+			for id in rewards:
+				var item := items.get(id) as ItemDefinition
+				lines.append("  + %d  %s" % [int(rewards[id]), item.display_name if item else String(id)])
+			_body.text = "\n".join(lines)
+			_retry.text = "Hunt again"
 		"escaped":
 			_title.text = "The trail went cold"
 			_body.text = "%s escaped into the jungle.\nYou searched for %s." % [

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_hbgp2"]
+
+[resource]
+script = ExtResource("1_hbgp2")
+id = &"thornback_antler"
+display_name = "Thornback Antler"
+description = "A broken antler of living thorn. Still warm."
+color = Color(0.75, 0.65, 0.45, 1)
+rarity = 1

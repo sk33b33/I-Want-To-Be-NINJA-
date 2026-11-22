@@ -1,31 +1,32 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
-[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_7smn1"]
-[ext_resource type="PackedScene" path="res://scenes/biomes/verdant_canopy.tscn" id="2_raeie"]
-[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_hxu8e"]
-[ext_resource type="Script" path="res://scripts/expedition/expedition_manager.gd" id="4_nvumn"]
-[ext_resource type="Resource" path="res://data/hunts/kurogale.tres" id="5_ou6is"]
-[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="6_necax"]
-[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="7_r4lks"]
-[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="8_pg34l"]
-[ext_resource type="Script" path="res://scripts/ui/player_hud.gd" id="9_m4h2d"]
-[ext_resource type="Script" path="res://scripts/ui/expedition_hud.gd" id="10_p8abn"]
-[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="11_s17dp"]
-[ext_resource type="Script" path="res://scripts/ui/expedition_results.gd" id="12_37hlw"]
-[ext_resource type="Script" path="res://scripts/combat/combat_fx.gd" id="13_6llfj"]
-[ext_resource type="Material" path="res://data/materials/firefly.tres" id="14_0bhws"]
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_raeie"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/verdant_canopy.tscn" id="2_hxu8e"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_nvumn"]
+[ext_resource type="Script" path="res://scripts/expedition/expedition_manager.gd" id="4_ou6is"]
+[ext_resource type="Resource" path="res://data/hunts/kurogale.tres" id="5_necax"]
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="6_r4lks"]
+[ext_resource type="Script" path="res://scripts/ui/debug_hud.gd" id="7_pg34l"]
+[ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="8_m4h2d"]
+[ext_resource type="Script" path="res://scripts/ui/player_hud.gd" id="9_p8abn"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_hud.gd" id="10_s17dp"]
+[ext_resource type="Script" path="res://scripts/ui/boss_hud.gd" id="11_37hlw"]
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="12_6llfj"]
+[ext_resource type="Script" path="res://scripts/ui/expedition_results.gd" id="13_0bhws"]
+[ext_resource type="Script" path="res://scripts/combat/combat_fx.gd" id="14_62atk"]
+[ext_resource type="Material" path="res://data/materials/firefly.tres" id="15_i7in8"]
 
 [node name="Main" type="Node3D"]
-script = ExtResource("1_7smn1")
+script = ExtResource("1_raeie")
 
-[node name="Level" parent="." instance=ExtResource("2_raeie")]
+[node name="Level" parent="." instance=ExtResource("2_hxu8e")]
 
-[node name="Player" parent="." instance=ExtResource("3_hxu8e")]
+[node name="Player" parent="." instance=ExtResource("3_nvumn")]
 
 [node name="Expedition" type="Node" parent="."]
-script = ExtResource("4_nvumn")
-hunt = ExtResource("5_ou6is")
-default_config = ExtResource("6_necax")
+script = ExtResource("4_ou6is")
+hunt = ExtResource("5_necax")
+default_config = ExtResource("6_r4lks")
 scene_path = "res://scenes/main/main.tscn"
 
 [node name="UI" type="CanvasLayer" parent="."]
@@ -39,7 +40,7 @@ theme_override_colors/font_color = Color(0.85, 0.85, 0.8, 0.85)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-script = ExtResource("7_r4lks")
+script = ExtResource("7_pg34l")
 camera_rig_path = NodePath("../../Player/CameraRig")
 
 [node name="TouchControls" type="Control" parent="UI"]
@@ -48,7 +49,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-script = ExtResource("8_pg34l")
+script = ExtResource("8_m4h2d")
 
 [node name="PlayerHud" type="Control" parent="UI"]
 layout_mode = 3
@@ -56,7 +57,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-script = ExtResource("9_m4h2d")
+script = ExtResource("9_p8abn")
 player_path = NodePath("../../Player")
 
 [node name="ExpeditionHud" type="Control" parent="UI"]
@@ -65,7 +66,16 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-script = ExtResource("10_p8abn")
+script = ExtResource("10_s17dp")
+manager_path = NodePath("../../Expedition")
+
+[node name="BossHud" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("11_37hlw")
 manager_path = NodePath("../../Expedition")
 
 [node name="PauseMenu" type="Control" parent="UI"]
@@ -73,7 +83,7 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("11_s17dp")
+script = ExtResource("12_6llfj")
 manager_path = NodePath("../../Expedition")
 
 [node name="ExpeditionResults" type="Control" parent="UI"]
@@ -81,9 +91,9 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("12_37hlw")
+script = ExtResource("13_0bhws")
 manager_path = NodePath("../../Expedition")
 
 [node name="CombatFx" type="Node3D" parent="."]
-script = ExtResource("13_6llfj")
-spark_material = ExtResource("14_0bhws")
+script = ExtResource("14_62atk")
+spark_material = ExtResource("15_i7in8")

@@ -20,6 +20,10 @@ extends Resource
 @export var lunge_speed: float = 3.0
 ## How long before the clip slice ends the next combo input is accepted (and the dodge cancel).
 @export var cancel_window: float = 0.25
+## Ranged skills: spawn this projectile at the hit moment instead of using the melee hitbox.
+@export var projectile_scene: PackedScene
+## Element of the hit (e.g. &"fire" for the Ember Talisman). Empty = physical.
+@export var element: StringName = &""
 
 
 func windup_seconds() -> float:

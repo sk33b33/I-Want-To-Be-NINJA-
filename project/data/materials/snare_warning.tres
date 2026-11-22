@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/area_warning.gdshader" id="1_p8ah2"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_p8ah2")
+shader_parameter/color = Color(0.3, 1, 0.35, 1)

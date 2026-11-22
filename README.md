@@ -2,7 +2,7 @@
 
 A 3D jungle ninja hunting adventure for **Android phones and PC**, built in Godot 4.5.
 
-**Status:** Phases 0–4 built: hunt board, 45:00 expedition timer, gloomy procedural Verdant Canopy, Mixamo ninja with climbing, ledge grabs and twin-blade combat (combo, heavy, dodge, lock-on), Thornling enemies, checkpoints, and a boss arena (boss arrives in Phase 5). Human playtests pending. See `docs/PHASES.md`.
+**Status:** Phases 0–5 built: hunt board, 45:00 expedition timer, gloomy procedural Verdant Canopy, Mixamo ninja with climbing and twin-blade combat, Thornlings, and the first boss — Kurogale, the Thornback Stag — with breakable antlers and saved rewards. Human playtests pending. See `docs/PHASES.md`.
 
 ![Verdant Canopy](docs/screenshots/01_spawn_idle.png)
 

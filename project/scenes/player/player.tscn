@@ -63,7 +63,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0
 [node name="WeaponHitbox" type="Area3D" parent="Visual"]
 script = ExtResource("4_yj68g")
 
-[node name="@CollisionShape3D@7" type="CollisionShape3D" parent="Visual/WeaponHitbox"]
+[node name="@CollisionShape3D@16" type="CollisionShape3D" parent="Visual/WeaponHitbox"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.05)
 shape = SubResource("BoxShape3D_wva7c")
 
@@ -94,7 +94,7 @@ script = ExtResource("11_uniwh")
 team = &"player"
 health_path = NodePath("../Health")
 
-[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Hurtbox"]
+[node name="@CollisionShape3D@15" type="CollisionShape3D" parent="Hurtbox"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_vo27k")
 

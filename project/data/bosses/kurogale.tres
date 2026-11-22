@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_jrwdr"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="2_lgl4i"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="3_uin1k"]
+[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="4_hwjqt"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="5_fax44"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="6_qg2wr"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="7_23fs5"]
+
+[sub_resource type="Resource" id="Resource_ef3qq"]
+script = ExtResource("1_jrwdr")
+id = &"antler_sweep"
+display_name = "Antler Sweep"
+telegraph_time = 0.9
+active_time = 0.35
+recovery_time = 1.1
+damage = 24.0
+knockback = 8.0
+max_range = 5.5
+weight = 3.0
+cooldown = 2.5
+counterplay = "Roll away or get behind it; its head stays low afterwards: strike the antlers."
+
+[sub_resource type="Resource" id="Resource_be0d6"]
+script = ExtResource("1_jrwdr")
+id = &"root_snare"
+display_name = "Root Snare"
+telegraph_time = 1.2
+active_time = 0.45
+recovery_time = 0.9
+damage = 18.0
+knockback = 4.0
+min_range = 3.0
+max_range = 22.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "Step out of the glowing green rings before the roots erupt."
+
+[sub_resource type="Resource" id="Resource_kck7j"]
+script = ExtResource("1_jrwdr")
+id = &"charge"
+display_name = "Charge"
+active_time = 0.9
+recovery_time = 1.2
+damage = 28.0
+knockback = 10.0
+move_speed = 15.0
+min_range = 7.0
+max_range = 26.0
+weight = 2.0
+cooldown = 5.0
+counterplay = "Roll sideways off the red strip; if it slams into a pillar it is stunned."
+
+[sub_resource type="Resource" id="Resource_1qcfe"]
+script = ExtResource("1_jrwdr")
+id = &"thorn_burst"
+display_name = "Thorn Burst"
+active_time = 0.3
+recovery_time = 0.9
+knockback = 9.0
+max_range = 5.0
+weight = 2.0
+cooldown = 6.0
+enraged_only = true
+counterplay = "Leave the red ring around it."
+
+[sub_resource type="Resource" id="Resource_50jtk"]
+script = ExtResource("2_lgl4i")
+affinity = &"nature"
+multipliers = {
+&"earth": 0.5,
+&"fire": 1.5
+}
+
+[sub_resource type="Resource" id="Resource_n74kr"]
+script = ExtResource("3_uin1k")
+id = &"antler"
+display_name = "Antlers"
+break_health = 220.0
+reward = ExtResource("4_hwjqt")
+
+[resource]
+script = ExtResource("5_fax44")
+id = &"kurogale"
+display_name = "Kurogale, the Thornback Stag"
+elements = SubResource("Resource_50jtk")
+attacks = Array[ExtResource("1_jrwdr")]([SubResource("Resource_ef3qq"), SubResource("Resource_be0d6"), SubResource("Resource_kck7j"), SubResource("Resource_1qcfe")])
+parts = Array[ExtResource("3_uin1k")]([SubResource("Resource_n74kr")])
+victory_rewards = Array[ExtResource("6_qg2wr")]([ExtResource("7_23fs5")])

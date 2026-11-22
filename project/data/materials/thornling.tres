@@ -12,3 +12,4 @@ shader_parameter/flap_amount = null
 shader_parameter/glow_energy = 2.5
 shader_parameter/spine_color = null
 shader_parameter/spine_idle = null
+shader_parameter/spine_strength = null

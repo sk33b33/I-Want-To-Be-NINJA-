@@ -12,6 +12,7 @@ var _trail: ProgressBar
 var _flash: ColorRect
 var _lock: Label
 var _down: Label
+var _skill: Label
 
 
 func _ready() -> void:
@@ -28,6 +29,7 @@ func _ready() -> void:
 	_combat.player_died.connect(func() -> void: _down.visible = true)
 	_combat.player_respawned.connect(func() -> void: _down.visible = false)
 	_combat.lock_target_changed.connect(func(t: Node3D) -> void: _lock.visible = t != null)
+	_skill.visible = _combat.config.skill != null
 	_on_health_changed(_health.current, _health.max_health)
 
 
@@ -35,6 +37,10 @@ func _process(delta: float) -> void:
 	_flash.color.a = maxf(_flash.color.a - delta * 1.2, 0.0)
 	# The pale "recent damage" trail catches up after a moment.
 	_trail.value = move_toward(_trail.value, _bar.value, delta * 40.0)
+	if _combat and _skill.visible:
+		var left := _combat.skill_cooldown_left
+		_skill.text = "Ember Talisman: ready" if left <= 0.0 else "Ember Talisman: %.1fs" % left
+		_skill.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2) if left <= 0.0 else UiStyle.MUTED)
 
 
 func shown_health() -> float:
@@ -69,6 +75,9 @@ func _build() -> void:
 	_lock = UiStyle.label("LOCKED ON", 16, Color(1.0, 0.45, 0.3))
 	_lock.visible = false
 	box.add_child(_lock)
+	_skill = UiStyle.label("", 16, Color(1.0, 0.6, 0.2))
+	_skill.visible = false
+	box.add_child(_skill)
 	_down = UiStyle.label("Defeated — returning to the last shrine…", 30, UiStyle.DANGER)
 	_down.set_anchors_preset(Control.PRESET_CENTER)
 	_down.position = Vector2(-360, 60)

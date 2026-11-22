@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AttackDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/attack_definition.gd" id="1_lk21y"]
+[ext_resource type="PackedScene" path="res://scenes/combat/fire_talisman.tscn" id="1_pjp1w"]
+
+[resource]
+script = ExtResource("1_lk21y")
+id = &"ember_talisman"
+clip_start = 0.35
+clip_end = 0.95
+clip_hit = 0.7
+speed = 1.6
+damage = 18.0
+stagger = 15.0
+lunge_speed = 0.0
+projectile_scene = ExtResource("1_pjp1w")
+element = &"fire"

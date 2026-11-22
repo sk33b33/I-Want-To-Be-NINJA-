@@ -53,3 +53,13 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Feedback: pooled sparks + damage numbers (`CombatFx`), player health bar with damage trail, red hurt flash, "Defeated" message, lock-on reticle.
 - Touch controls: ATK / HVY / ROLL / LOCK buttons; CAM moved to the top-right.
 - Tests: 16 new combat tests incl. two gate bots.
+
+## 2026-11-22 — Phase 5: first boss — Kurogale, the Thornback Stag
+- Data-driven boss: `BossDefinition` / `BossAttackDefinition` / `BossPartDefinition` (`data/bosses/kurogale.tres`), per-creature `ElementProfile` (fire ×1.5, earth ×0.5).
+- Kurogale (`scripts/bosses/kurogale.gd`, procedural stag with thorned back and branching antlers): dormant until the arena event, roaring intro, stalk, four telegraphed attacks — Antler Sweep (red arc), Root Snare (green rings under the player), Charge (long red strip; stunned if it hits a pillar), Thorn Burst (enraged only, red ring). Enrages at 50% (20% faster tempo). Head lowers during recoveries/staggers so the antlers can be struck.
+- Breakable antlers (220 part damage): break once → long stagger, antlers snap to stubs, weaker sweep, +1 Thornback Antler (granted once per run).
+- One swing touching body and antlers counts as one hit (lands on the part).
+- **Ember Talisman** player skill (F / RB / FIRE button): fire projectile, 4 s cooldown.
+- Victory: "Hunt complete" results (time, parts broken, materials). Rewards written once to `user://profile.json` (`PlayerProfile`); the hunt board lists earned materials.
+- Boss HUD: name, health bar, part status, enrage / part-broken banners. Arena sigil recoloured violet (red now always means danger).
+- Tests: 16 boss tests incl. the gate bot (defeats Kurogale, breaks antlers, no deaths).

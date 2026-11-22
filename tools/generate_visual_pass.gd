@@ -11,8 +11,10 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute("res://data/materials")
 	DirAccess.make_dir_recursive_absolute("res://data/biomes")
 	_materials()
+	_boss_scenes_prerequisites()
 	_data()
 	_enemy_scenes()
+	_boss_scenes()
 	_player_scene()
 	_checkpoint_scene()
 	_level_scene()
@@ -82,10 +84,16 @@ func _materials() -> void:
 	_save(_shader_mat("ring_marker", {}), MAT + "ring_marker.tres")
 	_save(_shader_mat("stone", {"detail_noise": detail, "climb_marks": 1.0}), MAT + "climb_stone.tres")
 	_save(_shader_mat("spirit_flame", {}), MAT + "spirit_flame.tres")
-	_save(_shader_mat("ring_marker", {"color": Color(1.0, 0.15, 0.05), "strength": 0.7}), MAT + "arena_sigil.tres")
+	_save(_shader_mat("ring_marker", {"color": Color(0.5, 0.25, 0.7), "strength": 0.35}), MAT + "arena_sigil.tres")  # Not red: red means danger.
 	_save(_shader_mat("health_bar", {}), MAT + "health_bar.tres")
 	_save(_shader_mat("attack_warning", {}), MAT + "attack_warning.tres")
 	_save(_shader_mat("lock_reticle", {}), MAT + "lock_reticle.tres")
+	_save(_shader_mat("area_warning", {}), MAT + "area_warning.tres")
+	_save(_shader_mat("area_warning", {"color": Color(0.3, 1.0, 0.35)}), MAT + "snare_warning.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.13, 0.11, 0.085), "glow_color": Color(0.5, 1.0, 0.3),
+			"glow_energy": 4.0, "spine_idle": Color(0.12, 0.2, 0.08)}), MAT + "kurogale_body.tres")
+	_save(_shader_mat("creature", {"body_color": Color(0.3, 0.26, 0.2), "spine_idle": Color(0.34, 0.3, 0.22),
+			"spine_color": Color(1.0, 0.25, 0.05), "spine_strength": 0.6}), MAT + "kurogale_antlers.tres")
 	_save(_shader_mat("creature", {"body_color": Color(0.09, 0.08, 0.06), "glow_color": Color(1.0, 0.75, 0.2),
 			"glow_energy": 2.5}), MAT + "thornling.tres")
 	var blade := StandardMaterial3D.new()
@@ -120,6 +128,7 @@ func _data() -> void:
 	_save(load("res://scripts/traversal/traversal_config.gd").new(), "res://data/player/traversal.tres")
 	_expedition_data()
 	_combat_data()
+	_boss_data()
 
 
 func _own(node: Node, owner: Node) -> void:
@@ -579,7 +588,13 @@ func _level_scene() -> void:
 	sigil.position = Vector3(0, 0.06, -120)
 	sigil.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	_root.add_child(sigil)
-	_omni("ArenaGlow", Vector3(0, 5, -120), Color(1.0, 0.15, 0.05), 3.0, 22.0)
+	_omni("ArenaGlow", Vector3(0, 5, -120), Color(0.55, 0.3, 0.8), 2.0, 22.0)
+	# Phase 5: Kurogale sleeps in the arena, facing the gate (+Z).
+	var boss: Node3D = (load("res://scenes/bosses/kurogale.tscn") as PackedScene).instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
+	boss.name = "Boss"
+	boss.position = Vector3(0, 0.2, -121)
+	boss.rotation.y = PI
+	_root.add_child(boss)
 
 	_omni("GateGlow", Vector3(0, 4, -91), Color(1.0, 0.2, 0.08), 2.5, 16.0)
 	_omni("ShrineGlow", Vector3(-9, 2.5, -8), Color(0.2, 0.9, 0.8), 1.2, 9.0)
@@ -645,14 +660,15 @@ func _main_scene() -> void:
 	php.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(php)
 	php.owner = main
-	for spec in [["ExpeditionHud", "res://scripts/ui/expedition_hud.gd"], ["PauseMenu", "res://scripts/ui/pause_menu.gd"],
+	for spec in [["ExpeditionHud", "res://scripts/ui/expedition_hud.gd"], ["BossHud", "res://scripts/ui/boss_hud.gd"],
+			["PauseMenu", "res://scripts/ui/pause_menu.gd"],
 			["ExpeditionResults", "res://scripts/ui/expedition_results.gd"]]:
 		var c := Control.new()
 		c.name = spec[0]
 		c.set_script(load(spec[1]))
 		c.set("manager_path", NodePath("../../Expedition"))
 		c.set_anchors_preset(Control.PRESET_FULL_RECT)
-		c.mouse_filter = Control.MOUSE_FILTER_IGNORE if spec[0] == "ExpeditionHud" else Control.MOUSE_FILTER_STOP
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE if spec[0].ends_with("Hud") else Control.MOUSE_FILTER_STOP
 		ui.add_child(c)
 		c.owner = main
 	var ps := PackedScene.new()
@@ -717,6 +733,8 @@ func _hunt_board_scene() -> void:
 	for id in ["verdant_canopy", "emberwild", "moonfen", "stormcrag"]:
 		list.append(load("res://data/biomes/biome_%s.tres" % id))
 	board.set("biomes", list)
+	var items: Array[ItemDefinition] = [load("res://data/items/thornback_antler.tres"), load("res://data/items/kurogale_hide.tres")]
+	board.set("known_items", items)
 	board.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_pack(board, "res://scenes/ui/hunt_board.tscn")
 
@@ -748,6 +766,12 @@ func _combat_data() -> void:
 	var cfg := PlayerCombatConfig.new()
 	cfg.light_combo = [l1, l2, l3] as Array[AttackDefinition]
 	cfg.heavy = heavy
+	# Ember Talisman: quick throw (first combo slice, sped up) that launches a fire projectile.
+	var skill := _attack("ember_talisman", 0.35, 0.95, 0.7, 1.6, 18.0, 15.0, 2.0, 0.0)
+	skill.element = &"fire"
+	skill.projectile_scene = load("res://scenes/combat/fire_talisman.tscn")
+	_save(skill, "res://data/combat/attack_ember_talisman.tres")
+	cfg.skill = load("res://data/combat/attack_ember_talisman.tres")
 	_save(cfg, "res://data/combat/player_combat.tres")
 	_save(EnemyConfig.new(), "res://data/enemies/thornling.tres")
 
@@ -860,3 +884,211 @@ func _enemy_scenes() -> void:
 	dhurt.add_child(dhc)
 	d.add_child(dhurt)
 	_pack(d, "res://scenes/enemies/training_dummy.tscn")
+
+
+func _item(id: String, name: String, desc: String, color: Color, rarity: int) -> ItemDefinition:
+	var it := ItemDefinition.new()
+	it.id = StringName(id)
+	it.display_name = name
+	it.description = desc
+	it.color = color
+	it.rarity = rarity
+	return _save(it, "res://data/items/%s.tres" % id)
+
+
+func _boss_attack(id: String, name: String, telegraph: float, active: float, recovery: float, damage: float,
+		knockback: float, min_r: float, max_r: float, weight: float, cooldown: float, counter: String) -> BossAttackDefinition:
+	var a := BossAttackDefinition.new()
+	a.id = StringName(id)
+	a.display_name = name
+	a.telegraph_time = telegraph
+	a.active_time = active
+	a.recovery_time = recovery
+	a.damage = damage
+	a.knockback = knockback
+	a.min_range = min_r
+	a.max_range = max_r
+	a.weight = weight
+	a.cooldown = cooldown
+	a.counterplay = counter
+	return a
+
+
+func _boss_data() -> void:
+	DirAccess.make_dir_recursive_absolute("res://data/items")
+	DirAccess.make_dir_recursive_absolute("res://data/bosses")
+	var antler := _item("thornback_antler", "Thornback Antler", "A broken antler of living thorn. Still warm.",
+			Color(0.75, 0.65, 0.45), 1)
+	var hide := _item("kurogale_hide", "Kurogale's Hide", "Bark-like hide carved from the Thornback Stag.",
+			Color(0.35, 0.3, 0.2), 0)
+	var el := ElementProfile.new()
+	el.affinity = &"nature"
+	el.multipliers = {&"fire": 1.5, &"earth": 0.5}
+	var sweep := _boss_attack("antler_sweep", "Antler Sweep", 0.9, 0.35, 1.1, 24.0, 8.0, 0.0, 5.5, 3.0, 2.5,
+			"Roll away or get behind it; its head stays low afterwards: strike the antlers.")
+	var snare := _boss_attack("root_snare", "Root Snare", 1.2, 0.45, 0.9, 18.0, 4.0, 3.0, 22.0, 2.0, 6.0,
+			"Step out of the glowing green rings before the roots erupt.")
+	var charge := _boss_attack("charge", "Charge", 1.0, 0.9, 1.2, 28.0, 10.0, 7.0, 26.0, 2.0, 5.0,
+			"Roll sideways off the red strip; if it slams into a pillar it is stunned.")
+	charge.move_speed = 15.0
+	var burst := _boss_attack("thorn_burst", "Thorn Burst", 1.0, 0.3, 0.9, 20.0, 9.0, 0.0, 5.0, 2.0, 6.0,
+			"Leave the red ring around it.")
+	burst.enraged_only = true
+	var part := BossPartDefinition.new()
+	part.id = &"antler"
+	part.display_name = "Antlers"
+	part.break_health = 220.0
+	part.reward = antler
+	part.reward_count = 1
+	part.break_stagger_time = 2.0
+	var def := BossDefinition.new()
+	def.id = &"kurogale"
+	def.display_name = "Kurogale, the Thornback Stag"
+	def.max_health = 900.0
+	def.elements = el
+	def.attacks = [sweep, snare, charge, burst] as Array[BossAttackDefinition]
+	def.parts = [part] as Array[BossPartDefinition]
+	def.victory_rewards = [hide] as Array[ItemDefinition]
+	_save(def, "res://data/bosses/kurogale.tres")
+
+
+func _warning_quad(node_name: String, size: Vector2, pos: Vector3, mat: String) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.name = node_name
+	var q := QuadMesh.new()
+	q.size = size
+	q.orientation = PlaneMesh.FACE_Y
+	q.material = load(MAT + mat + ".tres")
+	mi.mesh = q
+	mi.position = pos
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi
+
+
+func _area(node_name: String, script: String, team: StringName, shape: Shape3D, pos: Vector3) -> Area3D:
+	var a := Area3D.new()
+	a.name = node_name
+	a.set_script(load(script))
+	a.set("team", team)
+	var c := CollisionShape3D.new()
+	c.shape = shape
+	c.position = pos
+	a.add_child(c)
+	return a
+
+
+func _box_shape(size: Vector3) -> BoxShape3D:
+	var b := BoxShape3D.new()
+	b.size = size
+	return b
+
+
+func _boss_scenes() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/bosses")
+	DirAccess.make_dir_recursive_absolute("res://scenes/combat")
+	# Ember Talisman projectile.
+	var tal := Node3D.new()
+	tal.name = "FireTalisman"
+	tal.set_script(load("res://scripts/combat/fire_talisman.gd"))
+	var sphere := SphereShape3D.new()
+	sphere.radius = 0.45
+	tal.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"player", sphere, Vector3.ZERO))
+	var flame := MeshInstance3D.new()
+	flame.name = "Flame"
+	var fq := QuadMesh.new()
+	fq.size = Vector2(0.5, 0.7)
+	fq.material = load(MAT + "spirit_flame.tres")
+	flame.mesh = fq
+	flame.set_instance_shader_parameter("flame_color", Color(1.0, 0.45, 0.1))
+	flame.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	tal.add_child(flame)
+	var light := OmniLight3D.new()
+	light.light_color = Color(1.0, 0.5, 0.15)
+	light.light_energy = 1.5
+	light.omni_range = 4.0
+	tal.add_child(light)
+	_pack(tal, "res://scenes/combat/fire_talisman.tscn")
+
+	# Root snare hazard.
+	var sn := Node3D.new()
+	sn.name = "RootSnare"
+	sn.set_script(load("res://scripts/bosses/root_snare.gd"))
+	sn.add_child(_warning_quad("Ring", Vector2(3.4, 3.4), Vector3(0, 0.07, 0), "snare_warning"))
+	var roots := Node3D.new()
+	roots.name = "Roots"
+	var rm := MeshInstance3D.new()
+	rm.mesh = ProceduralMeshes.snare_roots(load(MAT + "bark_vertex.tres"))
+	roots.add_child(rm)
+	sn.add_child(roots)
+	var cyl := CylinderShape3D.new()
+	cyl.radius = 1.6
+	cyl.height = 2.0
+	sn.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"enemy", cyl, Vector3(0, 1, 0)))
+	_pack(sn, "res://scenes/bosses/root_snare.tscn")
+
+	# Kurogale.
+	var k := CharacterBody3D.new()
+	k.name = "Kurogale"
+	k.set_script(load("res://scripts/bosses/kurogale.gd"))
+	k.set("definition", load("res://data/bosses/kurogale.tres"))
+	k.set("root_snare_scene", load("res://scenes/bosses/root_snare.tscn"))
+	var col := CollisionShape3D.new()
+	col.name = "Collision"
+	col.shape = _box_shape(Vector3(1.8, 3.0, 4.4))
+	col.position = Vector3(0, 1.5, 0)  # Bottom at the origin, so the boss stands on the ground.
+	k.add_child(col)
+	var vis := Node3D.new()
+	vis.name = "Visual"
+	k.add_child(vis)
+	var body := MeshInstance3D.new()
+	body.name = "Body"
+	body.mesh = ProceduralMeshes.kurogale_body(load(MAT + "kurogale_body.tres"))
+	vis.add_child(body)
+	var ant := MeshInstance3D.new()
+	ant.name = "Antlers"
+	ant.mesh = ProceduralMeshes.kurogale_antlers(load(MAT + "kurogale_antlers.tres"), false)
+	vis.add_child(ant)
+	var stubs := MeshInstance3D.new()
+	stubs.name = "AntlerStubs"
+	stubs.mesh = ProceduralMeshes.kurogale_antlers(load(MAT + "kurogale_antlers.tres"), true)
+	vis.add_child(stubs)
+	var ah := _area("AntlerHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(3.2, 2.4, 2.6)), Vector3(0, 4.0, -2.4))
+	ah.set("part_id", &"antler")
+	ah.set("health_path", NodePath("../../Health"))
+	vis.add_child(ah)
+	var front := Node3D.new()
+	front.name = "Front"
+	k.add_child(front)
+	front.add_child(_area("SweepHitbox", "res://scripts/combat/hitbox.gd", &"enemy", _box_shape(Vector3(6.0, 2.6, 4.2)), Vector3(0, 1.3, -3.6)))
+	front.add_child(_area("ChargeHitbox", "res://scripts/combat/hitbox.gd", &"enemy", _box_shape(Vector3(2.6, 2.6, 1.8)), Vector3(0, 1.3, -2.7)))
+	front.add_child(_warning_quad("SweepWarning", Vector2(6.0, 4.5), Vector3(0, 0.12, -3.8), "attack_warning"))
+	front.add_child(_warning_quad("ChargeWarning", Vector2(2.4, 14.0), Vector3(0, 0.12, -8.5), "attack_warning"))
+	var health := Node.new()
+	health.name = "Health"
+	health.set_script(load("res://scripts/combat/health_component.gd"))
+	k.add_child(health)
+	var bh := _area("BodyHurtbox", "res://scripts/combat/hurtbox.gd", &"enemy", _box_shape(Vector3(2.2, 2.8, 4.6)), Vector3(0, 1.9, 0.2))
+	bh.set("health_path", NodePath("../Health"))
+	k.add_child(bh)
+	var burst := SphereShape3D.new()
+	burst.radius = 5.0
+	k.add_child(_area("BurstHitbox", "res://scripts/combat/hitbox.gd", &"enemy", burst, Vector3(0, 1.0, 0)))
+	k.add_child(_warning_quad("BurstWarning", Vector2(10.0, 10.0), Vector3(0, 0.12, 0), "area_warning"))
+	_pack(k, "res://scenes/bosses/kurogale.tscn")
+
+
+## The talisman projectile scene must exist before the combat data that references it.
+func _boss_scenes_prerequisites() -> void:
+	if not ResourceLoader.exists("res://scenes/combat/fire_talisman.tscn"):
+		_boss_scenes_talisman_only()
+
+
+func _boss_scenes_talisman_only() -> void:
+	DirAccess.make_dir_recursive_absolute("res://scenes/combat")
+	var tal := Node3D.new()
+	tal.name = "FireTalisman"
+	tal.set_script(load("res://scripts/combat/fire_talisman.gd"))
+	var sphere := SphereShape3D.new()
+	sphere.radius = 0.45
+	tal.add_child(_area("Hitbox", "res://scripts/combat/hitbox.gd", &"player", sphere, Vector3.ZERO))
+	_pack(tal, "res://scenes/combat/fire_talisman.tscn")

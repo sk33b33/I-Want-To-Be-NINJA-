@@ -21,6 +21,7 @@ signal player_respawned
 signal lock_target_changed(target: Node3D)
 ## Landed hit -> brief freeze (animator pauses for `seconds`).
 signal hit_stopped(seconds: float)
+signal skill_used(cooldown: float)
 
 enum State { READY, ATTACK, DODGE, HURT, DEAD }
 
@@ -49,6 +50,8 @@ var _dodge_buffer: float = 0.0
 var _sprint_press_time: float = -1.0
 var _knockback: Vector3 = Vector3.ZERO
 var _hit_active: bool = false
+var _skill_buffer: float = 0.0
+var skill_cooldown_left: float = 0.0
 
 
 func _ready() -> void:
@@ -74,6 +77,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_heavy_buffer = config.input_buffer
 	elif event.is_action_pressed("dodge"):
 		_dodge_buffer = config.input_buffer
+	elif event.is_action_pressed("skill"):
+		_skill_buffer = config.input_buffer
 	elif event.is_action_pressed("lock_on"):
 		toggle_lock()
 	# Keyboard: a quick tap of Shift (the sprint key) is a dodge; holding it sprints.
@@ -93,6 +98,8 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 	_heavy_buffer -= delta
 	_dodge_buffer -= delta
 	_dodge_cooldown -= delta
+	_skill_buffer -= delta
+	skill_cooldown_left = maxf(skill_cooldown_left - delta, 0.0)
 	_validate_lock()
 	match state:
 		State.DEAD:
@@ -125,6 +132,12 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 		return true
 	if _heavy_buffer > 0.0 and config.heavy:
 		_start_attack(config.heavy, -1, wish)
+		return true
+	if _skill_buffer > 0.0 and config.skill and skill_cooldown_left <= 0.0:
+		_skill_buffer = 0.0
+		skill_cooldown_left = config.skill_cooldown
+		_start_attack(config.skill, -2, wish)
+		skill_used.emit(config.skill_cooldown)
 		return true
 	return false
 
@@ -235,9 +248,13 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 		info.amount = a.damage
 		info.stagger = a.stagger
 		info.knockback = a.knockback
+		info.element = a.element
 		info.source = body
 		info.attack_name = a.id
-		hitbox.activate(info)
+		if a.projectile_scene:
+			_throw(a, info)
+		else:
+			hitbox.activate(info)
 	elif _hit_active and _t >= windup + a.active_time:
 		_hit_active = false
 		hitbox.deactivate()
@@ -255,6 +272,14 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 		hitbox.deactivate()
 		combo_index = 0
 		_set_state(State.READY)
+
+
+func _throw(a: AttackDefinition, info: DamageInfo) -> void:
+	var projectile := a.projectile_scene.instantiate() as FireTalisman
+	body.get_parent().add_child(projectile)
+	var from := body.global_position + Vector3.UP * 1.3 + _attack_dir * 0.6
+	var to := get_lock_point() if lock_target else from + _attack_dir * 10.0
+	projectile.launch(from, to - from, info)
 
 
 func _on_hit_landed(_hurtbox: Hurtbox, _info: DamageInfo) -> void:

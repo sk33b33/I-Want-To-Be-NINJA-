@@ -1,16 +1,20 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/hunt_board.gd" id="1_bfisk"]
-[ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="2_c2nkp"]
-[ext_resource type="Resource" path="res://data/biomes/biome_verdant_canopy.tres" id="3_3wthv"]
-[ext_resource type="Resource" path="res://data/biomes/biome_emberwild.tres" id="4_0xoth"]
-[ext_resource type="Resource" path="res://data/biomes/biome_moonfen.tres" id="5_p3d1j"]
-[ext_resource type="Resource" path="res://data/biomes/biome_stormcrag.tres" id="6_7yslh"]
+[ext_resource type="Script" path="res://scripts/ui/hunt_board.gd" id="1_0xoth"]
+[ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="2_p3d1j"]
+[ext_resource type="Resource" path="res://data/biomes/biome_verdant_canopy.tres" id="3_7yslh"]
+[ext_resource type="Resource" path="res://data/biomes/biome_emberwild.tres" id="4_24xak"]
+[ext_resource type="Resource" path="res://data/biomes/biome_moonfen.tres" id="5_j8x1f"]
+[ext_resource type="Resource" path="res://data/biomes/biome_stormcrag.tres" id="6_8bmgq"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_xu7b4"]
+[ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="8_x03km"]
+[ext_resource type="Resource" path="res://data/items/kurogale_hide.tres" id="9_f4ar6"]
 
 [node name="HuntBoard" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_bfisk")
-biomes = Array[ExtResource("2_c2nkp")]([ExtResource("3_3wthv"), ExtResource("4_0xoth"), ExtResource("5_p3d1j"), ExtResource("6_7yslh")])
+script = ExtResource("1_0xoth")
+biomes = Array[ExtResource("2_p3d1j")]([ExtResource("3_7yslh"), ExtResource("4_24xak"), ExtResource("5_j8x1f"), ExtResource("6_8bmgq")])
+known_items = Array[ExtResource("7_xu7b4")]([ExtResource("8_x03km"), ExtResource("9_f4ar6")])

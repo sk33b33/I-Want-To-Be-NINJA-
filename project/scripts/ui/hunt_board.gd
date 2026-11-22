@@ -5,7 +5,11 @@ extends Control
 
 @export var biomes: Array[BiomeDefinition] = []
 
+## Display names for material ids shown on the board (data, not code).
+@export var known_items: Array[ItemDefinition] = []
+
 var _start_buttons: Dictionary = {}  # hunt id -> Button
+var materials_label: Label
 
 
 func _ready() -> void:
@@ -38,6 +42,8 @@ func _build() -> void:
 	margin.add_child(col)
 	col.add_child(UiStyle.label("I want to be NINJA", 46))
 	col.add_child(UiStyle.label("Hunt board — choose a jungle and a beast. You have 45 minutes to reach its arena.", 20, UiStyle.MUTED))
+	materials_label = UiStyle.label(_materials_text(), 18, UiStyle.WARNING)
+	col.add_child(materials_label)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -56,6 +62,20 @@ func _build() -> void:
 			first = _start_buttons.get(biome.hunts[0].id)
 	if first:
 		first.grab_focus.call_deferred()
+
+
+func _materials_text() -> String:
+	var profile := PlayerProfile.load_profile()
+	if profile.materials.is_empty():
+		return "Materials: none yet — break beast parts to earn them."
+	var parts: PackedStringArray = []
+	for id in profile.materials:
+		var name := String(id)
+		for item in known_items:
+			if String(item.id) == name:
+				name = item.display_name
+		parts.append("%s ×%d" % [name, int(profile.materials[id])])
+	return "Materials: " + ",  ".join(parts)
 
 
 func _biome_card(biome: BiomeDefinition) -> Control:

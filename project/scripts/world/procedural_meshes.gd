@@ -509,3 +509,78 @@ static func ninja_blade(material: Material) -> ArrayMesh:
 			_quad(st, c0 + th, c1 + th, c1 + Vector3(0, 0, w1) + th * 0.2, c0 + Vector3(0, 0, w0) + th * 0.2,
 					steel, steel, steel, steel)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- boss (Phase 5)
+
+## Kurogale body: tall thorn-backed stag (~2.4 m at the shoulder), facing -Z, head at z ≈ -2.
+## Spines along the back are tagged COLOR.g = 1 (glow), eyes COLOR.a = 1.
+static func kurogale_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	var hide := Color(0, 0, 0, 0)
+	var spine := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 2.1, 0.2), Vector3(0.9, 0.85, 1.7), rng, hide, hide, 6, 10, 0.08)   # Torso.
+	_blob(st, Vector3(0, 2.3, 1.5), Vector3(0.8, 0.75, 0.8), rng, hide, hide, 5, 9, 0.08)    # Haunch.
+	_tube(st, PackedVector3Array([Vector3(0, 2.5, -1.2), Vector3(0, 3.1, -1.7), Vector3(0, 3.3, -2.0)]),
+			PackedFloat32Array([0.55, 0.42, 0.35]), PackedColorArray([hide, hide, hide]), 8, rng, 0.05)  # Neck.
+	_blob(st, Vector3(0, 3.25, -2.35), Vector3(0.36, 0.38, 0.62), rng, hide, hide, 5, 8, 0.06)  # Head.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.24 * sgn, 3.42, -2.65), Vector3(0.07, 0.05, 0.05), rng, eye, eye, 2, 5, 0.0)
+	for lx in [-0.55, 0.55]:
+		for lz in [-0.9, 1.5]:
+			_tube(st, PackedVector3Array([Vector3(lx, 1.9, lz), Vector3(lx * 1.05, 1.0, lz + 0.1), Vector3(lx * 1.05, 0.0, lz)]),
+					PackedFloat32Array([0.26, 0.17, 0.13]), PackedColorArray([hide, hide, hide]), 7, rng)
+	for i in 14:
+		var z := lerpf(-1.1, 1.9, float(i) / 13.0)
+		for sgn in [-1.0, 1.0]:
+			var base := Vector3(0.32 * sgn, 2.75 - absf(z - 0.3) * 0.12, z)
+			var h := rng.randf_range(0.45, 0.8)
+			var tip := base + Vector3(0.25 * sgn, h, 0.25)
+			_tri(st, base - Vector3(0.09, 0, 0), base + Vector3(0.09, 0, 0), tip, spine, spine, spine)
+			_tri(st, base - Vector3(0, 0, 0.09), base + Vector3(0, 0, 0.09), tip, spine, spine, spine)
+	return _finish(st, null, material)
+
+
+## Kurogale's antlers (the breakable part): two branching thorny racks above the head.
+## Whole mesh tagged COLOR.g = 1 so it glows during the Antler Sweep telegraph.
+static func kurogale_antlers(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 78
+	var c := Color(0, 1, 0, 0)
+	for sgn in [-1.0, 1.0]:
+		var base := Vector3(0.22 * sgn, 3.55, -2.3)
+		if broken:
+			var stub := base + Vector3(0.12 * sgn, 0.35, 0.05)
+			_tube(st, PackedVector3Array([base, stub]), PackedFloat32Array([0.09, 0.07]), PackedColorArray([c, c]), 6, rng, 0.15)
+			continue
+		var p1 := base + Vector3(0.5 * sgn, 0.8, 0.2)
+		var p2 := p1 + Vector3(0.6 * sgn, 0.9, 0.3)
+		var p3 := p2 + Vector3(0.3 * sgn, 0.7, -0.2)
+		_tube(st, PackedVector3Array([base, p1, p2, p3]), PackedFloat32Array([0.09, 0.075, 0.055, 0.02]),
+				PackedColorArray([c, c, c, c]), 6, rng, 0.05)
+		for k in 5:
+			var from: Vector3 = [p1, p1, p2, p2, p3][k]
+			var tine := from + Vector3(rng.randf_range(0.1, 0.4) * sgn, rng.randf_range(0.3, 0.6), rng.randf_range(-0.4, 0.2))
+			_tube(st, PackedVector3Array([from, tine]), PackedFloat32Array([0.04, 0.01]), PackedColorArray([c, c]), 5, rng)
+	return _finish(st, null, material)
+
+
+## Root Snare roots: a ring of thorned spikes erupting from the ground (radius ~1.6 m).
+static func snare_roots(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 79
+	var root := Color(0.18, 0.12, 0.07, 0.0)
+	var tip := Color(0.12, 0.25, 0.08, 0.0)
+	for i in 11:
+		var a := TAU * float(i) / 11.0 + rng.randf_range(-0.2, 0.2)
+		var r := rng.randf_range(0.2, 1.4)
+		var base := Vector3(cos(a) * r, -0.2, sin(a) * r)
+		var top := base + Vector3(rng.randf_range(-0.3, 0.3), rng.randf_range(1.0, 1.8), rng.randf_range(-0.3, 0.3))
+		_tube(st, PackedVector3Array([base, (base + top) * 0.5 + Vector3(0.1, 0, 0), top]),
+				PackedFloat32Array([0.16, 0.09, 0.01]), PackedColorArray([root, root, tip]), 5, rng, 0.1)
+	return _finish(st, null, material)

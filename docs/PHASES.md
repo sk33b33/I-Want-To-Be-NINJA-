@@ -86,7 +86,8 @@ Claude must update this section only after evidence of completed work.
 | 2 — Traversal vertical slice | **Implemented, automated checks pass; gate NOT yet passed** | Bot completes the Verdant Canopy route spawn → boss gate in **both** camera modes (climbs rampart, crosses gorge, grabs far-bank ledge, no falls). 42/42 tests incl. 7 traversal tests. Needs a human run of the route on PC and phone. |
 | 3 — Expedition flow & timer | **Implemented, automated checks pass; gate NOT yet passed** | Hunt board → expedition; 45:00 countdown verified at start, pause, resume, arena entry (stops + hides, never restarts or expires) and timeout (results screen). 57/57 tests. Needs a human check of the flow on PC and phone. |
 | 4 — Combat foundation | **Implemented, automated checks pass; gate NOT yet passed** | Light 3-hit combo, heavy, dodge i-frames, hurt/knockback, death → respawn at shrine, lock-on; Thornling enemy with telegraphed lunge + stagger; training dummy. Gate bots: beats two Thornlings without dying, and 15 s of random input never leaves the player stuck. 16 combat tests. Needs a human feel test on PC and phone. |
-| 5–13 | Not started | — |
+| 5 — First boss + part break | **Implemented, automated checks pass; gate NOT yet passed** | Kurogale (Nature, weak to Fire): antler sweep, root snare, charge (stuns on pillars), enraged thorn burst; every attack verified to warn before it can hurt. Antlers break once at 220 damage and reward once; victory grants Kurogale's Hide; rewards saved once to the player profile. Gate bot defeats Kurogale and breaks the antlers without dying. Needs a human fight on PC and phone. |
+| 6–13 | Not started | — |
 
 Note: at the owner's request a **visual pass** (gloomy Verdant Canopy, procedural terrain/flora/fauna, Mixamo ninja) was done ahead of Phase 6/11. It is placeholder-quality procedural art; it does not complete Phase 6 or Phase 11. 33/33 automated tests pass.
 

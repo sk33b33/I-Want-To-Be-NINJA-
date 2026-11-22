@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/fire_talisman.gd" id="1_exhv5"]
+[ext_resource type="Script" path="res://scripts/combat/hitbox.gd" id="2_3olyx"]
+[ext_resource type="Material" path="res://data/materials/spirit_flame.tres" id="3_d0clp"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_exhv5"]
+radius = 0.45
+
+[sub_resource type="QuadMesh" id="QuadMesh_3olyx"]
+material = ExtResource("3_d0clp")
+size = Vector2(0.5, 0.7)
+
+[node name="FireTalisman" type="Node3D"]
+script = ExtResource("1_exhv5")
+
+[node name="Hitbox" type="Area3D" parent="."]
+script = ExtResource("2_3olyx")
+
+[node name="@CollisionShape3D@6" type="CollisionShape3D" parent="Hitbox"]
+shape = SubResource("SphereShape3D_exhv5")
+
+[node name="Flame" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_3olyx")
+
+[node name="@OmniLight3D@7" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.5, 0.15, 1)
+light_energy = 1.5
+omni_range = 4.0

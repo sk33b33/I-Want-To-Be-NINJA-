@@ -11,6 +11,7 @@ uniform float flap_amount = 0.0;
 uniform float glow_energy = 3.0;
 uniform vec3 spine_color : source_color = vec3(1.0, 0.12, 0.04);
 uniform vec3 spine_idle : source_color = vec3(0.08, 0.16, 0.06);
+uniform float spine_strength = 4.0;
 instance uniform float spine_glow = 0.0;
 instance uniform float hit_flash = 0.0;
 
@@ -28,5 +29,5 @@ void fragment() {
 	float spine = step(0.5, COLOR.g);
 	ALBEDO = mix(body_color, spine_idle, spine);
 	ROUGHNESS = 0.8;
-	EMISSION = glow_color * COLOR.a * glow_energy + spine_color * spine * spine_glow * 4.0 + vec3(hit_flash * 1.5);
+	EMISSION = glow_color * COLOR.a * glow_energy + spine_color * spine * spine_glow * spine_strength + vec3(hit_flash * 1.5);
 }

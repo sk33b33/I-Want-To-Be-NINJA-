@@ -167,3 +167,10 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - `HandGrip` (SkeletonModifier3D) closes both hands while the blades are drawn, using the finger pose of the owner's Dual_Weapon_Combo clip (fingers ~70° curled); sheathed hands stay relaxed.
 - `WeaponMount` computes each hand's grip from that hand's own knuckles in the fist pose: the handle runs across the knuckles through the closed fingers and the blade leaves on the thumb side — correct for both hands without per-side numbers.
 - Tests: `grip_test.gd` (3) — fingers closed, handle inside each fist (< 3.5 cm), blade out of the thumb side for both hands, relaxed when sheathed; seen failing on the old code first.
+
+## 2026-11-23 — Slash trails for light and heavy attacks (owner request)
+- `WeaponTrail`: a fading ribbon from each blade's guard to its tip, drawn during the swing of light and heavy attacks (from just before the hit frame to just after the hit window — not during the wind-up, never for the talisman). Smoothed between frames (cubic), fades over 0.16 s, additive and translucent.
+- Heavy attack trail is wider (band runs further down the blade) and brighter; colour follows the forged blade element (fire orange, water blue, lightning pale, earth amber), plain steel-blue otherwise.
+- Data: `data/combat/blade_trail.tres` (`TrailConfig`) and `AttackDefinition.trail_width / trail_intensity` (heavy set in the generator too). LOW quality uses less smoothing.
+- First look was a near-opaque white sheet (additive + scene glow): toned down to a translucent streak, brightest at the tip.
+- Tests: `trail_test.gd` (4).

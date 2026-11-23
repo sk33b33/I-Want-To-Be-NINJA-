@@ -14,6 +14,10 @@ extends Node
 @export var anim_player_path: NodePath = ^"../Visual/NinjaModel/AnimationPlayer"
 ## Where along the blade mesh (its +Y, metres) the fist closes: the middle of the handle.
 @export var handle_centre: float = -0.02
+## Slash trails (one per hand blade).
+@export var trail_config: TrailConfig = preload("res://data/combat/blade_trail.tres")
+
+var trails: Array[WeaponTrail] = []
 
 ## Sheath placement in the player's own frame (the "Visual" node: forward = -Z, left = -X, up = +Y;
 ## metres from the feet): at the left hip, handles forward, blades sloping down and back.
@@ -136,6 +140,12 @@ func _hook_combat() -> void:
 	var combat := get_node_or_null(combat_path) as PlayerCombat
 	if combat == null:
 		return
+	for blade in blades:
+		var trail := WeaponTrail.new()
+		trail.name = "Trail" + blade.get_parent().name
+		add_child(trail)
+		trail.setup(blade, combat, trail_config)
+		trails.append(trail)
 	combat.sword_state_changed.connect(func(drawn: bool) -> void: set_sheathed(not drawn))
 	set_sheathed(not combat.sword_drawn)
 

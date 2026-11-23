@@ -13,3 +13,5 @@ damage = 32.0
 stagger = 30.0
 knockback = 6.0
 lunge_speed = 2.0
+trail_width = 1.3
+trail_intensity = 1.35

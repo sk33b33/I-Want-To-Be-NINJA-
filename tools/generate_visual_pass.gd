@@ -808,6 +808,9 @@ func _combat_data() -> void:
 	var l2 := _attack("light_2", 1.0, 1.45, 1.18, 1.1, 11.0, 8.0, 1.5, 3.0)
 	var l3 := _attack("light_3", 1.45, 2.25, 1.83, 1.0, 17.0, 18.0, 4.0, 4.0)
 	var heavy := _attack("heavy", 2.25, 3.3, 2.68, 0.85, 32.0, 30.0, 6.0, 2.0)
+	heavy.trail_width = 1.3  # Slash trail: wider and brighter than the light combo.
+	heavy.trail_intensity = 1.35
+	_save(heavy, "res://data/combat/attack_heavy.tres")
 	var cfg := PlayerCombatConfig.new()
 	cfg.light_combo = [l1, l2, l3] as Array[AttackDefinition]
 	cfg.heavy = heavy

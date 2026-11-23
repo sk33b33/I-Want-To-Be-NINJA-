@@ -22,6 +22,9 @@ extends Resource
 @export var cancel_window: float = 0.25
 ## Ranged skills: spawn this projectile at the hit moment instead of using the melee hitbox.
 @export var projectile_scene: PackedScene
+## Slash trail (WeaponTrail): band width along the blade (1 = guard to tip) and brightness.
+@export var trail_width: float = 1.0
+@export var trail_intensity: float = 1.0
 ## Element of the hit (e.g. &"fire" for the Ember Talisman). Empty = physical.
 @export var element: StringName = &""
 

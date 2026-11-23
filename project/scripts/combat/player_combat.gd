@@ -253,6 +253,15 @@ func _complete_swap_now() -> void:
 	_swap_t = -1.0
 
 
+## True while a blade attack is swinging (for the slash trail): from `lead` before the hit frame
+## to `tail` after the hit window. Never for the thrown talisman.
+func swing_active(lead: float = 0.1, tail: float = 0.08) -> bool:
+	if state != State.ATTACK or current_attack == null or current_attack.projectile_scene != null:
+		return false
+	var hit := current_attack.windup_seconds()
+	return _t >= hit - lead and _t <= hit + current_attack.active_time + tail
+
+
 func is_busy() -> bool:
 	return state != State.READY
 

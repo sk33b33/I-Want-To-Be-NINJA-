@@ -1,11 +1,18 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
 
 [ext_resource type="Shader" path="res://shaders/basalt.gdshader" id="1_bx21q"]
 [ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_58wmi"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_normal.jpg" id="3_xkbfl"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_albedo.jpg" id="4_q0lda"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_bx21q")
+shader_parameter/tt_tex = ExtResource("4_q0lda")
+shader_parameter/tt_nrm = ExtResource("3_xkbfl")
+shader_parameter/tt_tile = null
+shader_parameter/tt_strength = null
+shader_parameter/tt_normal_strength = null
 shader_parameter/detail_noise = ExtResource("2_58wmi")
 shader_parameter/rock_light = Color(0.24, 0.2, 0.12, 1)
 shader_parameter/rock_dark = Color(0.08, 0.065, 0.04, 1)

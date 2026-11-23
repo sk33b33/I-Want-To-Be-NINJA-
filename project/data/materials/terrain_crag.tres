@@ -1,14 +1,26 @@
-[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+[gd_resource type="ShaderMaterial" load_steps=10 format=3]
 
 [ext_resource type="Shader" path="res://shaders/terrain.gdshader" id="1_resnl"]
 [ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_7jtms"]
 [ext_resource type="Texture2D" path="res://data/materials/noise_macro.tres" id="3_gdeq5"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/forest_floor_normal.jpg" id="3_mhjba"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/forest_floor_albedo.jpg" id="4_1loak"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/mud_path_normal.jpg" id="6_df4le"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/mud_path_albedo.jpg" id="7_8durm"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/cliff_rock_normal.jpg" id="8_m0jd6"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/cliff_rock_albedo.jpg" id="9_33mdh"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_resnl")
 shader_parameter/detail_noise = ExtResource("2_7jtms")
 shader_parameter/macro_noise = ExtResource("3_gdeq5")
+shader_parameter/ground_tex = ExtResource("4_1loak")
+shader_parameter/ground_nrm = ExtResource("3_mhjba")
+shader_parameter/path_tex = ExtResource("7_8durm")
+shader_parameter/path_nrm = ExtResource("6_df4le")
+shader_parameter/rock_tex = ExtResource("9_33mdh")
+shader_parameter/rock_nrm = ExtResource("8_m0jd6")
 shader_parameter/moss_dark = Color(0.06, 0.08, 0.07, 1)
 shader_parameter/moss_light = Color(0.13, 0.17, 0.14, 1)
 shader_parameter/mud = Color(0.11, 0.11, 0.12, 1)
@@ -16,3 +28,9 @@ shader_parameter/rock = Color(0.24, 0.26, 0.3, 1)
 shader_parameter/rock_dark = Color(0.08, 0.09, 0.11, 1)
 shader_parameter/detail_scale = null
 shader_parameter/macro_scale = null
+shader_parameter/ground_tile = null
+shader_parameter/path_tile = null
+shader_parameter/rock_tile = null
+shader_parameter/detail_strength = null
+shader_parameter/photo_colour = null
+shader_parameter/normal_strength = null

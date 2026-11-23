@@ -41,3 +41,11 @@ extends Resource
 @export_range(0.0, 1.0, 0.05) var particle_scale: float = 1.0
 ## Extra flash lights on lightning strikes etc.
 @export var effect_lights: bool = true
+
+@export_group("Surfaces")
+## Normal maps on the CC0-textured ground, rock and stone (global shader uniform
+## `detail_normals`). Off on Low: the bumps cost a few texture reads per pixel.
+@export var detail_normals: bool = true
+## A second, larger ground-texture sample that hides tiling (global uniform `anti_tile`).
+@export var anti_tile: bool = true
+

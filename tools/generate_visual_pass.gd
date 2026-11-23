@@ -30,6 +30,8 @@ func _initialize() -> void:
 
 
 func _save(res: Resource, path: String) -> Resource:
+	if res is ShaderMaterial:
+		Cc0Surfaces.apply(res, path.get_file().get_basename())  # CC0 detail textures (art pass).
 	var err := ResourceSaver.save(res, path)
 	if err != OK:
 		push_error("save failed %s %d" % [path, err])

@@ -2,6 +2,7 @@
 // `rune_glow` (per instance, 0..1) makes the veins blaze — used as a hazard warning
 // (sinking stones, crumbling platforms).
 shader_type spatial;
+#include "res://shaders/include/textured_triplanar.gdshaderinc"
 
 uniform sampler2D detail_noise : hint_default_white, repeat_enable, filter_linear_mipmap;
 uniform vec3 rock_light : source_color = vec3(0.17, 0.15, 0.14);
@@ -26,9 +27,12 @@ void fragment() {
 			+ texture(detail_noise, world_pos.xz * scale).r * w.y
 			+ texture(detail_noise, world_pos.xy * scale).r * w.z;
 	float vein = smoothstep(0.03, 0.0, abs(n - 0.52));
-	vec3 col = mix(rock_dark, rock_light, smoothstep(0.3, 0.8, n));
+	vec3 col = mix(rock_dark, rock_light, smoothstep(0.3, 0.8, n)) * tt_detail(world_pos, w);
 	ALBEDO = col * (1.0 - vein * 0.5);
 	ROUGHNESS = 0.95;
+	if (detail_normals) {
+		NORMAL = normalize((VIEW_MATRIX * vec4(tt_normal(world_pos, world_normal, w), 0.0)).xyz);
+	}
 	EMISSION = ember * vein * (0.06 + rune_glow * 4.0);
 	if (climb_marks > 0.0) {
 		float side = 1.0 - w.y;

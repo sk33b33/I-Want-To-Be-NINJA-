@@ -1,5 +1,6 @@
 // Ancient mossy stone for ruins and route pieces (triplanar, world space, no UVs needed).
 shader_type spatial;
+#include "res://shaders/include/textured_triplanar.gdshaderinc"
 
 uniform sampler2D detail_noise : hint_default_white, repeat_enable, filter_linear_mipmap;
 uniform vec3 stone_light : source_color = vec3(0.32, 0.32, 0.3);
@@ -7,6 +8,7 @@ uniform vec3 stone_dark : source_color = vec3(0.12, 0.125, 0.125);
 uniform vec3 moss : source_color = vec3(0.1, 0.18, 0.07);
 uniform float scale = 0.4;
 uniform float moss_amount = 0.6;
+uniform float seams = 1.0;
 // Optional glowing carved runes (used on the boss gate).
 uniform vec3 rune_color : source_color = vec3(0.0);
 uniform float rune_strength = 0.0;
@@ -29,9 +31,9 @@ void fragment() {
 			+ texture(detail_noise, world_pos.xz * scale).r * w.y
 			+ texture(detail_noise, world_pos.xy * scale).r * w.z;
 	float big = texture(detail_noise, world_pos.xz * scale * 0.15 + world_pos.y * 0.05).r;
-	vec3 col = mix(stone_dark, stone_light, n);
-	// Block seams.
-	float seam = smoothstep(0.03, 0.0, abs(fract(world_pos.y * 0.9) - 0.5) - 0.47);
+	vec3 col = mix(stone_dark, stone_light, n) * tt_detail(world_pos, w);
+	// Block seams (the CC0 stone-block texture has its own, so only without one).
+	float seam = smoothstep(0.03, 0.0, abs(fract(world_pos.y * 0.9) - 0.5) - 0.47) * seams;
 	col *= 1.0 - seam * 0.5;
 	float moss_w = smoothstep(0.35, 0.85, world_normal.y + big * 0.6 - 0.3) * moss_amount;
 	moss_w = max(moss_w, smoothstep(0.65, 0.9, big) * moss_amount * 0.7);
@@ -49,6 +51,9 @@ void fragment() {
 	}
 	ALBEDO = col;
 	ROUGHNESS = 0.9;
+	if (detail_normals) {
+		NORMAL = normalize((VIEW_MATRIX * vec4(tt_normal(world_pos, world_normal, w), 0.0)).xyz);
+	}
 	if (rune_strength > 0.0) {
 		float rune = step(0.82, texture(detail_noise, world_pos.xy * 1.7).r) * (1.0 - w.y);
 		float pulse = 0.6 + 0.4 * sin(TIME * 1.7);

@@ -1,17 +1,25 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
 
 [ext_resource type="Shader" path="res://shaders/stone.gdshader" id="1_vlyb5"]
 [ext_resource type="Texture2D" path="res://data/materials/noise_detail.tres" id="2_c7xo3"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/stone_blocks_normal.jpg" id="3_hk3e7"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/stone_blocks_albedo.jpg" id="4_4yhhs"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_vlyb5")
+shader_parameter/tt_tex = ExtResource("4_4yhhs")
+shader_parameter/tt_nrm = ExtResource("3_hk3e7")
+shader_parameter/tt_tile = null
+shader_parameter/tt_strength = null
+shader_parameter/tt_normal_strength = null
 shader_parameter/detail_noise = ExtResource("2_c7xo3")
 shader_parameter/stone_light = null
 shader_parameter/stone_dark = null
 shader_parameter/moss = null
 shader_parameter/scale = null
 shader_parameter/moss_amount = null
+shader_parameter/seams = 0.0
 shader_parameter/rune_color = null
 shader_parameter/rune_strength = null
 shader_parameter/climb_marks = 1.0

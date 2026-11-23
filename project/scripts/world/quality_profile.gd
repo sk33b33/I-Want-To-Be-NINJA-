@@ -65,6 +65,7 @@ static func apply_to_scene(root: Node) -> void:
 				if env.sky:
 					env.sky.radiance_size = Sky.RADIANCE_SIZE_32
 	apply_brightness(root)
+	apply_surface_detail(q)
 	for n in root.find_children("*", "DirectionalLight3D", true, false):
 		var sun := n as DirectionalLight3D
 		sun.shadow_enabled = sun.shadow_enabled and q.moon_shadows
@@ -77,6 +78,18 @@ static func apply_to_scene(root: Node) -> void:
 		l.distance_fade_begin = q.light_fade_distance
 		l.distance_fade_length = 6.0
 		l.shadow_enabled = false
+
+
+## What apply_surface_detail() last set (the renderer cannot be read back when headless).
+static var surface_detail: Dictionary = {}
+
+
+## Surface detail switches for every CC0-textured material at once (global shader uniforms,
+## so no per-material writes; set once per expedition, never per frame).
+static func apply_surface_detail(q: QualityPreset) -> void:
+	surface_detail = {&"detail_normals": q.detail_normals, &"anti_tile": q.anti_tile}
+	RenderingServer.global_shader_parameter_set(&"detail_normals", q.detail_normals)
+	RenderingServer.global_shader_parameter_set(&"anti_tile", q.anti_tile)
 
 
 ## Picture brightness (GameSettings.brightness) on every WorldEnvironment under `root`. The

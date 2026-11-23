@@ -22,3 +22,5 @@ particle_scale = 0.4
 effect_lights = false
 sky_reflections = false
 sky_flash = false
+detail_normals = false
+anti_tile = false

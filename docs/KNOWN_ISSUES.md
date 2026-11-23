@@ -18,8 +18,8 @@
 - A single save profile (no slots, no cloud sync).
 - The keyboard "tap Shift to roll" shortcut follows whatever key is bound to Sprint.
 
-## Watch on device
-- Android crash a few seconds into an expedition (2026-11-23): slash-trail geometry made static, the per-frame finger modifier replaced by baked clips, the sky no longer re-baked every frame (no sky flash / reflections on Low), shaders warmed up at load, and — the timing match — no more engine WAV looping (ambience/music restart themselves); awaiting confirmation on the owner's phone. If it recurs, the dojo shows a crash report to copy.
+## Resolved on device
+- Android crash a few seconds into every expedition (Galaxy S20, Mali-G77) — **fixed and confirmed by the owner (2026-11-23)**. Cause: the engine's AudioStreamWAV loop wrap (the 8 s ambience loop); loops now restart via `AudioDirector` instead. The other changes made while hunting it stay (static slash-trail geometry, baked fist pose, no per-frame sky writes, shader warm-up, crash reports) — each removes real per-frame or first-draw work on phones.
 
 ## Cosmetic / engine
 - Quitting while a sound is still playing prints "resources still in use at exit" in the console (engine shutdown message; no effect on players or saves).

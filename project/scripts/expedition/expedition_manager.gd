@@ -76,6 +76,8 @@ func _ready() -> void:
 		boss.defeated.connect(_on_boss_defeated)
 	start_expedition()
 	audio.setup.call_deferred(get_parent(), self)  # After every sibling is ready.
+	if ShaderWarmup.is_needed():
+		_warm_up.call_deferred()
 
 
 func _process(delta: float) -> void:
@@ -92,6 +94,15 @@ func start_expedition() -> void:
 	timer.start(resolved[0])
 	CrashReport.note("expedition %s, quality %s, difficulty %s" % [hunt.id if hunt else &"?", QualityProfile.tier(), GameSettings.difficulty])
 	expedition_started.emit(hunt, timer.duration)
+
+
+## Compile every shader up front (see ShaderWarmup) — paused, behind a loading screen.
+func _warm_up() -> void:
+	var w := ShaderWarmup.new()
+	w.name = "ShaderWarmup"
+	add_child(w)
+	await w.run(get_parent())
+	w.queue_free()
 
 
 ## Difficulty (Phase 12): after gear, so armor and difficulty multiply. Never touches the timer.

@@ -20,8 +20,8 @@ static var _started: bool = false
 static var breadcrumbs_path: String = "user://breadcrumbs.log"
 static var previous_breadcrumbs: String = ""
 static var _crumbs: PackedStringArray = []
-const MAX_CRUMBS := 40
-const HEARTBEAT := 2.0
+const MAX_CRUMBS := 80
+const HEARTBEAT := 1.0
 
 
 ## Call once when the game boots (the dojo does this when it is the main scene).

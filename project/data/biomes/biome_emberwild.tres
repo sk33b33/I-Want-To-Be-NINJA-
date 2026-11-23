@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="BiomeDefinition" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="BiomeDefinition" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="1_1dq03"]
 [ext_resource type="Resource" path="res://data/hunts/ashen_oni_tortoise.tres" id="2_nk6ly"]
+[ext_resource type="Resource" path="res://data/hunts/kasai.tres" id="3_nk6ly"]
 [ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="3_wxx3v"]
 
 [resource]
@@ -10,7 +11,7 @@ id = &"emberwild"
 display_name = "Emberwild"
 mood = "Volcanic jungle of black spires and lava."
 expedition_scene = "res://scenes/main/expedition_emberwild.tscn"
-hunts = Array[ExtResource("1_1dq03")]([ExtResource("2_nk6ly")])
+hunts = Array[ExtResource("1_1dq03")]([ExtResource("2_nk6ly"), ExtResource("3_nk6ly")])
 unlocked = true
 requires_hunt = &"kurogale"
 locked_note = "defeat Kurogale to unlock"

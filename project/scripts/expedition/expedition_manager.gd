@@ -69,6 +69,7 @@ func _ready() -> void:
 	timer.expired.connect(_on_timer_expired)
 	if _player and crafting:
 		GearLoadout.apply(_player, Forge.equipped_gear(PlayerProfile.load_profile(), crafting))
+	_swap_in_hunt_boss()
 	boss = get_node_or_null(boss_path) as BossController
 	_apply_difficulty(GameSettings.difficulty_preset())
 	if boss:
@@ -94,6 +95,22 @@ func start_expedition() -> void:
 	timer.start(resolved[0])
 	CrashReport.note("expedition %s, quality %s, difficulty %s" % [hunt.id if hunt else &"?", QualityProfile.tier(), GameSettings.difficulty])
 	expedition_started.emit(hunt, timer.duration)
+
+
+## Phase 13: a jungle can hold several hunts. If the chosen hunt names its own beast, it takes
+## the arena boss's place (same spot and name, so everything else finds it as before).
+func _swap_in_hunt_boss() -> void:
+	if hunt == null or hunt.boss_scene == null:
+		return
+	var old := get_node_or_null(boss_path) as Node3D
+	if old == null:
+		return
+	var beast := hunt.boss_scene.instantiate() as Node3D
+	beast.name = old.name
+	beast.transform = old.transform
+	old.replace_by(beast)
+	old.free()
+	CrashReport.note("hunt beast: %s" % hunt.id)
 
 
 ## Compile every shader up front (see ShaderWarmup) — paused, behind a loading screen.

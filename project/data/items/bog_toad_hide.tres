@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_ke8yh"]
+
+[resource]
+script = ExtResource("1_ke8yh")
+id = &"bog_toad_hide"
+display_name = "Bog Toad Hide"
+description = "Rubbery, damp and impossible to tear."
+color = Color(0.2, 0.3, 0.15, 1)

@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/creature.gdshader" id="1_bqr7v"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_bqr7v")
+shader_parameter/body_color = Color(0.3, 0.4, 0.1, 1)
+shader_parameter/glow_color = Color(0.6, 1, 0.2, 1)
+shader_parameter/flap_speed = null
+shader_parameter/flap_amount = null
+shader_parameter/glow_energy = 3.0
+shader_parameter/spine_color = Color(0.8, 1, 0.3, 1)
+shader_parameter/spine_idle = Color(0.4, 0.6, 0.1, 1)
+shader_parameter/spine_strength = 2.0

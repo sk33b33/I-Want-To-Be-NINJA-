@@ -1,0 +1,129 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_h72db"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/root_snare.tscn" id="2_7fpig"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="3_w81da"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="4_8eamn"]
+[ext_resource type="Resource" path="res://data/items/mantis_scythe.tres" id="5_n20yj"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="6_ml688"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_oq43x"]
+[ext_resource type="Resource" path="res://data/items/ironbark_carapace.tres" id="8_0n4a4"]
+
+[sub_resource type="Resource" id="Resource_oryoa"]
+script = ExtResource("1_h72db")
+id = &"scythe_cross"
+hitbox_node = NodePath("Front/CrossHitbox")
+warning_node = NodePath("Front/CrossWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.35
+glow = 1
+element = &"nature"
+weakened_by_part = &"scythes"
+display_name = "Scythe Cross"
+active_time = 0.35
+recovery_time = 1.1
+damage = 26.0
+knockback = 10.0
+max_range = 5.5
+weight = 3.0
+cooldown = 3.0
+counterplay = "Both scythes rise and cross: step back out of the zone, then strike the scythes as they bury in the ground."
+
+[sub_resource type="Resource" id="Resource_6cyrt"]
+script = ExtResource("1_h72db")
+id = &"leaping_strike"
+kind = 1
+hitbox_node = NodePath("Front/DashHitbox")
+warning_node = NodePath("Front/DashWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.2
+telegraph_wobble = 0.05
+dash_homing = 0.8
+stuns_on_wall = true
+stun_time = 2.6
+element = &"nature"
+display_name = "Leaping Strike"
+active_time = 1.0
+recovery_time = 1.4
+damage = 28.0
+knockback = 12.0
+move_speed = 13.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It crouches and springs along the line: roll sideways late; it stuns itself on the pillars."
+
+[sub_resource type="Resource" id="Resource_wxmin"]
+script = ExtResource("1_h72db")
+id = &"seed_burst"
+kind = 2
+eruption_scene = ExtResource("2_7fpig")
+eruption_offsets = PackedVector3Array(0, 0, 0, 3, 0, 1, -3, 0, 1, 0, 0, -3)
+telegraph_pitch = 0.15
+glow = 2
+element = &"nature"
+display_name = "Seed Burst"
+telegraph_time = 1.3
+active_time = 0.5
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It flicks thorn seeds around you: get out of the green circles before they sprout."
+
+[sub_resource type="Resource" id="Resource_crbe8"]
+script = ExtResource("1_h72db")
+id = &"whirl"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"nature"
+display_name = "Whirling Scythes"
+telegraph_time = 1.2
+active_time = 0.5
+damage = 24.0
+knockback = 9.0
+weight = 2.0
+cooldown = 6.0
+enraged_only = true
+counterplay = "Enraged: it spins with both scythes out — leave the ring."
+
+[sub_resource type="Resource" id="Resource_ikjxq"]
+script = ExtResource("3_w81da")
+affinity = &"nature"
+multipliers = {
+&"fire": 1.5,
+&"nature": 0.5,
+&"water": 0.85
+}
+
+[sub_resource type="Resource" id="Resource_t7oh2"]
+script = ExtResource("4_8eamn")
+id = &"scythes"
+display_name = "Scythes"
+break_health = 230.0
+reward = ExtResource("5_n20yj")
+break_stagger_time = 2.3
+intact_node = NodePath("Visual/Part")
+broken_node = NodePath("Visual/PartStub")
+
+[resource]
+script = ExtResource("6_ml688")
+id = &"kamakiri"
+display_name = "Kamakiri, the Ironbark Mantis"
+max_health = 950.0
+stagger_time = 1.5
+elements = SubResource("Resource_ikjxq")
+attacks = Array[ExtResource("1_h72db")]([SubResource("Resource_oryoa"), SubResource("Resource_6cyrt"), SubResource("Resource_wxmin"), SubResource("Resource_crbe8")])
+parts = Array[ExtResource("4_8eamn")]([SubResource("Resource_t7oh2")])
+victory_rewards = Array[ExtResource("7_oq43x")]([ExtResource("8_0n4a4")])
+walk_speed = 3.4
+turn_sharpness = 4.5
+stalk_distance = 4.8
+head_down_pitch = -0.5
+lock_offset = Vector3(0, 2.6, -1)

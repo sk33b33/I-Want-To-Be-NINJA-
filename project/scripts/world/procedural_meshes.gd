@@ -851,3 +851,192 @@ static func lightning_bolt(material: Material) -> ArrayMesh:
 		cols.append(c)
 	_tube(st, pts, radii, cols, 5, rng)
 	return _finish(st, null, material)
+
+
+# ---------------------------------------------------------------- Phase 13: second beasts
+# Conventions as for the other bosses: faces -Z, COLOR.g = 1 glows in telegraphs, COLOR.a = eyes.
+
+## Kamakiri, the Ironbark Mantis: upright thorax, long abdomen, folded wings, four walking legs.
+static func mantis_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 160
+	var hide := Color(0, 0, 0, 0)
+	var vein := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 1.5, 1.4), Vector3(0.7, 0.6, 1.6), rng, hide, hide, 6, 10, 0.08)            # Abdomen.
+	_tube(st, PackedVector3Array([Vector3(0, 1.6, 0.1), Vector3(0, 2.4, -0.5), Vector3(0, 3.0, -0.9)]),
+			PackedFloat32Array([0.4, 0.3, 0.26]), PackedColorArray([hide, hide, hide]), 8, rng, 0.05)  # Thorax.
+	_blob(st, Vector3(0, 3.25, -1.1), Vector3(0.45, 0.32, 0.35), rng, hide, hide, 4, 8, 0.05)       # Head.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.34 * sgn, 3.32, -1.2), Vector3(0.16, 0.16, 0.14), rng, eye, eye, 3, 6, 0.0)
+		# Antennae.
+		_tube(st, PackedVector3Array([Vector3(0.12 * sgn, 3.5, -1.2), Vector3(0.4 * sgn, 4.1, -1.6)]),
+				PackedFloat32Array([0.03, 0.01]), PackedColorArray([hide, hide]), 4, rng)
+		# Four walking legs.
+		for lz in [0.2, 1.2]:
+			var hip := Vector3(0.3 * sgn, 1.6, lz)
+			_tube(st, PackedVector3Array([hip, hip + Vector3(0.9 * sgn, 0.5, -0.1), Vector3(1.3 * sgn, 0.0, lz - 0.2)]),
+					PackedFloat32Array([0.12, 0.08, 0.04]), PackedColorArray([hide, hide, hide]), 5, rng)
+		# Folded wings along the abdomen (veins glow).
+		var w := Vector3(0.25 * sgn, 2.2, -0.2)
+		_tri(st, w, w + Vector3(0.45 * sgn, -0.35, 2.6), w + Vector3(0.05 * sgn, -0.2, 2.8), vein, vein, vein)
+	return _finish(st, null, material)
+
+
+## The mantis's scythe arms (breakable): two long raptorial forelegs with serrated blades.
+static func mantis_scythes(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 161
+	var c := Color(0, 1, 0, 0)
+	for sgn in [-1.0, 1.0]:
+		var sh := Vector3(0.3 * sgn, 2.6, -0.7)
+		var elbow := sh + Vector3(0.35 * sgn, 0.5, -0.6)
+		if broken:
+			_tube(st, PackedVector3Array([sh, sh + Vector3(0.2 * sgn, 0.25, -0.3)]), PackedFloat32Array([0.13, 0.1]),
+					PackedColorArray([c, c]), 6, rng, 0.15)
+			continue
+		var wrist := elbow + Vector3(0.1 * sgn, -1.1, -0.7)
+		_tube(st, PackedVector3Array([sh, elbow, wrist]), PackedFloat32Array([0.14, 0.11, 0.08]), PackedColorArray([c, c, c]), 6, rng)
+		# Blade: a curved serrated sickle hanging from the wrist.
+		var tip := wrist + Vector3(0.0, 0.9, -0.5)
+		_tri(st, wrist, wrist + Vector3(0, 0.15, -0.1), tip, c, c, c)
+		for k in 4:
+			var a := wrist.lerp(tip, float(k) / 4.0)
+			_tri(st, a, a + Vector3(0, 0.1, -0.05), a + Vector3(0.0, 0.0, -0.18), c, c, c)
+	return _finish(st, null, material)
+
+
+## Kasai, the Cinder Salamander: long low body, splayed legs, flat head, dorsal frill.
+static func salamander_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 162
+	var hide := Color(0, 0, 0, 0)
+	var frill := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	var spine := PackedVector3Array()
+	var radii := PackedFloat32Array()
+	var cols := PackedColorArray()
+	for i in 9:
+		var z := lerpf(-2.2, 2.6, float(i) / 8.0)
+		spine.append(Vector3(sin(i * 0.7) * 0.15, 0.9 + 0.1 * sin(i * 0.9), z))
+		radii.append(lerpf(0.55, 0.75, sin(float(i) / 8.0 * PI)))
+		cols.append(hide)
+	_tube(st, spine, radii, cols, 9, rng, 0.06)
+	_blob(st, Vector3(0, 0.95, -2.6), Vector3(0.75, 0.42, 0.85), rng, hide, hide, 4, 9, 0.05)       # Head.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.45 * sgn, 1.25, -2.85), Vector3(0.12, 0.1, 0.1), rng, eye, eye, 2, 5, 0.0)
+		for lz in [-1.4, 1.6]:
+			var hip := Vector3(0.6 * sgn, 0.9, lz)
+			_tube(st, PackedVector3Array([hip, hip + Vector3(0.7 * sgn, 0.1, -0.1), Vector3(1.4 * sgn, 0.0, lz - 0.3)]),
+					PackedFloat32Array([0.24, 0.17, 0.12]), PackedColorArray([hide, hide, hide]), 6, rng)
+	for i in 10:  # Frill along the back.
+		var p := spine[mini(i, spine.size() - 1)] if i < spine.size() else spine[-1]
+		var base := Vector3(0, p.y + 0.55, lerpf(-2.0, 2.2, float(i) / 9.0))
+		var h := rng.randf_range(0.35, 0.6)
+		_tri(st, base - Vector3(0, 0, 0.18), base + Vector3(0, 0, 0.18), base + Vector3(0, h, 0.1), frill, frill, frill)
+	return _finish(st, null, material)
+
+
+## The salamander's flaming tail (breakable): a long tapering tail ending in flame fronds.
+static func salamander_tail(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 163
+	var c := Color(0, 1, 0, 0)
+	var flame := Color(0, 1, 0, 1)
+	var end_z := 3.6 if broken else 6.2
+	_tube(st, PackedVector3Array([Vector3(0, 0.9, 2.5), Vector3(0.3, 0.7, (2.5 + end_z) * 0.5), Vector3(-0.2, 0.55, end_z)]),
+			PackedFloat32Array([0.5, 0.32, 0.08 if not broken else 0.25]), PackedColorArray([c, c, c]), 8, rng, 0.08 if broken else 0.0)
+	if not broken:
+		for k in 6:
+			var b := Vector3(-0.2, 0.6, 5.6 + k * 0.1)
+			_tri(st, b, b + Vector3(0.12, 0, 0), b + Vector3(rng.randf_range(-0.3, 0.3), rng.randf_range(0.6, 1.0), 0.3), flame, flame, flame)
+	return _finish(st, null, material)
+
+
+## Gamakage, the Bog Toad: a squat warty body, wide head, bulging eyes, folded legs.
+static func toad_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 164
+	var hide := Color(0, 0, 0, 0)
+	var wart := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 1.5, 0.4), Vector3(1.9, 1.3, 2.1), rng, hide, hide, 6, 12, 0.08)          # Body.
+	_blob(st, Vector3(0, 1.8, -1.4), Vector3(1.5, 0.75, 1.0), rng, hide, hide, 5, 10, 0.06)        # Head.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.9 * sgn, 2.55, -1.6), Vector3(0.3, 0.3, 0.3), rng, hide, hide, 3, 7, 0.0)   # Eye bump.
+		_blob(st, Vector3(0.95 * sgn, 2.65, -1.82), Vector3(0.14, 0.14, 0.1), rng, eye, eye, 2, 6, 0.0)
+		# Folded hind legs and front arms.
+		_blob(st, Vector3(1.6 * sgn, 0.9, 1.4), Vector3(0.7, 0.6, 1.1), rng, hide, hide, 4, 8, 0.06)
+		_tube(st, PackedVector3Array([Vector3(1.1 * sgn, 1.2, -1.0), Vector3(1.5 * sgn, 0.0, -1.5)]),
+				PackedFloat32Array([0.3, 0.22]), PackedColorArray([hide, hide]), 6, rng)
+	for i in 26:  # Glowing warts.
+		var a := rng.randf() * TAU
+		var r := rng.randf_range(0.3, 1.6)
+		var base := Vector3(cos(a) * r, 2.6 - r * 0.3, 0.4 + sin(a) * r * 1.1)
+		_tri(st, base - Vector3(0.1, 0, 0), base + Vector3(0.1, 0, 0), base + Vector3(0, 0.22, 0), wart, wart, wart)
+	return _finish(st, null, material)
+
+
+## The toad's throat sac (breakable): a glowing balloon under the chin; broken = deflated folds.
+static func toad_sac(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 165
+	var c := Color(0, 1, 0, 1)
+	if broken:
+		_blob(st, Vector3(0, 1.05, -1.9), Vector3(0.5, 0.18, 0.35), rng, c, c, 3, 8, 0.25)
+	else:
+		_blob(st, Vector3(0, 1.05, -2.0), Vector3(0.9, 0.7, 0.8), rng, c, c, 5, 10, 0.04)
+	return _finish(st, null, material)
+
+
+## Kazekiri, the Gale Wolf: a lean wolf with a storm mane (mane glows in telegraphs).
+static func wolf_body(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 166
+	var hide := Color(0, 0, 0, 0)
+	var mane := Color(0, 1, 0, 0)
+	var eye := Color(0, 0, 0, 1)
+	_blob(st, Vector3(0, 1.55, 0.3), Vector3(0.65, 0.65, 1.5), rng, hide, hide, 5, 10, 0.07)       # Torso.
+	_tube(st, PackedVector3Array([Vector3(0, 1.8, -1.0), Vector3(0, 2.2, -1.5)]), PackedFloat32Array([0.45, 0.36]),
+			PackedColorArray([hide, hide]), 8, rng)                                               # Neck.
+	_blob(st, Vector3(0, 2.25, -1.85), Vector3(0.38, 0.36, 0.45), rng, hide, hide, 4, 8, 0.05)     # Head.
+	_tube(st, PackedVector3Array([Vector3(0, 2.15, -2.15), Vector3(0, 2.05, -2.6)]), PackedFloat32Array([0.2, 0.12]),
+			PackedColorArray([hide, hide]), 6, rng)                                               # Snout.
+	for sgn in [-1.0, 1.0]:
+		_blob(st, Vector3(0.2 * sgn, 2.38, -2.1), Vector3(0.06, 0.05, 0.05), rng, eye, eye, 2, 5, 0.0)
+		var ear := Vector3(0.2 * sgn, 2.55, -1.8)
+		_tri(st, ear, ear + Vector3(0.12 * sgn, 0, 0.1), ear + Vector3(0.05 * sgn, 0.35, 0.05), hide, hide, hide)
+		for lz in [-0.7, 1.2]:
+			_tube(st, PackedVector3Array([Vector3(0.35 * sgn, 1.4, lz), Vector3(0.4 * sgn, 0.7, lz + 0.1), Vector3(0.4 * sgn, 0.0, lz)]),
+					PackedFloat32Array([0.18, 0.12, 0.1]), PackedColorArray([hide, hide, hide]), 6, rng)
+	_tube(st, PackedVector3Array([Vector3(0, 1.8, 1.7), Vector3(0, 1.5, 2.5), Vector3(0, 1.2, 3.1)]),
+			PackedFloat32Array([0.18, 0.14, 0.05]), PackedColorArray([hide, mane, mane]), 6, rng)      # Tail.
+	for i in 16:  # Storm mane spikes along the neck and shoulders.
+		var z := lerpf(-1.6, 0.0, float(i) / 15.0)
+		var base := Vector3(rng.randf_range(-0.2, 0.2), 2.2 - (z + 1.6) * 0.25, z)
+		_tri(st, base - Vector3(0.08, 0, 0), base + Vector3(0.08, 0, 0), base + Vector3(0, rng.randf_range(0.4, 0.7), 0.35), mane, mane, mane)
+	return _finish(st, null, material)
+
+
+## The wolf's storm fangs (breakable): long crackling fangs and jaw spurs at the muzzle.
+static func wolf_fangs(material: Material, broken: bool) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 167
+	var c := Color(0, 1, 0, 1)
+	for sgn in [-1.0, 1.0]:
+		var b := Vector3(0.1 * sgn, 1.98, -2.5)
+		var length := 0.08 if broken else 0.42
+		_tube(st, PackedVector3Array([b, b + Vector3(0.04 * sgn, -length, -0.08)]), PackedFloat32Array([0.05, 0.005]),
+				PackedColorArray([c, c]), 5, rng)
+		var spur := Vector3(0.3 * sgn, 2.0, -2.1)
+		_tube(st, PackedVector3Array([spur, spur + Vector3(0.3 * sgn, (0.05 if broken else 0.25), -0.3 * (0.3 if broken else 1.0))]),
+				PackedFloat32Array([0.06, 0.01]), PackedColorArray([c, c]), 5, rng)
+	return _finish(st, null, material)

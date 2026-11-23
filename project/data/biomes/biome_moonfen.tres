@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="BiomeDefinition" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="BiomeDefinition" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="1_shl18"]
 [ext_resource type="Resource" path="res://data/hunts/nami.tres" id="2_4q5dd"]
+[ext_resource type="Resource" path="res://data/hunts/gamakage.tres" id="3_4q5dd"]
 [ext_resource type="Script" path="res://scripts/expedition/biome_definition.gd" id="3_t7if4"]
 
 [resource]
@@ -10,7 +11,7 @@ id = &"moonfen"
 display_name = "Moonfen"
 mood = "Bioluminescent swamp in violet night."
 expedition_scene = "res://scenes/main/expedition_moonfen.tscn"
-hunts = Array[ExtResource("1_shl18")]([ExtResource("2_4q5dd")])
+hunts = Array[ExtResource("1_shl18")]([ExtResource("2_4q5dd"), ExtResource("3_4q5dd")])
 unlocked = true
 requires_hunt = &"ashen_oni_tortoise"
 locked_note = "defeat the Ashen Oni-Tortoise to unlock"

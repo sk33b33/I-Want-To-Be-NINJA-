@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_sf035"]
+
+[resource]
+script = ExtResource("1_sf035")
+id = &"salamander_hide"
+display_name = "Salamander Hide"
+description = "Slick, heat-proof hide."
+color = Color(0.35, 0.15, 0.1, 1)

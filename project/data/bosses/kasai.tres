@@ -1,0 +1,133 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_x2kvw"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/lava_burst.tscn" id="2_p07q5"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="3_pk5vg"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="4_jtnms"]
+[ext_resource type="Resource" path="res://data/items/cinder_tail.tres" id="5_fpr13"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="6_d07w3"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_obf4n"]
+[ext_resource type="Resource" path="res://data/items/salamander_hide.tres" id="8_sv0ho"]
+
+[sub_resource type="Resource" id="Resource_mre78"]
+script = ExtResource("1_x2kvw")
+id = &"flame_breath"
+hitbox_node = NodePath("Front/BreathHitbox")
+warning_node = NodePath("Front/BreathWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.35
+glow = 1
+element = &"fire"
+weakened_by_part = &"tail"
+display_name = "Flame Breath"
+telegraph_time = 1.2
+active_time = 0.5
+recovery_time = 1.2
+damage = 26.0
+knockback = 8.0
+max_range = 9.0
+weight = 3.0
+cooldown = 3.0
+counterplay = "Its throat glows and the strip in front of it lights up: step to the side — its tail is open behind it."
+
+[sub_resource type="Resource" id="Resource_ot4iw"]
+script = ExtResource("1_x2kvw")
+id = &"belly_slide"
+kind = 1
+hitbox_node = NodePath("Front/DashHitbox")
+warning_node = NodePath("Front/DashWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.2
+telegraph_wobble = 0.05
+dash_homing = 1.0
+stuns_on_wall = true
+stun_time = 2.6
+element = &"fire"
+display_name = "Belly Slide"
+active_time = 1.2
+recovery_time = 1.5
+damage = 26.0
+knockback = 12.0
+move_speed = 12.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It drops flat and slides at you: roll sideways late; it stuns itself on the pillars."
+
+[sub_resource type="Resource" id="Resource_4qf7v"]
+script = ExtResource("1_x2kvw")
+id = &"magma_spit"
+kind = 2
+eruption_scene = ExtResource("2_p07q5")
+eruption_offsets = PackedVector3Array(0, 0, 0, 3, 0, 1, -3, 0, 1, 0, 0, -3)
+telegraph_pitch = 0.15
+glow = 2
+element = &"fire"
+display_name = "Magma Spit"
+telegraph_time = 1.3
+active_time = 0.5
+damage = 22.0
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "Glowing circles open under you: step out before the magma lands."
+
+[sub_resource type="Resource" id="Resource_j82ju"]
+script = ExtResource("1_x2kvw")
+id = &"cinder_ring"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"fire"
+display_name = "Cinder Ring"
+telegraph_time = 1.2
+damage = 24.0
+knockback = 9.0
+max_range = 6.5
+weight = 2.0
+cooldown = 6.0
+enraged_only = true
+counterplay = "Enraged: the ground around it glows; get out of the ring."
+
+[sub_resource type="Resource" id="Resource_hekyb"]
+script = ExtResource("3_pk5vg")
+affinity = &"fire"
+multipliers = {
+&"fire": 0.25,
+&"nature": 0.75,
+&"water": 1.5
+}
+
+[sub_resource type="Resource" id="Resource_cy3a1"]
+script = ExtResource("4_jtnms")
+id = &"tail"
+display_name = "Tail"
+break_health = 240.0
+reward = ExtResource("5_fpr13")
+break_stagger_time = 2.3
+intact_node = NodePath("Visual/Part")
+broken_node = NodePath("Visual/PartStub")
+
+[resource]
+script = ExtResource("6_d07w3")
+id = &"kasai"
+display_name = "Kasai, the Cinder Salamander"
+max_health = 1050.0
+poise = 140.0
+stagger_time = 1.5
+elements = SubResource("Resource_hekyb")
+attacks = Array[ExtResource("1_x2kvw")]([SubResource("Resource_mre78"), SubResource("Resource_ot4iw"), SubResource("Resource_4qf7v"), SubResource("Resource_j82ju")])
+parts = Array[ExtResource("4_jtnms")]([SubResource("Resource_cy3a1")])
+victory_rewards = Array[ExtResource("7_obf4n")]([ExtResource("8_sv0ho")])
+walk_speed = 2.8
+turn_sharpness = 3.5
+stalk_distance = 5.5
+attack_interval = 1.3
+head_down_pitch = -0.25
+lock_offset = Vector3(0, 1.4, -2.2)

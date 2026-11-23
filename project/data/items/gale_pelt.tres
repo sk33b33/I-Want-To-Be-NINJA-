@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_20uns"]
+
+[resource]
+script = ExtResource("1_20uns")
+id = &"gale_pelt"
+display_name = "Gale Pelt"
+description = "A storm-grey pelt that sheds rain."
+color = Color(0.4, 0.45, 0.55, 1)

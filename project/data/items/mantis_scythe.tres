@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_0864l"]
+
+[resource]
+script = ExtResource("1_0864l")
+id = &"mantis_scythe"
+display_name = "Mantis Scythe"
+description = "A serrated scythe of ironbark, sharper than forged steel."
+color = Color(0.8, 0.85, 0.5, 1)
+rarity = 1

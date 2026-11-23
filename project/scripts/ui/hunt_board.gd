@@ -232,6 +232,23 @@ static func is_open(biome: BiomeDefinition, profile: PlayerProfile) -> bool:
 	return int(profile.hunts_completed.get(String(biome.requires_hunt), 0)) > 0
 
 
+## Phase 13: a hunt inside an open jungle may need another hunt first (its second beast).
+static func is_hunt_open(biome: BiomeDefinition, hunt: HuntDefinition, profile: PlayerProfile) -> bool:
+	if not is_open(biome, profile):
+		return false
+	if hunt.requires_hunt == &"" or "--unlock-all" in OS.get_cmdline_user_args() or GameSettings.get_unlock_all():
+		return true
+	return int(profile.hunts_completed.get(String(hunt.requires_hunt), 0)) > 0
+
+
+func _hunt_name(id: StringName) -> String:
+	for b in biomes:
+		for h in b.hunts:
+			if h.id == id:
+				return h.beast_name
+	return String(id).capitalize()
+
+
 func _biome_card(biome: BiomeDefinition) -> Control:
 	var open := is_open(biome, PlayerProfile.load_profile())
 	var accent := biome.accent if open else Color(0.35, 0.35, 0.35)
@@ -242,16 +259,22 @@ func _biome_card(biome: BiomeDefinition) -> Control:
 	card.add_child(col)
 	col.add_child(UiStyle.label(biome.display_name, 30, accent))
 	col.add_child(UiStyle.label(biome.mood, 18, UiStyle.MUTED))
+	var profile := PlayerProfile.load_profile()
 	for hunt in biome.hunts:
-		col.add_child(UiStyle.label(hunt.full_name(), 22, UiStyle.BONE if open else UiStyle.MUTED))
+		var hunt_open := open and is_hunt_open(biome, hunt, profile)
+		col.add_child(UiStyle.label(hunt.full_name(), 22, UiStyle.BONE if hunt_open else UiStyle.MUTED))
 		col.add_child(UiStyle.label("Element: %s   Weak to: %s" % [hunt.element, hunt.weakness], 18, UiStyle.MUTED))
-		if open:
+		if hunt_open:
 			col.add_child(UiStyle.label(hunt.description, 17, UiStyle.MUTED))
 			var minutes := int((hunt.config.duration_seconds if hunt.config else ExpeditionConfig.MIN_DURATION_SECONDS) / 60.0)
 			var b := UiStyle.button("Begin expedition  (%d:00)" % minutes, accent)
 			b.pressed.connect(begin.bind(biome, hunt))
 			col.add_child(b)
 			_start_buttons[hunt.id] = b
+		elif open:
+			var lock := UiStyle.button("Locked — defeat %s first" % _hunt_name(hunt.requires_hunt), accent)
+			lock.disabled = true
+			col.add_child(lock)
 	if not open:
 		var note := biome.locked_note
 		if biome.unlocked and biome.requires_hunt != &"":

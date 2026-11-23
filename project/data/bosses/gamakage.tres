@@ -1,0 +1,135 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_u1mja"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/spirit_spout.tscn" id="2_6kaxe"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="3_1nktn"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="4_j6myb"]
+[ext_resource type="Resource" path="res://data/items/toxin_sac.tres" id="5_0ige7"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="6_feqns"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_3vehx"]
+[ext_resource type="Resource" path="res://data/items/bog_toad_hide.tres" id="8_gdeli"]
+
+[sub_resource type="Resource" id="Resource_oxdse"]
+script = ExtResource("1_u1mja")
+id = &"tongue_lash"
+hitbox_node = NodePath("Front/TongueHitbox")
+warning_node = NodePath("Front/TongueWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.35
+glow = 1
+element = &"water"
+weakened_by_part = &"sac"
+display_name = "Tongue Lash"
+telegraph_time = 1.1
+active_time = 0.35
+recovery_time = 1.2
+damage = 24.0
+knockback = 10.0
+max_range = 10.0
+weight = 3.0
+cooldown = 3.0
+counterplay = "It opens its mouth and the long strip in front lights up: step sideways out of the line."
+
+[sub_resource type="Resource" id="Resource_621ss"]
+script = ExtResource("1_u1mja")
+id = &"belly_flop"
+kind = 1
+hitbox_node = NodePath("Front/DashHitbox")
+warning_node = NodePath("Front/DashWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.2
+telegraph_wobble = 0.05
+dash_homing = 0.6
+stuns_on_wall = true
+stun_time = 2.6
+element = &"water"
+display_name = "Belly Flop"
+telegraph_time = 1.2
+active_time = 1.0
+recovery_time = 1.6
+damage = 30.0
+knockback = 13.0
+move_speed = 10.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It crouches and hops at you: roll sideways late; it stuns itself on the pillars."
+
+[sub_resource type="Resource" id="Resource_8l2ok"]
+script = ExtResource("1_u1mja")
+id = &"venom_bubbles"
+kind = 2
+eruption_scene = ExtResource("2_6kaxe")
+eruption_offsets = PackedVector3Array(0, 0, 0, 3, 0, 1, -3, 0, 1, 0, 0, -3)
+telegraph_pitch = 0.15
+glow = 2
+element = &"water"
+display_name = "Venom Bubbles"
+telegraph_time = 1.4
+active_time = 0.5
+knockback = 5.0
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "Bubbling circles open under you: keep moving and get out before they burst."
+
+[sub_resource type="Resource" id="Resource_sdwi5"]
+script = ExtResource("1_u1mja")
+id = &"croak_shock"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"water"
+display_name = "Croak Shock"
+telegraph_time = 1.2
+damage = 22.0
+knockback = 10.0
+max_range = 7.0
+weight = 2.0
+cooldown = 6.0
+enraged_only = true
+counterplay = "Enraged: its sac swells and the ground around it ripples — get out of the ring."
+
+[sub_resource type="Resource" id="Resource_34hwa"]
+script = ExtResource("3_1nktn")
+affinity = &"water"
+multipliers = {
+&"fire": 0.75,
+&"lightning": 1.5,
+&"poison": 0.25,
+&"water": 0.5
+}
+
+[sub_resource type="Resource" id="Resource_wqerm"]
+script = ExtResource("4_j6myb")
+id = &"sac"
+display_name = "Throat sac"
+break_health = 250.0
+reward = ExtResource("5_0ige7")
+break_stagger_time = 2.3
+intact_node = NodePath("Visual/Part")
+broken_node = NodePath("Visual/PartStub")
+
+[resource]
+script = ExtResource("6_feqns")
+id = &"gamakage"
+display_name = "Gamakage, the Bog Toad"
+max_health = 1150.0
+poise = 160.0
+stagger_time = 1.5
+elements = SubResource("Resource_34hwa")
+attacks = Array[ExtResource("1_u1mja")]([SubResource("Resource_oxdse"), SubResource("Resource_621ss"), SubResource("Resource_8l2ok"), SubResource("Resource_sdwi5")])
+parts = Array[ExtResource("4_j6myb")]([SubResource("Resource_wqerm")])
+victory_rewards = Array[ExtResource("7_3vehx")]([ExtResource("8_gdeli")])
+walk_speed = 2.4
+turn_sharpness = 3.0
+stalk_distance = 5.5
+attack_interval = 1.4
+head_down_pitch = -0.3
+lock_offset = Vector3(0, 1.8, -1.8)

@@ -214,3 +214,15 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Owner: "still a bit too dark". New **Brightness** slider (Settings, dojo and pause menu; 0.8–2.0×, live) scaling each jungle's exposure and ambient light; default **1.5×** (compared on Low at 1.0 / 1.5 / 1.8 — 1.5 shows the ground, ninja and props and still reads moody; 1.8 starts to wash out). `QualityProfile.apply_brightness()` remembers the level's own values so the slider never compounds.
 - Owner: "make the other jungles available so I can test". New dojo switch **Unlock all jungles (testing)** (saved; off by default) — the hunt board refreshes with all four hunts open. The normal unlock chain is unchanged when it is off.
 - Tests: `brightness_unlock_test.gd` (2). 228 total.
+
+## 2026-11-23 — Phase 13, part 1: a second beast in every jungle
+Owner approved Phase 13 scope: second beast per jungle → more weapons → secrets & exploration → day/night & weather (no co-op for now).
+- Four new original beasts, each its own hunt on the board, unlocked by beating that jungle's first beast (or the **Unlock all** testing switch):
+  - **Kamakiri, the Ironbark Mantis** (Verdant Canopy; nature, weak to fire) — Scythe Cross, Leaping Strike, Seed Burst, Whirling Scythes; the scythes break.
+  - **Kasai, the Cinder Salamander** (Emberwild; fire, weak to water) — Flame Breath, Belly Slide, Magma Spit, Cinder Ring; the tail breaks (get behind it).
+  - **Gamakage, the Bog Toad** (Moonfen; water/poison, weak to lightning) — Tongue Lash, Belly Flop, Venom Bubbles, Croak Shock; the throat sac breaks.
+  - **Kazekiri, the Gale Wolf** (Stormcrag; lightning, weak to earth) — Gale Claw, Thunder Lunge, Storm Howl, Static Burst; the storm fangs break.
+- Each drops a part material (Mantis Scythe, Cinder Tail, Toxin Sac, Gale Fang) and a victory hide; they are in the forge catalog, ready for the new weapons in part 2.
+- Beasts are pure data + a generated scene on the existing `BossController` (no new boss code): `tools/generate_beasts.gd` writes boss data, scenes, materials, items and hunts. `HuntDefinition.boss_scene` swaps the beast into the jungle's arena; `HuntDefinition.requires_hunt` + `HuntBoard.is_hunt_open()` gate it.
+- Bodies are procedural primitives (placeholder art, original designs).
+- Tests: `beasts_test.gd` (5) — complete data, every attack warns before it can hurt, the hunt puts its beast in the arena and the part rewards once, unlock order, and a gate bot that defeats each new beast.

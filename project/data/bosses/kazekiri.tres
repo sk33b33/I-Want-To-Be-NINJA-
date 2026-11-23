@@ -1,0 +1,129 @@
+[gd_resource type="Resource" script_class="BossDefinition" load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/bosses/boss_attack_definition.gd" id="1_d6o2y"]
+[ext_resource type="PackedScene" path="res://scenes/bosses/storm_bolt.tscn" id="2_qgtdl"]
+[ext_resource type="Script" path="res://scripts/combat/element_profile.gd" id="3_kue6h"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_part_definition.gd" id="4_o7w32"]
+[ext_resource type="Resource" path="res://data/items/gale_fang.tres" id="5_ef0nt"]
+[ext_resource type="Script" path="res://scripts/bosses/boss_definition.gd" id="6_kckvp"]
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="7_1i7ct"]
+[ext_resource type="Resource" path="res://data/items/gale_pelt.tres" id="8_gwhe4"]
+
+[sub_resource type="Resource" id="Resource_eli1o"]
+script = ExtResource("1_d6o2y")
+id = &"gale_claw"
+hitbox_node = NodePath("Front/ClawHitbox")
+warning_node = NodePath("Front/ClawWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.35
+glow = 1
+element = &"lightning"
+weakened_by_part = &"fangs"
+display_name = "Gale Claw"
+active_time = 0.35
+recovery_time = 1.1
+damage = 24.0
+knockback = 11.0
+max_range = 5.5
+weight = 3.0
+cooldown = 3.0
+counterplay = "It rears and the zone in front lights up: back out, then strike the fangs as it lands."
+
+[sub_resource type="Resource" id="Resource_ohlck"]
+script = ExtResource("1_d6o2y")
+id = &"thunder_lunge"
+kind = 1
+hitbox_node = NodePath("Front/DashHitbox")
+warning_node = NodePath("Front/DashWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = -0.2
+telegraph_wobble = 0.05
+dash_homing = 0.7
+stuns_on_wall = true
+stun_time = 2.6
+element = &"lightning"
+display_name = "Thunder Lunge"
+active_time = 1.0
+recovery_time = 1.4
+damage = 28.0
+knockback = 13.0
+move_speed = 15.0
+min_range = 6.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It crouches and bolts along the line: roll sideways late; it stuns itself on the pillars."
+
+[sub_resource type="Resource" id="Resource_sfjvy"]
+script = ExtResource("1_d6o2y")
+id = &"storm_howl"
+kind = 2
+eruption_scene = ExtResource("2_qgtdl")
+eruption_offsets = PackedVector3Array(0, 0, 0, 3, 0, 1, -3, 0, 1, 0, 0, -3)
+telegraph_pitch = 0.15
+glow = 2
+element = &"lightning"
+display_name = "Storm Howl"
+telegraph_time = 1.3
+damage = 22.0
+min_range = 3.0
+max_range = 26.0
+weight = 2.0
+cooldown = 6.0
+counterplay = "It howls and pale circles open around you: step out before the bolts fall."
+
+[sub_resource type="Resource" id="Resource_kjuyq"]
+script = ExtResource("1_d6o2y")
+id = &"static_burst"
+kind = 3
+hitbox_node = NodePath("BurstHitbox")
+warning_node = NodePath("BurstWarning")
+eruption_offsets = PackedVector3Array(0, 0, 0)
+telegraph_pitch = 0.2
+glow = 1
+tracks_player = false
+element = &"lightning"
+display_name = "Static Burst"
+telegraph_time = 1.2
+damage = 24.0
+knockback = 10.0
+weight = 2.0
+cooldown = 6.0
+enraged_only = true
+counterplay = "Enraged: its mane crackles and the ground around it sparks — leave the ring."
+
+[sub_resource type="Resource" id="Resource_vib4k"]
+script = ExtResource("3_kue6h")
+affinity = &"lightning"
+multipliers = {
+&"earth": 1.5,
+&"lightning": 0.25,
+&"water": 0.85
+}
+
+[sub_resource type="Resource" id="Resource_v6y2u"]
+script = ExtResource("4_o7w32")
+id = &"fangs"
+display_name = "Storm fangs"
+break_health = 220.0
+reward = ExtResource("5_ef0nt")
+break_stagger_time = 2.3
+intact_node = NodePath("Visual/Part")
+broken_node = NodePath("Visual/PartStub")
+
+[resource]
+script = ExtResource("6_kckvp")
+id = &"kazekiri"
+display_name = "Kazekiri, the Gale Wolf"
+max_health = 980.0
+stagger_time = 1.5
+elements = SubResource("Resource_vib4k")
+attacks = Array[ExtResource("1_d6o2y")]([SubResource("Resource_eli1o"), SubResource("Resource_ohlck"), SubResource("Resource_sfjvy"), SubResource("Resource_kjuyq")])
+parts = Array[ExtResource("4_o7w32")]([SubResource("Resource_v6y2u")])
+victory_rewards = Array[ExtResource("7_1i7ct")]([ExtResource("8_gwhe4")])
+walk_speed = 3.8
+turn_sharpness = 5.0
+stalk_distance = 4.8
+attack_interval = 1.15
+head_down_pitch = -0.45
+lock_offset = Vector3(0, 2, -1.6)

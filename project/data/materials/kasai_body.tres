@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/creature.gdshader" id="1_sjaao"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_sjaao")
+shader_parameter/body_color = Color(0.15, 0.08, 0.06, 1)
+shader_parameter/glow_color = Color(1, 0.6, 0.1, 1)
+shader_parameter/flap_speed = null
+shader_parameter/flap_amount = null
+shader_parameter/glow_energy = 4.0
+shader_parameter/spine_color = Color(1, 0.45, 0.05, 1)
+shader_parameter/spine_idle = Color(0.6, 0.18, 0.05, 1)
+shader_parameter/spine_strength = 3.0

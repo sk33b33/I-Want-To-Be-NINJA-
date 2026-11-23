@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="HuntDefinition" load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/bosses/kamakiri.tscn" id="1_x6s7o"]
+[ext_resource type="Resource" path="res://data/expedition/default_expedition.tres" id="2_oqjua"]
+[ext_resource type="Script" path="res://scripts/expedition/hunt_definition.gd" id="3_x18rk"]
+
+[resource]
+script = ExtResource("3_x18rk")
+id = &"kamakiri"
+beast_name = "Kamakiri"
+epithet = "the Ironbark Mantis"
+element = "Nature"
+weakness = "Fire"
+description = "A mantis grown from ironwood bark that hunts from the ruins' shadows. Its scythes cut stone; fire cracks its shell."
+signature = "Scythe cross, leaping strike"
+config = ExtResource("2_oqjua")
+boss_scene = ExtResource("1_x6s7o")
+requires_hunt = &"kurogale"

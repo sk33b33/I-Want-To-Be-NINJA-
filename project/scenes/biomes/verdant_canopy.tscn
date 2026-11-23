@@ -36,6 +36,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/pickup_glowcap.tscn" id="34_01uwr"]
 [ext_resource type="PackedScene" path="res://scenes/world/pickup_ruin_shard.tscn" id="35_fmwee"]
 [ext_resource type="PackedScene" path="res://scenes/world/lore_stone.tscn" id="36_2xlb7"]
+[ext_resource type="Resource" path="res://data/mood/verdant_canopy.tres" id="mood_verdant_canopy"]
 
 [sub_resource type="Sky" id="Sky_xwclo"]
 sky_material = ExtResource("1_hilan")
@@ -113,6 +114,7 @@ eye_material = ExtResource("18_sdyj0")
 firefly_material = ExtResource("19_g7ekt")
 
 [node name="Atmosphere" type="Node3D" parent="."]
+mood = ExtResource("mood_verdant_canopy")
 script = ExtResource("20_1ea3i")
 terrain_path = NodePath("../Terrain")
 sun_path = NodePath("../Moonlight")

@@ -25,3 +25,4 @@ sky_flash = false
 detail_normals = false
 anti_tile = false
 leaf_cards = false
+color_grade_lut = false

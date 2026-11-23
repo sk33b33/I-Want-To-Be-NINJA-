@@ -474,6 +474,7 @@ func _level_scene() -> void:
 	var atmos := Node3D.new()
 	atmos.name = "Atmosphere"
 	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("mood", load("res://data/mood/verdant_canopy.tres"))  # Art pass stage 3 (tools/generate_moods.gd).
 	atmos.set("terrain_path", NodePath("../Terrain"))
 	atmos.set("sun_path", NodePath("../Moonlight"))
 	atmos.set("environment_path", NodePath("../WorldEnvironment"))
@@ -1732,6 +1733,7 @@ func _emberwild_level() -> void:
 	var atmos := Node3D.new()
 	atmos.name = "Atmosphere"
 	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("mood", load("res://data/mood/emberwild.tres"))  # Art pass stage 3 (tools/generate_moods.gd).
 	atmos.set("terrain_path", NodePath("../Terrain"))
 	atmos.set("sun_path", NodePath("../Moonlight"))
 	atmos.set("environment_path", NodePath("../WorldEnvironment"))
@@ -2368,6 +2370,7 @@ func _moonfen_level() -> void:
 	var atmos := Node3D.new()
 	atmos.name = "Atmosphere"
 	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("mood", load("res://data/mood/moonfen.tres"))  # Art pass stage 3 (tools/generate_moods.gd).
 	atmos.set("terrain_path", NodePath("../Terrain"))
 	atmos.set("sun_path", NodePath("../Moonlight"))
 	atmos.set("environment_path", NodePath("../WorldEnvironment"))
@@ -2946,6 +2949,7 @@ func _stormcrag_level() -> void:
 	var atmos := Node3D.new()
 	atmos.name = "Atmosphere"
 	atmos.set_script(load("res://scripts/world/biome_atmosphere.gd"))
+	atmos.set("mood", load("res://data/mood/stormcrag.tres"))  # Art pass stage 3 (tools/generate_moods.gd).
 	atmos.set("terrain_path", NodePath("../Terrain"))
 	atmos.set("sun_path", NodePath("../Moonlight"))
 	atmos.set("environment_path", NodePath("../WorldEnvironment"))

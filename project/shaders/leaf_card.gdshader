@@ -13,6 +13,11 @@ uniform float translucency = 0.35;
 uniform float brightness = 2.0;
 uniform float photo_colour : hint_range(0.0, 1.0) = 0.25;
 uniform float alpha_cut : hint_range(0.0, 1.0) = 0.45;
+// Bioluminescence (copied from the canopy material, see foliage.gdshader).
+uniform vec3 glow_color : source_color = vec3(0.0);
+uniform vec3 glow_color_b : source_color = vec3(0.0);
+
+varying float glow_mix;
 
 void vertex() {
 	vec3 wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -20,6 +25,7 @@ void vertex() {
 	float sway = sin(TIME * wind_speed + phase) * 0.7 + sin(TIME * wind_speed * 2.3 + phase * 1.7) * 0.3;
 	VERTEX.x += sway * wind_strength * COLOR.a;
 	VERTEX.z += cos(TIME * wind_speed * 0.8 + phase) * wind_strength * 0.6 * COLOR.a;
+	glow_mix = clamp(sin(wp.x * 0.11 + sin(wp.z * 0.07) * 2.0) * sin(wp.z * 0.09 + 1.3) * 0.5 + 0.5, 0.0, 1.0);
 }
 
 void fragment() {
@@ -34,4 +40,5 @@ void fragment() {
 	ROUGHNESS = 0.7;
 	SPECULAR = 0.25;
 	BACKLIGHT = c * translucency;
+	EMISSION = mix(glow_color, glow_color_b, glow_mix) * smoothstep(1.25, 1.9, l) * 0.6;
 }

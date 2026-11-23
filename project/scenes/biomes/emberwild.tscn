@@ -38,6 +38,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/pickup_ruin_shard.tscn" id="36_x3401"]
 [ext_resource type="PackedScene" path="res://scenes/world/pickup_glowcap.tscn" id="37_h6367"]
 [ext_resource type="PackedScene" path="res://scenes/world/lore_stone.tscn" id="38_2j35e"]
+[ext_resource type="Resource" path="res://data/mood/emberwild.tres" id="mood_emberwild"]
 
 [sub_resource type="Sky" id="Sky_dv5r5"]
 sky_material = ExtResource("1_46863")
@@ -120,6 +121,7 @@ eye_material = ExtResource("17_7ajtm")
 firefly_material = ExtResource("18_kq6ch")
 
 [node name="Atmosphere" type="Node3D" parent="."]
+mood = ExtResource("mood_emberwild")
 script = ExtResource("19_syyqi")
 terrain_path = NodePath("../Terrain")
 sun_path = NodePath("../Moonlight")

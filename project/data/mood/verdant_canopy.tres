@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="JungleMood" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/jungle_mood.gd" id="1_v542v"]
+
+[resource]
+script = ExtResource("1_v542v")
+sun_color = Color(1, 0.8, 0.55, 1)
+sun_energy = 1.5
+ambient_color = Color(0.2, 0.3, 0.3, 1)
+fog_color = Color(0.22, 0.28, 0.26, 1)
+fog_density = 0.014
+fog_height_density = 0.06
+fog_sun_scatter = 0.3
+saturation = 1.05
+contrast = 1.12
+shadow_tint = Color(0, 0.04, 0.05, 1)
+highlight_tint = Color(1, 0.93, 0.78, 1)
+shaft_color = Color(1, 0.8, 0.45, 1)
+shaft_strength = 0.09
+shaft_width = 4.5
+water_shallow = Color(0.1, 0.45, 0.42, 1)
+water_deep = Color(0.01, 0.1, 0.12, 1)

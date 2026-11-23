@@ -50,3 +50,6 @@ extends Resource
 @export var anti_tile: bool = true
 ## Leaf-spray cards around tree canopies (alpha-tested; extra overdraw). Off on Low.
 @export var leaf_cards: bool = true
+## Split-tone colour grade (JungleMood shadow/highlight tints) as an Environment colour-correction
+## curve. Off on Low (saturation/contrast still apply).
+@export var color_grade_lut: bool = true

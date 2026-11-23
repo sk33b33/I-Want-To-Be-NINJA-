@@ -8,6 +8,9 @@ extends Node3D
 @export var environment_path: NodePath
 @export var seed: int = 555
 
+## Lighting & mood (art pass stage 3), applied once in _ready. Null = keep the scene's values.
+@export var mood: JungleMood
+
 @export_group("Lightning")
 @export var lightning_interval: Vector2 = Vector2(9.0, 24.0)
 @export var lightning_sun_boost: float = 1.6
@@ -49,9 +52,10 @@ func _ready() -> void:
 	_rng.seed = seed
 	_terrain = get_node_or_null(terrain_path) as BiomeTerrain
 	_sun = get_node_or_null(sun_path) as DirectionalLight3D
+	var env_node := get_node_or_null(environment_path) as WorldEnvironment
+	apply_mood(env_node.environment if env_node else null)
 	if _sun:
 		_sun_base_energy = _sun.light_energy
-	var env_node := get_node_or_null(environment_path) as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sky:
 		_sky_material = env_node.environment.sky.sky_material as ShaderMaterial
 	if _terrain == null:
@@ -63,6 +67,40 @@ func _ready() -> void:
 	mist_cards = int(mist_cards * QualityProfile.current().mist_scale)
 	_build_mist()
 	_build_shafts()
+
+
+## Apply `mood` to the environment, sun, light shafts and water (once; values are absolute).
+## Runs before QualityProfile.apply_brightness(), and records the brightness base values itself so
+## the slider always scales this mood's exposure/ambient.
+func apply_mood(env: Environment) -> void:
+	if mood == null:
+		return
+	CrashReport.note("mood: %s" % mood.resource_path.get_file())
+	if _sun:
+		_sun.light_color = mood.sun_color
+		_sun.light_energy = mood.sun_energy
+	if env:
+		env.ambient_light_color = mood.ambient_color
+		env.ambient_light_energy = mood.ambient_energy
+		env.tonemap_exposure = mood.exposure
+		env.set_meta(&"base_exposure", mood.exposure)
+		env.set_meta(&"base_ambient", mood.ambient_energy)
+		env.fog_light_color = mood.fog_color
+		env.fog_density = mood.fog_density
+		env.fog_sky_affect = mood.fog_sky_affect
+		env.fog_height = mood.fog_height
+		env.fog_height_density = mood.fog_height_density
+		env.fog_sun_scatter = mood.fog_sun_scatter
+		env.adjustment_enabled = true
+		env.adjustment_saturation = mood.saturation
+		env.adjustment_contrast = mood.contrast
+		env.adjustment_color_correction = mood.grade_curve() if QualityProfile.current().color_grade_lut else null
+	if shaft_material is ShaderMaterial:
+		shaft_material.set_shader_parameter("color", mood.shaft_color)
+		shaft_material.set_shader_parameter("strength", mood.shaft_strength)
+	if water_material is ShaderMaterial:
+		water_material.set_shader_parameter("shallow", mood.water_shallow)
+		water_material.set_shader_parameter("deep", mood.water_deep)
 
 
 func _process(delta: float) -> void:
@@ -172,7 +210,7 @@ func _build_shafts() -> void:
 	for i in shafts.size():
 		var s := shafts[i]
 		var quad := QuadMesh.new()
-		quad.size = Vector2(2.5, 26.0)
+		quad.size = Vector2(mood.shaft_width if mood else 2.5, 26.0)
 		quad.material = shaft_material
 		for k in 2:  # Two crossed planes read as a volume.
 			var mi := MeshInstance3D.new()

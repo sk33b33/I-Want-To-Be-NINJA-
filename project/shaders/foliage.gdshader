@@ -24,6 +24,10 @@ uniform float detail_tile = 2.2;
 uniform vec3 variation : source_color = vec3(1.25, 1.2, 0.8);
 uniform float variation_amount : hint_range(0.0, 1.0) = 0.35;
 uniform float base_darkening : hint_range(0.0, 1.0) = 0.45;
+// Bioluminescence (Moonfen): veins and the brightest canopy leaves glow, mixing two colours by a
+// slow world pattern. Black = off.
+uniform vec3 glow_color : source_color = vec3(0.0);
+uniform vec3 glow_color_b : source_color = vec3(0.0);
 
 varying vec3 world_pos;
 varying vec3 world_normal;
@@ -54,6 +58,7 @@ void fragment() {
 		side *= smoothstep(0.05, 0.12, across) * (1.0 - smoothstep(0.8, 1.0, across));
 		float edge = smoothstep(0.75, 1.0, across);
 		c = mix(c, c * 1.7 + vec3(0.02, 0.03, 0.0), clamp(midrib + side * 0.6, 0.0, 1.0) * veins);
+		EMISSION = mix(glow_color, glow_color_b, clamp(v * 0.5 + 0.5, 0.0, 1.0)) * clamp(midrib + side * 0.7, 0.0, 1.0);
 		c *= 1.0 - edge * 0.35 * veins;
 	}
 	if (!blade && detail_amount > 0.0) {
@@ -66,6 +71,7 @@ void fragment() {
 		float l = dot(d.rgb, vec3(0.299, 0.587, 0.114)) / max(dot(avg, vec3(0.299, 0.587, 0.114)), 0.001);
 		// Gaps between leaves read as deep shadow inside the canopy.
 		c *= mix(1.0, mix(0.35, l, d.a), detail_amount);
+		EMISSION = mix(glow_color, glow_color_b, clamp(v * 0.5 + 0.5, 0.0, 1.0)) * smoothstep(1.25, 1.9, l) * d.a * 0.6;
 	}
 	ALBEDO = c;
 	ROUGHNESS = 0.75;

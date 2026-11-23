@@ -35,7 +35,9 @@ const TUNING := {
 ## Canopy/broadleaf foliage materials (foliage.gdshader): leaf-spray detail on canopy cores and
 ## veins on broadleaf blades (art pass stage 2). File name -> extra parameters.
 const LEAF_FOLIAGE := {
-	"foliage_leaf": {}, "leaf_scorched": {}, "leaf_fen": {}, "leaf_crag": {},
+	"foliage_leaf": {}, "leaf_scorched": {}, "leaf_crag": {},
+	# Moonfen's bioluminescence (concept art: cyan and magenta glow in deep blue) — stage 3.
+	"leaf_fen": {"glow_color": Color(0.1, 0.9, 1.0) * 0.9, "glow_color_b": Color(1.0, 0.2, 0.85) * 0.9},
 }
 const LEAF_SPRAY := "leaf_spray.png"
 
@@ -56,7 +58,7 @@ static func leaf_cards_for(foliage: Material) -> ShaderMaterial:
 	m.set_shader_parameter("leaves", load(DIR + LEAF_SPRAY))
 	var src := foliage as ShaderMaterial
 	if src:
-		for k in ["tint", "wind_strength", "wind_speed", "translucency", "brightness"]:
+		for k in ["tint", "wind_strength", "wind_speed", "translucency", "brightness", "glow_color", "glow_color_b"]:
 			var v: Variant = src.get_shader_parameter(k)
 			if v != null:
 				m.set_shader_parameter(k, v)

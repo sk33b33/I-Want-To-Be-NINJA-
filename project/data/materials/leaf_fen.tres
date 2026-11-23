@@ -18,3 +18,5 @@ shader_parameter/detail_tile = null
 shader_parameter/variation = null
 shader_parameter/variation_amount = null
 shader_parameter/base_darkening = null
+shader_parameter/glow_color = Color(0.089999996, 0.80999994, 0.9, 0.9)
+shader_parameter/glow_color_b = Color(0.9, 0.17999999, 0.765, 0.9)

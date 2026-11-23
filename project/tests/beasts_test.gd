@@ -12,11 +12,19 @@ const BEASTS := [
 ]
 
 
-func _profile(hunts: Dictionary = {}) -> void:
+## The talisman a hunter brings for each weakness (fire is the default talisman).
+const CHARM_FOR := {&"water": &"mist_charm", &"lightning": &"storm_charm", &"earth": &"stone_charm"}
+
+
+func _profile(hunts: Dictionary = {}, charm: StringName = &"") -> void:
 	PlayerProfile.path = TEST_PROFILE
 	if FileAccess.file_exists(TEST_PROFILE):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PROFILE))
 	var p := PlayerProfile.new()
+	if charm != &"":
+		var catalog: CraftingCatalog = load("res://data/crafting/catalog.tres")
+		p.gear_owned.append(String(charm))
+		Forge.equip(p, catalog.find_gear(charm))
 	p.hunts_completed = hunts
 	p.save()
 
@@ -116,8 +124,8 @@ func test_choosing_the_hunt_puts_its_beast_in_the_arena_and_the_part_rewards_onc
 		var reward := boss.definition.parts[0].reward.id
 		check(int(m.run_rewards.get(reward, 0)) == 1, "%s rewards %s once" % [row[0], reward])
 		check(not (boss.get_node("Visual/Part") as Node3D).visible and (boss.get_node("Visual/PartStub") as Node3D).visible, "%s shows the broken part" % row[0])
-		main.free()
 		_nodes.erase(main)
+		main.free()
 		await physics_frames(3)
 	_done()
 
@@ -144,7 +152,7 @@ func test_second_beasts_unlock_after_the_first_or_with_the_testing_switch() -> v
 ## Phase 13 gate (part 1): the bot beats each new beast in its arena.
 func test_gate_bot_defeats_every_new_beast() -> void:
 	for row in BEASTS:
-		_profile()
+		_profile({}, CHARM_FOR.get(row[4], &""))
 		var main := _expedition(row)
 		await physics_frames(10)
 		var player := main.get_node("Player") as PlayerController
@@ -155,7 +163,7 @@ func test_gate_bot_defeats_every_new_beast() -> void:
 		check(boss.state == BossController.State.DEFEATED, "%s defeated (hp %.0f)" % [row[0], boss.get_health().current])
 		await physics_frames(int(boss.definition.death_time * 60.0) + 30)
 		check(int(PlayerProfile.load_profile().hunts_completed.get(row[0], 0)) == 1, "%s hunt recorded" % row[0])
-		main.free()
 		_nodes.erase(main)
+		main.free()
 		await physics_frames(3)
 	_done()

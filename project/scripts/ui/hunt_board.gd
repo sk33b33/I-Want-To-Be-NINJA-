@@ -28,7 +28,48 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	GameSettings.ensure_loaded()  # Applies saved readability options to the warning materials.
+	if get_tree().current_scene == self:  # Booted as the game (not in a test / benchmark).
+		CrashReport.begin_session(get_tree())
 	_build()
+	if CrashReport.previous_crashed:
+		_show_crash_report()
+
+
+## After a crash: show the end of the previous session's log so the owner can send it.
+func _show_crash_report() -> void:
+	var overlay := Control.new()
+	overlay.name = "CrashReport"
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var panel := UiStyle.panel()
+	panel.name = "CrashReportPanel"
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 10)
+	panel.add_child(col)
+	col.add_child(UiStyle.label("The game closed unexpectedly last time.", 26, UiStyle.WARNING))
+	col.add_child(UiStyle.label("Please copy this report and send it to the developer.", 17, UiStyle.MUTED))
+	var text := TextEdit.new()
+	text.text = CrashReport.previous_log_tail
+	text.editable = false
+	text.custom_minimum_size = Vector2(900, 320)
+	text.add_theme_font_size_override("font_size", 13)
+	col.add_child(text)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	var copy := UiStyle.button("Copy report")
+	copy.pressed.connect(func() -> void:
+		DisplayServer.clipboard_set(CrashReport.previous_log_tail)
+		copy.text = "Copied")
+	row.add_child(copy)
+	var close := UiStyle.button("Close", UiStyle.MUTED)
+	close.pressed.connect(func() -> void:
+		CrashReport.dismiss()
+		overlay.queue_free())
+	row.add_child(close)
+	col.add_child(row)
+	overlay.add_child(UiStyle.dim_backdrop(0.7))
+	overlay.add_child(UiStyle.centered(panel))
+	add_child(overlay)
+	copy.grab_focus.call_deferred()
 
 
 ## Start the given hunt's expedition (also used by tests).

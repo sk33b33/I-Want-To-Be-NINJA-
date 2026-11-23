@@ -19,7 +19,7 @@
 - The keyboard "tap Shift to roll" shortcut follows whatever key is bound to Sprint.
 
 ## Watch on device
-- Android crash during light attacks (2026-11-23) — fixed by making the slash trail's geometry static; awaiting confirmation on the owner's phone.
+- Android crash a few seconds into an expedition (2026-11-23): slash-trail geometry made static, and the per-frame finger modifier replaced by baked clips; awaiting confirmation on the owner's phone. If it recurs, the dojo shows a crash report to copy.
 
 ## Cosmetic / engine
 - Quitting while a sound is still playing prints "resources still in use at exit" in the console (engine shutdown message; no effect on players or saves).

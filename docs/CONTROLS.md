@@ -51,6 +51,8 @@ Stormcrag: on the storm plateau a pale ring appears where you stand — move on 
 
 Sprinting into a climbable wall (sprint + jump at the wall) plays a kick-up onto the wall before the climb.
 
+If the game ever closes unexpectedly, the dojo shows a report on the next launch — press **Copy report** and send it to the developer.
+
 Light and heavy attacks leave a slash trail behind the blades (heavy: wider and brighter; coloured by a forged blade's element).
 
 Blades: draw / sheathe puts both blades in the left-hip sheath or back in hand. Standing still plays the full animation; on the move you keep running and the blades change place on time; a roll finishes it at once. Attacking with sheathed blades draws them and attacks in one press. Expeditions start with blades drawn.

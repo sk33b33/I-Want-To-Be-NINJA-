@@ -180,3 +180,10 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - The trail mesh is now a fixed 32-point strip built once; each frame only shader uniforms change (`shaders/slash_trail.gdshader` positions the vertices). Looks the same.
 - While verifying in the real renderer: unused trail points collapsed to the world origin and drew a streak to the ground — they now collapse onto the last real point.
 - Regression test: the trail mesh is the same object with the same fixed vertex count after repeated swings (failed on the old trail). Needs the owner's retest on the phone to confirm the crash is gone.
+
+## 2026-11-23 — Android crash, round 2: remove the per-frame finger modifier; crash reports
+- The owner's screen recording showed the Godot app closing ~8 s into an expedition **while only walking** (no attacks) — so not the slash trail (hidden when not attacking). The only other change since the owner's crash-free run to the boss was the grip fix's `HandGrip`, a SkeletonModifier3D rewriting 30 finger bones every frame.
+- `HandGrip` no longer runs at runtime: the fist is baked into the clips' finger tracks once at load (weapon clips keep their own hands). Trade-off: the hands are also closed while the blades are sheathed. Grips, fists and blade placement are unchanged.
+- **Crash reports:** Godot's log file is now written on phones too; a session marker detects a crash, and the next launch shows the end of the previous session's log in the dojo with **Copy report** (backgrounded apps closed by the OS do not count as crashes). Breadcrumbs: session start (version, device, quality), expedition start, arena entry.
+- Tests: grip suite — no game-added skeleton modifier, fist baked into Run/Sprint/Climb/Idle (failed on the modifier version); `crash_report_test.gd` (4). End-to-end: a killed session is reported on the next launch with its log tail.
+- Still needs the owner's retest on the phone; if it crashes again, the dojo report (Copy) is what to send.

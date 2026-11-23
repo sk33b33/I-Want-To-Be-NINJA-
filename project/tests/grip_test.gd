@@ -81,12 +81,23 @@ func test_left_and_right_blades_mirror_each_other() -> void:
 		check(blade_dir.dot(across) > 0.8, "%s blade comes out of the thumb side (%.2f)" % [side, blade_dir.dot(across)])
 
 
-func test_hands_relax_when_the_blades_are_sheathed() -> void:
+## Regression (owner, Android): the per-frame finger modifier was followed by Godot crashing a
+## few seconds into an expedition, even just walking. The fist must be baked into the clips —
+## nothing may modify the skeleton at runtime.
+func test_fist_is_baked_into_the_clips_not_applied_every_frame() -> void:
 	var p := _player()
-	await physics_frames(30)
-	p.combat.start_swap(false)
-	await physics_frames(int(p.combat.config.sheathe_time * 60.0) + 10)
+	await physics_frames(10)
 	var sk := _sk(p)
-	check(not p.combat.sword_drawn, "sheathed")
-	var pose: Dictionary = await _final(sk)
-	check(pose["Right_curl"] < 30.0 and pose["Left_curl"] < 30.0, "open hands (%.0f° / %.0f°)" % [pose["Right_curl"], pose["Left_curl"]])
+	# (Godot adds an empty PhysicalBoneSimulator3D on its own — present in the crash-free build too.)
+	var ours := sk.find_children("*", "SkeletonModifier3D", true, false).filter(
+			func(m: Node) -> bool: return not m is PhysicalBoneSimulator3D)
+	check(ours.is_empty(), "no runtime skeleton modifier from the game (%s)" % str(ours))
+	var ap := p.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	for clip in [&"Run", &"Sprint", &"Climb_Up_Wall", &"Idle"]:
+		var a := ap.get_animation(clip)
+		var t := a.find_track(^"Armature/Skeleton3D:mixamorig_RightHandMiddle1", Animation.TYPE_ROTATION_3D)
+		var rest := sk.get_bone_rest(sk.find_bone("mixamorig_RightHandMiddle1")).basis.get_rotation_quaternion()
+		var curl := rad_to_deg(rest.angle_to(a.rotation_track_interpolate(t, 0.3))) if t >= 0 else 0.0
+		check(curl > 45.0, "%s has the fist baked in (%.0f°)" % [clip, curl])
+	var own := ap.get_animation(&"Draw_Sword")
+	check(own.find_track(^"Armature/Skeleton3D:mixamorig_RightHandMiddle1", Animation.TYPE_ROTATION_3D) >= 0, "weapon clips keep their own hands")

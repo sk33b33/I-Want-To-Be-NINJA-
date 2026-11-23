@@ -41,11 +41,9 @@ func _ready() -> void:
 		push_warning("WeaponMount: skeleton not found")
 		return
 	var mesh := ProceduralMeshes.ninja_blade(blade_material)
-	# The fist first: the grip is computed from the closed fingers.
+	# The fist first: the grip is computed from the closed fingers (baked into the clips later).
 	grip = HandGrip.new()
-	grip.name = "HandGrip"
-	skeleton.add_child(grip)
-	grip.capture(get_node_or_null(anim_player_path) as AnimationPlayer, grip_pose_clip, grip_pose_time)
+	grip.capture(skeleton, get_node_or_null(anim_player_path) as AnimationPlayer, grip_pose_clip, grip_pose_time)
 	for bone in hand_bones:
 		var att := BoneAttachment3D.new()
 		att.name = bone.trim_prefix("mixamorig_") + "Attachment"
@@ -133,8 +131,10 @@ func _calibrate_sheath() -> void:
 
 
 func _hook_combat() -> void:
-	# Wait for the animator to pose the model (Idle), then place the sheath.
+	# Bake the fist into every clip once the animator has built its Idle pose, then wait for the
+	# model to be posed (Idle) and place the sheath.
 	await get_tree().process_frame
+	grip.bake(get_node_or_null(anim_player_path) as AnimationPlayer)
 	await get_tree().process_frame
 	_calibrate_sheath()
 	var combat := get_node_or_null(combat_path) as PlayerCombat
@@ -153,8 +153,6 @@ func _hook_combat() -> void:
 ## Show the blades in hand (false) or at the hip (true).
 func set_sheathed(value: bool) -> void:
 	sheathed = value
-	if grip:
-		grip.active = not value  # Fists only while holding the blades.
 	for b in blades:
 		b.visible = not value
 	for b in sheathed_blades:

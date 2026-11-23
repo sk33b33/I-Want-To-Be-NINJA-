@@ -90,6 +90,7 @@ func start_expedition() -> void:
 	arena_entered = false
 	ended = false
 	timer.start(resolved[0])
+	CrashReport.note("expedition %s, quality %s, difficulty %s" % [hunt.id if hunt else &"?", QualityProfile.tier(), GameSettings.difficulty])
 	expedition_started.emit(hunt, timer.duration)
 
 
@@ -129,6 +130,7 @@ func enter_boss_arena() -> void:
 	timer.stop()
 	remaining_at_arena = timer.remaining
 	boss_arena_entered.emit(timer.remaining)
+	CrashReport.note("arena entered")
 	if boss:
 		boss.awaken()
 

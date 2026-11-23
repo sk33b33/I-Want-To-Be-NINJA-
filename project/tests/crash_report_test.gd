@@ -41,6 +41,22 @@ func test_marker_left_behind_means_the_last_session_crashed() -> void:
 	_done()
 
 
+func test_breadcrumbs_from_the_crashed_session_are_in_the_report() -> void:
+	_reset()
+	CrashReport.breadcrumbs_path = "user://test_breadcrumbs.log"
+	CrashReport.note("lightning flash (sky off)")
+	CrashReport._crumb(CrashReport.heartbeat(tree))
+	var f := FileAccess.open(MARKER, FileAccess.WRITE)
+	f.store_string("x")
+	f.close()
+	CrashReport.reset_for_tests()
+	CrashReport.begin_session(tree)
+	check(CrashReport.previous_log_tail.contains("last moments") and CrashReport.previous_log_tail.contains("lightning flash"), "breadcrumbs in the report")
+	check(CrashReport.previous_log_tail.contains("hb fps"), "heartbeat in the report")
+	CrashReport.breadcrumbs_path = "user://breadcrumbs.log"
+	_done()
+
+
 func test_going_to_the_background_or_quitting_clears_the_marker() -> void:
 	_reset()
 	CrashReport.begin_session(tree)

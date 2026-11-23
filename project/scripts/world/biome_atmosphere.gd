@@ -37,10 +37,15 @@ var _sky_material: ShaderMaterial
 var _sun_base_energy: float = 1.0
 var _rng := RandomNumberGenerator.new()
 var _next_flash: float = 5.0
+var _sky_flash_value: float = -1.0
+var _sky_flash_allowed: bool = true
+## How many times the sky material was changed (tests: must stay rare).
+var sky_updates: int = 0
 var _flash_t: float = -1.0
 
 
 func _ready() -> void:
+	_sky_flash_allowed = QualityProfile.current().sky_flash
 	_rng.seed = seed
 	_terrain = get_node_or_null(terrain_path) as BiomeTerrain
 	_sun = get_node_or_null(sun_path) as DirectionalLight3D
@@ -65,6 +70,7 @@ func _process(delta: float) -> void:
 	if _next_flash <= 0.0:
 		_flash_t = 0.0
 		_next_flash = _rng.randf_range(lightning_interval.x, lightning_interval.y)
+		CrashReport.note("lightning flash (sky %s)" % ("on" if _sky_flash_allowed else "off"))
 	var flash := 0.0
 	if _flash_t >= 0.0:
 		_flash_t += delta
@@ -72,8 +78,14 @@ func _process(delta: float) -> void:
 		flash = maxf(exp(-_flash_t * 14.0), exp(-absf(_flash_t - 0.22) * 18.0) * 0.8)
 		if _flash_t > 1.0:
 			_flash_t = -1.0
-	if _sky_material:
-		_sky_material.set_shader_parameter("flash", flash * lightning_sky_flash)
+	# Only touch the sky when the value changes: every change to the sky material makes the
+	# renderer re-bake the sky (on phones: a likely cause of the Mali GPU crashes). Phones keep
+	# the sky still and flash through the moonlight only (QualityPreset.sky_flash).
+	var sky_value := flash * lightning_sky_flash if _sky_flash_allowed else 0.0
+	if _sky_material and not is_equal_approx(sky_value, _sky_flash_value):
+		_sky_flash_value = sky_value
+		_sky_material.set_shader_parameter("flash", sky_value)
+		sky_updates += 1
 	if _sun:
 		_sun.light_energy = _sun_base_energy * (1.0 + flash * lightning_sun_boost)
 

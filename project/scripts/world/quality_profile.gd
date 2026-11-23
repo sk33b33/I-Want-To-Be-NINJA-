@@ -60,6 +60,10 @@ static func apply_to_scene(root: Node) -> void:
 		var env := (n as WorldEnvironment).environment
 		if env:
 			env.glow_enabled = env.glow_enabled and q.glow
+			if not q.sky_reflections:
+				env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+				if env.sky:
+					env.sky.radiance_size = Sky.RADIANCE_SIZE_32
 	for n in root.find_children("*", "DirectionalLight3D", true, false):
 		var sun := n as DirectionalLight3D
 		sun.shadow_enabled = sun.shadow_enabled and q.moon_shadows

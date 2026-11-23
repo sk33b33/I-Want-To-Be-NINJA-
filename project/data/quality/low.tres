@@ -20,3 +20,5 @@ mist_scale = 0.5
 rain_scale = 0.22
 particle_scale = 0.4
 effect_lights = false
+sky_reflections = false
+sky_flash = false

@@ -19,6 +19,12 @@ extends Resource
 ## Small lights (shrines, lanterns, glows) fade out beyond this distance.
 @export var light_fade_distance: float = 45.0
 
+## Sky reflections (the sky radiance cubemap). Off on phones: re-baking it is heavy GPU work.
+@export var sky_reflections: bool = true
+## Lightning also brightens the sky shader (changing the sky re-bakes its radiance). Without it,
+## lightning still flashes through the moonlight.
+@export var sky_flash: bool = true
+
 @export_group("World")
 ## Multiplies grass/fern/broadleaf/rock/mushroom counts.
 @export_range(0.1, 1.0, 0.05) var flora_density: float = 1.0

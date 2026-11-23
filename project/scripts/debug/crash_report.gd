@@ -15,6 +15,13 @@ static var marker_path: String = "user://session_open.marker"
 static var previous_crashed: bool = false
 static var previous_log_tail: String = ""
 static var _started: bool = false
+## Breadcrumbs: the last few notes + 2-second heartbeats, rewritten to their own small file every
+## time (always flushed) so they survive a native crash that the engine log cannot record.
+static var breadcrumbs_path: String = "user://breadcrumbs.log"
+static var previous_breadcrumbs: String = ""
+static var _crumbs: PackedStringArray = []
+const MAX_CRUMBS := 40
+const HEARTBEAT := 2.0
 
 
 ## Call once when the game boots (the dojo does this when it is the main scene).
@@ -24,7 +31,11 @@ static func begin_session(tree: SceneTree) -> void:
 	_started = true
 	previous_crashed = FileAccess.file_exists(marker_path)
 	if previous_crashed:
+		previous_breadcrumbs = FileAccess.get_file_as_string(breadcrumbs_path) if FileAccess.file_exists(breadcrumbs_path) else ""
 		previous_log_tail = _tail(_previous_log(), TAIL_LINES)
+		if previous_breadcrumbs != "":
+			previous_log_tail += "\n--- last moments (breadcrumbs) ---\n" + previous_breadcrumbs.strip_edges()
+	_crumbs.clear()
 	_write_marker()
 	var watch := CrashReport.new()
 	watch.name = "CrashWatch"
@@ -37,11 +48,23 @@ static func begin_session(tree: SceneTree) -> void:
 ## Breadcrumb in the log (shows up in the report if the game dies soon after).
 static func note(text: String) -> void:
 	print("[note] ", text)
+	_crumb(text)
+
+
+static func _crumb(text: String) -> void:
+	_crumbs.append("%.1fs %s" % [Time.get_ticks_msec() / 1000.0, text])
+	if _crumbs.size() > MAX_CRUMBS:
+		_crumbs = _crumbs.slice(_crumbs.size() - MAX_CRUMBS)
+	var f := FileAccess.open(breadcrumbs_path, FileAccess.WRITE)
+	if f:
+		f.store_string("\n".join(_crumbs) + "\n")
+		f.close()
 
 
 ## Tests: allow begin_session() again.
 static func reset_for_tests() -> void:
 	_started = false
+	_crumbs.clear()
 	dismiss()
 
 
@@ -76,6 +99,36 @@ static func _tail(path: String, lines: int) -> String:
 		return "(no log from the previous session was found)"
 	var all := FileAccess.get_file_as_string(path).strip_edges().split("\n")
 	return "\n".join(all.slice(maxi(all.size() - lines, 0)))
+
+
+var _hb: float = 0.0
+
+
+func _process(delta: float) -> void:
+	_hb += delta
+	if _hb < HEARTBEAT:
+		return
+	_hb = 0.0
+	CrashReport._crumb(CrashReport.heartbeat(get_tree()))
+
+
+## One line describing the moment: fps, memory, and what the ninja / boss are doing.
+static func heartbeat(tree: SceneTree) -> String:
+	var line := "hb fps %d mem %dMB" % [Engine.get_frames_per_second(), int(OS.get_static_memory_usage() / 1048576)]
+	var p := tree.get_first_node_in_group("player") as PlayerController
+	if p:
+		var ap := p.get_node_or_null("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+		line += " | pos %s floor %s clip %s" % [p.global_position.snapped(Vector3.ONE * 0.1), p.is_on_floor(), ap.assigned_animation if ap else "?"]
+		if p.combat:
+			line += " combat %s blades %s" % [PlayerCombat.State.keys()[p.combat.state], "out" if p.combat.sword_drawn else "sheathed"]
+		if p.traversal:
+			line += " trav %s" % TraversalComponent.State.keys()[p.traversal.state]
+	var m := tree.get_first_node_in_group("expedition") as ExpeditionManager
+	if m:
+		line += " | timer %d arena %s" % [int(m.timer.remaining), m.arena_entered]
+		if m.boss:
+			line += " boss %s" % BossController.State.keys()[m.boss.state]
+	return line
 
 
 func _notification(what: int) -> void:

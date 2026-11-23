@@ -111,20 +111,9 @@ func _materials() -> void:
 	_save(blade, MAT + "blade.tres")
 	_save(_shader_mat("sky_gloom", {"cloud_noise": clouds}), MAT + "sky_gloom.tres")
 
-	var bark := StandardMaterial3D.new()
-	bark.vertex_color_use_as_albedo = true
-	bark.roughness = 0.95
-	bark.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_save(bark, MAT + "bark_vertex.tres")
-	var rock := StandardMaterial3D.new()
-	rock.vertex_color_use_as_albedo = true
-	rock.roughness = 0.9
-	rock.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_save(rock, MAT + "rock_vertex.tres")
-	var wood := StandardMaterial3D.new()
-	wood.albedo_color = Color(0.11, 0.075, 0.05)
-	wood.roughness = 0.9
-	_save(wood, MAT + "dark_wood.tres")
+	# Art pass: textured `painted` shader (was StandardMaterial3D with vertex colour).
+	for f: String in Cc0Surfaces.PAINTED:
+		_save(Cc0Surfaces.make_painted(f), MAT + f + ".tres")
 
 
 func _data() -> void:

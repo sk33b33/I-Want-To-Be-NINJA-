@@ -1,6 +1,16 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://shaders/painted.gdshader" id="1_4jbs6"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/cliff_rock_normal.jpg" id="2_wr4am"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/cliff_rock_albedo.jpg" id="3_hjrhs"]
 
 [resource]
-cull_mode = 2
-vertex_color_use_as_albedo = true
-roughness = 0.9
+render_priority = 0
+shader = ExtResource("1_4jbs6")
+shader_parameter/tt_tex = ExtResource("3_hjrhs")
+shader_parameter/tt_nrm = ExtResource("2_wr4am")
+shader_parameter/tt_tile = 3.0
+shader_parameter/tt_strength = 0.8
+shader_parameter/tt_normal_strength = null
+shader_parameter/base_color = Color(1, 1, 1, 1)
+shader_parameter/roughness = 0.9

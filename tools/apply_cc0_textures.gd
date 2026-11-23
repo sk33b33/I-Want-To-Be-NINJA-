@@ -6,6 +6,8 @@ extends SceneTree
 func _initialize() -> void:
 	var dir := "res://data/materials/"
 	var count := 0
+	for f: String in Cc0Surfaces.PAINTED:  # Flat/vertex-colour materials become `painted`.
+		ResourceSaver.save(Cc0Surfaces.make_painted(f), dir + f + ".tres")
 	for f in DirAccess.get_files_at(dir):
 		if not f.ends_with(".tres"):
 			continue

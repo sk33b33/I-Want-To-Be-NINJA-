@@ -1,6 +1,16 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
+
+[ext_resource type="Shader" path="res://shaders/painted.gdshader" id="1_7n72e"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_normal.jpg" id="2_lgsx2"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_albedo.jpg" id="3_je53v"]
 
 [resource]
-cull_mode = 2
-vertex_color_use_as_albedo = true
-roughness = 0.95
+render_priority = 0
+shader = ExtResource("1_7n72e")
+shader_parameter/tt_tex = ExtResource("3_je53v")
+shader_parameter/tt_nrm = ExtResource("2_lgsx2")
+shader_parameter/tt_tile = 1.6
+shader_parameter/tt_strength = 0.8
+shader_parameter/tt_normal_strength = null
+shader_parameter/base_color = Color(1, 1, 1, 1)
+shader_parameter/roughness = 0.95

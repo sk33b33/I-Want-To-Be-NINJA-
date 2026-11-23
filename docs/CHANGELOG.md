@@ -161,3 +161,9 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Reaching a climbable wall at sprint speed (≥ 9 m/s, `NinjaAnimationConfig.wall_run_min_speed`) plays the kick-up part of the owner's **Sprint_To_Wall_Climb** (0.5–1.83 s; the run-up before it already happened in game) at 1.4×, then hands over to the climb loop; climbing down cancels it. A normal run still goes straight into the climb.
 - Bug found by screenshot: removing the clip's root motion anchored the hips where they are at the start of the slice — 1.9 m ahead after the run-up — so the ninja was drawn inside the wall. Hips are now anchored horizontally at the clip's first frame (over the feet); a test checks it.
 - Tests: animator suite +3 (sprint kick-up, no kick-up from a run, kick-up in place).
+
+## 2026-11-23 — Fix: blades not held properly (owner playtest)
+- Owner report after playing to the boss: "the swords are not placed properly in the hands when unsheathed". Close-ups showed three faults: both hands used the same grip offset although the left hand's bone axes are mirrored (the left blade stuck out of the palm and up the forearm); the handle crossed an open hand 4–5 cm from where fingers would close; and the hands were open because the movement clips were animated without weapons.
+- `HandGrip` (SkeletonModifier3D) closes both hands while the blades are drawn, using the finger pose of the owner's Dual_Weapon_Combo clip (fingers ~70° curled); sheathed hands stay relaxed.
+- `WeaponMount` computes each hand's grip from that hand's own knuckles in the fist pose: the handle runs across the knuckles through the closed fingers and the blade leaves on the thumb side — correct for both hands without per-side numbers.
+- Tests: `grip_test.gd` (3) — fingers closed, handle inside each fist (< 3.5 cm), blade out of the thumb side for both hands, relaxed when sheathed; seen failing on the old code first.

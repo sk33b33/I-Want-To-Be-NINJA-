@@ -8,9 +8,12 @@ extends Node
 @export var skeleton_path: NodePath = ^"../Visual/NinjaModel/Armature/Skeleton3D"
 @export var blade_material: Material
 @export var hand_bones: PackedStringArray = PackedStringArray(["mixamorig_RightHand", "mixamorig_LeftHand"])
-## Blade placement in hand-bone space (bone units are centimetres: the armature is scaled 0.01).
-@export var grip_offset: Vector3 = Vector3(0, 8, 2)
-@export var grip_rotation_degrees: Vector3 = Vector3(-90, 0, 0)
+## The fist: finger pose copied from this clip/time (a clip animated holding weapons).
+@export var grip_pose_clip: StringName = &"Dual_Weapon_Combo"
+@export var grip_pose_time: float = 0.1
+@export var anim_player_path: NodePath = ^"../Visual/NinjaModel/AnimationPlayer"
+## Where along the blade mesh (its +Y, metres) the fist closes: the middle of the handle.
+@export var handle_centre: float = -0.02
 
 ## Sheath placement in the player's own frame (the "Visual" node: forward = -Z, left = -X, up = +Y;
 ## metres from the feet): at the left hip, handles forward, blades sloping down and back.
@@ -22,6 +25,7 @@ extends Node
 @export var combat_path: NodePath = ^"../Combat"
 
 var blades: Array[MeshInstance3D] = []
+var grip: HandGrip
 ## The pair worn at the hip while sheathed.
 var sheathed_blades: Array[MeshInstance3D] = []
 var sheathed: bool = false
@@ -33,6 +37,11 @@ func _ready() -> void:
 		push_warning("WeaponMount: skeleton not found")
 		return
 	var mesh := ProceduralMeshes.ninja_blade(blade_material)
+	# The fist first: the grip is computed from the closed fingers.
+	grip = HandGrip.new()
+	grip.name = "HandGrip"
+	skeleton.add_child(grip)
+	grip.capture(get_node_or_null(anim_player_path) as AnimationPlayer, grip_pose_clip, grip_pose_time)
 	for bone in hand_bones:
 		var att := BoneAttachment3D.new()
 		att.name = bone.trim_prefix("mixamorig_") + "Attachment"
@@ -41,13 +50,48 @@ func _ready() -> void:
 		var blade := MeshInstance3D.new()
 		blade.name = "Blade"
 		blade.mesh = mesh
-		blade.scale = Vector3.ONE * 100.0  # Undo the armature's 0.01 scale.
-		blade.position = grip_offset
-		blade.rotation_degrees = grip_rotation_degrees
 		att.add_child(blade)
+		blade.transform = grip_transform(skeleton, bone)
 		blades.append(blade)
 	_build_sheath(skeleton, mesh)
 	_hook_combat.call_deferred()
+
+
+## Blade placement in hand-bone space, from the hand's own bones in the fist pose (so the
+## mirrored left hand is right too): the handle runs across the knuckles (pinky -> index) through
+## the centre of the closed fingers, the blade leaves the fist on the thumb side, its edge faces
+## the way the fingers point.
+func grip_transform(skeleton: Skeleton3D, hand: String) -> Transform3D:
+	var side := hand.trim_prefix("mixamorig_").trim_suffix("Hand")  # "Right" / "Left"
+	var knuckles := {}
+	var centre := Vector3.ZERO
+	for f in ["Index", "Middle", "Ring", "Pinky"]:
+		var chain := _finger_chain(skeleton, "mixamorig_%sHand%s" % [side, f])
+		knuckles[f] = chain[0]
+		centre += chain[0] + chain[2]
+	centre /= 8.0
+	var across: Vector3 = (knuckles["Index"] - knuckles["Pinky"]).normalized()
+	var fingers: Vector3 = ((knuckles["Index"] + knuckles["Pinky"]) * 0.5).normalized()
+	var edge := (fingers - across * fingers.dot(across)).normalized()
+	var basis := Basis(across.cross(edge).normalized(), across, edge)
+	var s := 100.0  # Hand-bone space is in centimetres (armature scale 0.01); the mesh is in metres.
+	return Transform3D(basis.scaled(Vector3.ONE * s), centre - across * handle_centre * s)
+
+
+## Joint positions (hand-bone space) of finger bones 1..3 with the fist rotations applied.
+func _finger_chain(skeleton: Skeleton3D, prefix: String) -> Array[Vector3]:
+	var out: Array[Vector3] = []
+	var t := Transform3D.IDENTITY
+	for n in 3:
+		var b := skeleton.find_bone("%s%d" % [prefix, n + 1])
+		if b < 0:
+			out.append(t.origin)
+			continue
+		var rest := skeleton.get_bone_rest(b)
+		var rot: Quaternion = grip.fist.get(b, rest.basis.get_rotation_quaternion()) if grip else rest.basis.get_rotation_quaternion()
+		t = t * Transform3D(Basis(rot), rest.origin)
+		out.append(t.origin)
+	return out
 
 
 ## Two blades in the hip sheath (placed by _calibrate_sheath once the model is posed).
@@ -99,6 +143,8 @@ func _hook_combat() -> void:
 ## Show the blades in hand (false) or at the hip (true).
 func set_sheathed(value: bool) -> void:
 	sheathed = value
+	if grip:
+		grip.active = not value  # Fists only while holding the blades.
 	for b in blades:
 		b.visible = not value
 	for b in sheathed_blades:

@@ -112,3 +112,29 @@ func test_every_jungle_canopy_has_leaf_detail_and_veins() -> void:
 		var m := load("res://data/materials/%s.tres" % f) as ShaderMaterial
 		check(m.get_shader_parameter("leaf_detail") != null and float(m.get_shader_parameter("detail_amount")) > 0.0, "%s: leaf-spray detail" % f)
 		check(float(m.get_shader_parameter("veins")) > 0.0, "%s: broadleaf veins" % f)
+
+
+## Stage 3 (lighting & mood): every jungle loads with its JungleMood applied (sun, fog, grade),
+## the split-tone grade is off on Low, and the brightness slider scales the mood's exposure.
+## (A first version set `mood` before the script in the scene file, so it was silently dropped.)
+func test_every_jungle_applies_its_mood() -> void:
+	var scenes := {"verdant_canopy": "res://scenes/main/main.tscn", "emberwild": "res://scenes/main/expedition_emberwild.tscn",
+		"moonfen": "res://scenes/main/expedition_moonfen.tscn", "stormcrag": "res://scenes/main/expedition_stormcrag.tscn"}
+	PlayerProfile.path = "user://test_profile_art.json"
+	for tier in [&"high", &"low"]:
+		QualityProfile.force_tier(tier)
+		for id: String in scenes:
+			var mood := load("res://data/mood/%s.tres" % id) as JungleMood
+			var main := instantiate(scenes[id])
+			await process_frames(2)
+			var sun := main.get_node("Level/Moonlight") as DirectionalLight3D
+			var env := (main.get_node("Level/WorldEnvironment") as WorldEnvironment).environment
+			check(sun.light_color.is_equal_approx(mood.sun_color), "%s: sun colour from its mood" % id)
+			check(is_equal_approx(env.fog_density, mood.fog_density) and env.fog_light_color.is_equal_approx(mood.fog_color), "%s: fog from its mood" % id)
+			check(is_equal_approx(env.adjustment_saturation, mood.saturation), "%s: saturation from its mood" % id)
+			check((env.adjustment_color_correction != null) == (tier == &"high"), "%s %s: split-tone grade only off Low" % [id, tier])
+			check(is_equal_approx(env.tonemap_exposure, mood.exposure * GameSettings.brightness), "%s: brightness scales the mood's exposure" % id)
+			main.free()
+			_nodes.erase(main)
+	PlayerProfile.path = PlayerProfile.DEFAULT_PATH
+	_done()

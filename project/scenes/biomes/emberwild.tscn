@@ -121,8 +121,8 @@ eye_material = ExtResource("17_7ajtm")
 firefly_material = ExtResource("18_kq6ch")
 
 [node name="Atmosphere" type="Node3D" parent="."]
-mood = ExtResource("mood_emberwild")
 script = ExtResource("19_syyqi")
+mood = ExtResource("mood_emberwild")
 terrain_path = NodePath("../Terrain")
 sun_path = NodePath("../Moonlight")
 environment_path = NodePath("../WorldEnvironment")

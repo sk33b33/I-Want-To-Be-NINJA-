@@ -41,7 +41,11 @@ extends Resource
 @export var hurt_end_time: float = 0.35
 @export var death_clip: StringName = &"Death_Backward"
 ## Clips whose forward root motion is removed (the code moves the body instead).
-@export var strip_forward_motion: Array[StringName] = [&"Dual_Weapon_Combo", &"Quick_Roll_To_Run", &"Death_Backward"]
+@export var strip_forward_motion: Array[StringName] = [&"Dual_Weapon_Combo", &"Quick_Roll_To_Run", &"Death_Backward",
+		&"Draw_Sword", &"Sheath_Sword"]
+## Draw / sheathe (played while standing; PlayerCombatConfig owns the timing).
+@export var draw_clip: StringName = &"Draw_Sword"
+@export var sheathe_clip: StringName = &"Sheath_Sword"
 
 @export_group("Jump timing (seconds into the clip)")
 @export var jump_takeoff_time: float = 0.45

@@ -148,3 +148,11 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - The clips' root motion (the climb rises 1.1 m per cycle; the pull-up 1.9 m up and 3.7 m forward) is removed at load with a straight-line "detrend" that keeps each reach and the heave, so they loop in place on the body that TraversalComponent moves.
 - Test runner hardening: a suite file that does not parse now fails the run (it counted as 0 tests before).
 - Tests: animator suite updated (12 clips, up/down/pause, in-place loops, hang + mantle fit); seen failing against the old model first.
+
+## 2026-11-23 — Draw / sheathe blades (owner's Draw_Sword + Sheath_Sword clips)
+- `ninja.glb` updated again: adds **Draw_Sword**, **Sheath_Sword** (and Sprint_To_Wall_Climb, not used yet); everything else unchanged.
+- New action **Draw / sheathe** — R / D-pad ↑ / touch **BLADE** (top right); remappable (Settings → Controls).
+- Both blades go to a sheath at the left hip (the clips draw across the body from the left hip) and come back to the hands at the moment the hand reaches the hip in each clip (`PlayerCombatConfig`: draw 0.8 s, swap at 0.05 s; sheathe 1.2 s, swap at 0.85 s).
+- Never in the way: standing still plays the full animation; moving keeps running while the blades change place on time; a roll completes it instantly; attacking while sheathed draws and attacks in one press; an attack during the first part of a sheathe cancels it. Expeditions start with blades drawn (no change for existing play).
+- Placement bug found by screenshot: the sheath was first computed from the hip bone's rest pose and ended up in front of the body pointing sideways; it is now set in the player's frame and calibrated on the live standing pose (test checks left side, hip height, pointing back and down).
+- Tests: `blades_test.gd` (8); animator clip list updated to 14. 205 total.

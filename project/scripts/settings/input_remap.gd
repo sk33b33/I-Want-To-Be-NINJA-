@@ -7,7 +7,7 @@ extends RefCounted
 ## project defaults; "reset" reloads the defaults. Gameplay still reads actions only.
 
 const ACTIONS: Array[StringName] = [&"move_forward", &"move_back", &"move_left", &"move_right", &"jump",
-		&"sprint", &"dodge", &"attack_light", &"attack_heavy", &"skill", &"lock_on", &"camera_toggle", &"pause"]
+		&"sprint", &"dodge", &"attack_light", &"attack_heavy", &"skill", &"draw_sword", &"lock_on", &"camera_toggle", &"pause"]
 const KEYBOARD := &"kb"
 const GAMEPAD := &"pad"
 const JOY_BUTTON_NAMES := ["A", "B", "X", "Y", "Back", "Guide", "Start", "Left stick press", "Right stick press",

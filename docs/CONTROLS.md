@@ -21,6 +21,7 @@ Not yet implemented: interact.
 | Ember Talisman (fire charm, 4 s cooldown; water with the Mist Charm) | F | RB / R1 | FIRE button |
 | Switch camera | V | D-pad down | CAM button |
 | Pause (freezes the expedition timer) | Esc | Start / Menu | **II** button (top right) |
+| Draw / sheathe blades | R | D-pad ↑ | **BLADE** button (top right) |
 
 These are defaults only. Implement remapping in a later phase. Avoid conflicting context actions.
 
@@ -47,6 +48,8 @@ Walk over glowing pickups (Glowcap, Ruin Shard) to gather them; walk up to a lor
 Moonfen: mud slows you and you cannot jump while in it; a stream current pushes you sideways; green-rimmed pools are poison; in the fog bank follow the cyan spirit lanterns; reed rafts sink while you stand on them — keep moving.
 
 Stormcrag: on the storm plateau a pale ring appears where you stand — move on (or roll) before the bolt falls, or rest under a rock overhang. On the gale ridge, white chevrons show which way the next gust will blow; cross in the calm. Wet stone is slippery: you speed up and stop slowly.
+
+Blades: draw / sheathe puts both blades in the left-hip sheath or back in hand. Standing still plays the full animation; on the move you keep running and the blades change place on time; a roll finishes it at once. Attacking with sheathed blades draws them and attacks in one press. Expeditions start with blades drawn.
 
 Notes:
 - Mouse look: click the game window to capture the mouse; Esc releases it. Mouse wheel zooms in top-down mode.

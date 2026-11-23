@@ -22,6 +22,10 @@ signal lock_target_changed(target: Node3D)
 ## Landed hit -> brief freeze (animator pauses for `seconds`).
 signal hit_stopped(seconds: float)
 signal skill_used(cooldown: float)
+## Draw (true) or sheathe (false) started; the blades change place `*_swap_at` seconds later.
+signal sword_swap_started(drawing: bool)
+## The blades are now in hand (true) or in the hip sheath (false).
+signal sword_state_changed(drawn: bool)
 
 enum State { READY, ATTACK, DODGE, HURT, DEAD }
 
@@ -64,6 +68,7 @@ var blade_element: StringName = &""
 
 func _ready() -> void:
 	body = get_parent() as PlayerController
+	sword_drawn = not config.start_sheathed
 	health = get_node_or_null(health_path) as HealthComponent
 	hitbox = get_node_or_null(hitbox_path) as Hitbox
 	if health:
@@ -74,6 +79,16 @@ func _ready() -> void:
 	if hitbox:
 		hitbox.hit_landed.connect(_on_hit_landed)
 	body.respawned.connect(_on_body_respawned)
+
+
+## Blades in hand (true) or sheathed at the hip (false). Sheathed blades cannot attack: an attack
+## press draws first and then attacks. Draw/sheathe never stops movement; a roll finishes it.
+var sword_drawn: bool = true
+var _swap_t: float = -1.0  # Seconds into a draw/sheathe; < 0 = none.
+var _swap_to_drawn: bool = true
+var _swap_done: bool = false
+var _swap_buffer: float = 0.0
+var _attack_after_draw: int = 0  # 0 none, 1 light, 2 heavy.
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -94,6 +109,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_skill_buffer = config.input_buffer
 	elif event.is_action_pressed("lock_on"):
 		toggle_lock()
+	elif event.is_action_pressed("draw_sword"):
+		_swap_buffer = config.input_buffer
 	# Keyboard: a quick tap of Shift (the sprint key) is a dodge; holding it sprints.
 	if event is InputEventKey and event.is_action("sprint"):
 		var now := Time.get_ticks_msec() / 1000.0
@@ -112,6 +129,8 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 	_dodge_buffer -= delta
 	_dodge_cooldown -= delta
 	_skill_buffer -= delta
+	_swap_buffer -= delta
+	_update_swap(delta)
 	skill_cooldown_left = maxf(skill_cooldown_left - delta, 0.0)
 	_validate_lock()
 	match state:
@@ -140,6 +159,18 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 	if _dodge_buffer > 0.0 and _dodge_cooldown <= 0.0:
 		_start_dodge(wish)
 		return true
+	if (_light_buffer > 0.0 or _heavy_buffer > 0.0) and not _blades_ready():
+		# Sheathed (or mid-sheathe): draw first, then attack when the blades are in hand.
+		_attack_after_draw = 1 if _light_buffer > 0.0 else 2
+		_light_buffer = 0.0
+		_heavy_buffer = 0.0
+		if not (is_swapping() and _swap_to_drawn):
+			start_swap(true)
+		return false
+	if _swap_buffer > 0.0:
+		_swap_buffer = 0.0
+		if not is_swapping():
+			start_swap(not sword_drawn)
 	if _light_buffer > 0.0 and not config.light_combo.is_empty():
 		_start_attack(config.light_combo[0], 0, wish)
 		return true
@@ -164,6 +195,62 @@ func skill_element() -> StringName:
 
 func effective_skill_cooldown() -> float:
 	return maxf(config.skill_cooldown - skill_cooldown_reduction, 0.5)
+
+
+## Start drawing (true) or sheathing (false). Reversing a swap in progress is allowed.
+func start_swap(drawing: bool) -> void:
+	if drawing == sword_drawn and not is_swapping():
+		return
+	_swap_to_drawn = drawing
+	_swap_t = 0.0
+	_swap_done = drawing == sword_drawn  # Reversed before the swap moment: nothing to move.
+	sword_swap_started.emit(drawing)
+
+
+func is_swapping() -> bool:
+	return _swap_t >= 0.0
+
+
+## Blades usable now: drawn, and not about to be put away.
+func _blades_ready() -> bool:
+	if is_swapping() and not _swap_to_drawn and not _swap_done:
+		_swap_t = -1.0  # Cancel a sheathe that has not reached the hip yet.
+		return sword_drawn
+	return sword_drawn and not is_swapping()
+
+
+func _update_swap(delta: float) -> void:
+	if not is_swapping():
+		return
+	_swap_t += delta
+	var swap_at := config.draw_swap_at if _swap_to_drawn else config.sheathe_swap_at
+	var total := config.draw_time if _swap_to_drawn else config.sheathe_time
+	if not _swap_done and _swap_t >= swap_at:
+		_finish_swap_moment()
+	if _swap_t >= total:
+		_swap_t = -1.0
+		if _attack_after_draw != 0 and sword_drawn:
+			if _attack_after_draw == 1:
+				_light_buffer = config.input_buffer
+			else:
+				_heavy_buffer = config.input_buffer
+		_attack_after_draw = 0
+
+
+func _finish_swap_moment() -> void:
+	_swap_done = true
+	if sword_drawn != _swap_to_drawn:
+		sword_drawn = _swap_to_drawn
+		sword_state_changed.emit(sword_drawn)
+
+
+## A roll (or death) completes a draw/sheathe at once.
+func _complete_swap_now() -> void:
+	if not is_swapping():
+		return
+	if not _swap_done:
+		_finish_swap_moment()
+	_swap_t = -1.0
 
 
 func is_busy() -> bool:
@@ -319,6 +406,7 @@ func _on_hit_landed(_hurtbox: Hurtbox, _info: DamageInfo) -> void:
 # ---------------------------------------------------------------- dodge
 
 func _start_dodge(wish: Vector3) -> void:
+	_complete_swap_now()
 	_dodge_buffer = 0.0
 	_light_buffer = 0.0
 	_heavy_buffer = 0.0

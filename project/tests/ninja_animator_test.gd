@@ -10,7 +10,7 @@ func _setup() -> Array:
 	return [player, animator]
 
 
-func test_ninja_model_and_all_twelve_clips_are_present() -> void:
+func test_ninja_model_and_all_fourteen_clips_are_present() -> void:
 	var nodes := _setup()
 	var player: PlayerController = nodes[0]
 	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
@@ -18,7 +18,7 @@ func test_ninja_model_and_all_twelve_clips_are_present() -> void:
 	if anim == null:
 		return
 	for clip in ["Run", "Sprint", "Jump", "Front_Flip", "Front_Flip_2", "Quick_Roll_To_Run",
-			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward", "Climb_Up_Wall", "Climb_Down_Wall", "Climb_On"]:
+			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward", "Climb_Up_Wall", "Climb_Down_Wall", "Climb_On", "Draw_Sword", "Sheath_Sword"]:
 		check(anim.has_animation(clip), "clip %s imported" % clip)
 	check(anim.has_animation("Idle"), "Idle pose generated (the GLB has no idle clip)")
 

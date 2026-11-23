@@ -7,7 +7,7 @@ extends VBoxContainer
 
 const LABELS := {&"move_forward": "Move forward", &"move_back": "Move back", &"move_left": "Move left",
 		&"move_right": "Move right", &"jump": "Jump", &"sprint": "Sprint (tap: roll on keyboard)", &"dodge": "Roll",
-		&"attack_light": "Light attack", &"attack_heavy": "Heavy attack", &"skill": "Talisman",
+		&"attack_light": "Light attack", &"attack_heavy": "Heavy attack", &"skill": "Talisman", &"draw_sword": "Draw / sheathe blades",
 		&"lock_on": "Lock on", &"camera_toggle": "Switch camera", &"pause": "Pause"}
 ## Seconds to wait for the new binding before giving up.
 const LISTEN_TIMEOUT := 6.0

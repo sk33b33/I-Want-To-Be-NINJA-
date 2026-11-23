@@ -32,6 +32,16 @@ extends Resource
 ## Shift presses shorter than this count as a dodge tap on keyboard (holding still sprints).
 @export var keyboard_tap_time: float = 0.2
 
+@export_group("Blades: draw / sheathe")
+## Expeditions start with the blades in hand (false) or in their hip sheath (true).
+@export var start_sheathed: bool = false
+## Draw_Sword / Sheath_Sword timing (seconds). The blades change place (hip <-> hands) at the
+## *_swap_at moment, which matches the hand reaching the left-hip sheath in the clip.
+@export var draw_time: float = 0.8
+@export var draw_swap_at: float = 0.05
+@export var sheathe_time: float = 1.2
+@export var sheathe_swap_at: float = 0.85
+
 @export_group("Lock-on")
 @export var lock_range: float = 18.0
 ## Locks break when the target gets this much farther than lock_range.

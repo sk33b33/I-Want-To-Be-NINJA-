@@ -30,6 +30,7 @@ var _buttons: Array[Dictionary] = [
 	{"action": "lock_on", "label": "LOCK", "anchor": Vector2(-1.4, -7.9), "scale": 0.75, "touch": -1},
 	{"action": "skill", "label": "CHARM", "anchor": Vector2(-4.0, -6.9), "scale": 0.8, "touch": -1},
 	# Top-right system buttons.
+	{"action": "draw_sword", "label": "BLADE", "anchor": Vector2(-5.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 	{"action": "camera_toggle", "label": "CAM", "anchor": Vector2(-3.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 	{"action": "pause", "label": "II", "anchor": Vector2(-1.2, 1.2), "scale": 0.6, "touch": -1, "top": true},
 ]

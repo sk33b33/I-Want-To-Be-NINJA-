@@ -4,7 +4,7 @@ extends Node
 ## it never changes movement). States: IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE.
 ## Implements docs/PHASES.md Phase 1 player feedback using assets/models/ninja/ninja.glb.
 
-enum State { IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE, COMBAT, DEAD }
+enum State { IDLE, RUN, SPRINT, AIR, LAND, CLIMB, HANG, MANTLE, COMBAT, DEAD, SWAP }
 
 @export var player_path: NodePath = ^".."
 @export var animation_player_path: NodePath
@@ -43,6 +43,7 @@ func _ready() -> void:
 		c.player_died.connect(_on_player_died)
 		c.player_respawned.connect(func() -> void: _set_state(State.IDLE, _idle_name, 1.0))
 		c.hit_stopped.connect(_on_hit_stopped)
+		c.sword_swap_started.connect(_on_sword_swap_started)
 	_play(_idle_name)
 
 
@@ -58,6 +59,13 @@ func _physics_process(delta: float) -> void:
 	if state == State.COMBAT or state == State.DEAD:
 		state = State.LAND  # Hand back to locomotion.
 		_enter_ground_state(_player.get_horizontal_speed())
+		return
+	if state == State.SWAP:
+		# Draw/sheathe plays while standing; moving, falling or finishing hands back.
+		var c := _player.combat
+		if c == null or not c.is_swapping() or not _player.is_on_floor() \
+				or _player.get_horizontal_speed() > config.idle_speed_threshold:
+			_enter_ground_state(_player.get_horizontal_speed())
 		return
 	if _player.traversal and _player.traversal.state != TraversalComponent.State.NONE:
 		if state == State.CLIMB:
@@ -153,6 +161,21 @@ func _on_hit_stopped(seconds: float) -> void:
 		_frozen_speed = _anim.speed_scale
 	_freeze = seconds
 	_anim.speed_scale = 0.0
+
+
+## Play Draw_Sword / Sheath_Sword fitted to the combat timing — only when standing still on the
+## ground (moving keeps the run animation; the blades still change place on time).
+func _on_sword_swap_started(drawing: bool) -> void:
+	var clip := config.draw_clip if drawing else config.sheathe_clip
+	if not _anim.has_animation(clip) or not _player.is_on_floor() \
+			or _player.get_horizontal_speed() > config.idle_speed_threshold \
+			or (_player.traversal and _player.traversal.state != TraversalComponent.State.NONE):
+		return
+	var duration := _player.combat.config.draw_time if drawing else _player.combat.config.sheathe_time
+	state = State.SWAP
+	_play(clip, 0.1)
+	_anim.seek(0.0, true)
+	_anim.speed_scale = _anim.get_animation(clip).length / maxf(duration, 0.05)
 
 
 func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:

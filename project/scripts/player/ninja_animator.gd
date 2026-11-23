@@ -61,8 +61,11 @@ func _physics_process(delta: float) -> void:
 		return
 	if _player.traversal and _player.traversal.state != TraversalComponent.State.NONE:
 		if state == State.CLIMB:
-			var climb_speed := _player.traversal.get_climb_velocity().length()
-			_anim.speed_scale = clampf(climb_speed / config.climb_reference_speed, 0.0, 1.5)
+			var v := _player.traversal.get_climb_velocity()
+			var clip := config.climb_down_clip if v.y < -0.1 and _anim.has_animation(config.climb_down_clip) else config.climb_clip
+			if v.length() > 0.05 and _anim.current_animation != clip:
+				_play(clip, 0.15)
+			_anim.speed_scale = clampf(v.length() / config.climb_reference_speed, 0.0, config.climb_max_speed_scale)
 		return
 	var speed := _player.get_horizontal_speed()
 	var on_floor := _player.is_on_floor()
@@ -157,8 +160,6 @@ func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
 	match traversal_state:
 		TraversalComponent.State.CLIMB:
 			state = State.CLIMB
-			if _anim.has_animation(config.climb_clip):
-				_anim.get_animation(config.climb_clip).loop_mode = Animation.LOOP_LINEAR
 			_play(config.climb_clip, 0.1)
 		TraversalComponent.State.HANG:
 			state = State.HANG
@@ -169,6 +170,9 @@ func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
 			state = State.MANTLE
 			_play(config.mantle_clip, 0.08)
 			_anim.seek(config.mantle_start_time, true)
+			# Fit the pull-up slice into the traversal's mantle time.
+			var mantle_time := _player.traversal.config.mantle_time if _player.traversal else 0.45
+			_anim.speed_scale = maxf(config.mantle_end_time - config.mantle_start_time, 0.05) / maxf(mantle_time, 0.05)
 		TraversalComponent.State.NONE:
 			if state != State.AIR:  # A wall jump already switched to AIR.
 				state = State.AIR
@@ -219,6 +223,14 @@ func _prepare_clips() -> void:
 	for clip in [config.jump_clip, config.sprint_jump_clip]:
 		if _anim.has_animation(clip):
 			_flatten_hips(_anim.get_animation(clip))
+	# Climb clips: loop in place (remove the climb's rise but keep the reach bob).
+	for clip in [config.climb_clip, config.climb_down_clip]:
+		if _anim.has_animation(clip):
+			var a := _anim.get_animation(clip)
+			_detrend_hips(a, 0.0, a.length)
+			a.loop_mode = Animation.LOOP_LINEAR
+	if _anim.has_animation(config.mantle_clip):
+		_detrend_hips(_anim.get_animation(config.mantle_clip), config.mantle_start_time, config.mantle_end_time)
 	for clip in config.strip_forward_motion:
 		if _anim.has_animation(clip):
 			_strip_forward(_anim.get_animation(clip))
@@ -244,6 +256,25 @@ func _flatten_hips(anim: Animation) -> void:
 		p.y = start.y  # Remove forward root motion.
 		p.z = maxf(p.z, -max_up_cm)  # Clamp vertical rise.
 		anim.track_set_key_value(track, k, p)
+
+
+## Remove the net travel of the hips between `from` and `to` (a straight-line drift) while keeping
+## the motion around it (each reach of a climb, the heave of a pull-up). The lower end of the
+## climb sits at the clip's lowest end height, so the body stays on its capsule. Keys after `to`
+## keep the full correction.
+func _detrend_hips(anim: Animation, from: float, to: float) -> void:
+	var track := anim.find_track(config.hips_bone_track, Animation.TYPE_POSITION_3D)
+	if track < 0 or to <= from:
+		return
+	var a := anim.position_track_interpolate(track, from)
+	var b := anim.position_track_interpolate(track, to)
+	var anchor := Vector3(a.x, a.y, maxf(a.z, b.z))  # -z is up: the lower of the two ends.
+	for k in anim.track_get_key_count(track):
+		var t := anim.track_get_key_time(track, k)
+		var w := clampf((t - from) / (to - from), 0.0, 1.0)
+		var p: Vector3 = anim.track_get_key_value(track, k)
+		var drift := a.lerp(b, w)
+		anim.track_set_key_value(track, k, Vector3(p.x - drift.x + anchor.x, p.y - drift.y + anchor.y, p.z - drift.z + anchor.z))
 
 
 ## Remove travel along the ground (bone-space x/y) but keep the vertical motion (crouch, fall).

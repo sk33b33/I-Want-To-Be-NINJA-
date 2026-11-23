@@ -10,7 +10,7 @@ func _setup() -> Array:
 	return [player, animator]
 
 
-func test_ninja_model_and_all_nine_clips_are_present() -> void:
+func test_ninja_model_and_all_twelve_clips_are_present() -> void:
 	var nodes := _setup()
 	var player: PlayerController = nodes[0]
 	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
@@ -18,7 +18,7 @@ func test_ninja_model_and_all_nine_clips_are_present() -> void:
 	if anim == null:
 		return
 	for clip in ["Run", "Sprint", "Jump", "Front_Flip", "Front_Flip_2", "Quick_Roll_To_Run",
-			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward"]:
+			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward", "Climb_Up_Wall", "Climb_Down_Wall", "Climb_On"]:
 		check(anim.has_animation(clip), "clip %s imported" % clip)
 	check(anim.has_animation("Idle"), "Idle pose generated (the GLB has no idle clip)")
 
@@ -125,7 +125,7 @@ func test_heavy_attack_plays_its_slice() -> void:
 	check(anim.current_animation_position >= h.clip_start - 0.01, "inside the heavy slice (pos %.2f)" % anim.current_animation_position)
 
 
-func test_climbing_plays_the_climb_clip() -> void:
+func _climb_setup() -> Array:
 	make_floor()
 	var wall := make_floor(Vector3(8, 8, 1), Vector3(0, 4, -2.0))
 	wall.collision_layer = 1 | 4
@@ -140,6 +140,58 @@ func test_climbing_plays_the_climb_clip() -> void:
 		if player.traversal.state == TraversalComponent.State.CLIMB:
 			break
 	await physics_frames(3)
-	var cfg := (player.get_node("NinjaAnimator") as NinjaAnimator).config
+	return [player, anim, (player.get_node("NinjaAnimator") as NinjaAnimator).config]
+
+
+## Owner's model update (Phase 12+): the GLB now has real climbing clips.
+func test_climbing_up_and_down_play_the_wall_climb_clips() -> void:
+	var r: Array = await _climb_setup()
+	var player: PlayerController = r[0]
+	var anim: AnimationPlayer = r[1]
+	var cfg: NinjaAnimationConfig = r[2]
 	check(player.traversal.state == TraversalComponent.State.CLIMB, "climbing")
-	check(anim.current_animation == cfg.climb_clip, "climb clip playing (got %s)" % anim.current_animation)
+	check(anim.current_animation == cfg.climb_clip and cfg.climb_clip == &"Climb_Up_Wall", "climbing up plays Climb_Up_Wall (got %s)" % anim.current_animation)
+	check(anim.speed_scale > 1.0, "plays faster when climbing at full speed (%.2f)" % anim.speed_scale)
+	await physics_frames(60)  # Climb well clear of the ground first.
+	release("move_forward")
+	press("move_back")
+	await physics_frames(8)
+	check(anim.current_animation == &"Climb_Down_Wall", "climbing down plays Climb_Down_Wall (got %s)" % anim.current_animation)
+	release("move_back")
+	await physics_frames(5)
+	check(player.traversal.state == TraversalComponent.State.CLIMB, "still on the wall")
+	check(is_zero_approx(anim.speed_scale), "holding still on the wall pauses the clip")
+
+
+func test_climb_clips_loop_in_place() -> void:
+	var nodes := _setup()
+	var anim := (nodes[0] as PlayerController).get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(2)
+	for clip in [&"Climb_Up_Wall", &"Climb_Down_Wall"]:
+		var a := anim.get_animation(clip)
+		var t := a.find_track(^"Armature/Skeleton3D:mixamorig_Hips", Animation.TYPE_POSITION_3D)
+		var start := a.position_track_interpolate(t, 0.0)
+		var end := a.position_track_interpolate(t, a.length)
+		check(absf(end.z - start.z) < 2.0, "%s ends where it starts (rise %.0f cm)" % [clip, start.z - end.z])
+		check(absf(start.z) < 120.0, "%s hips at standing height (%.0f cm)" % [clip, -start.z])
+		check(a.loop_mode == Animation.LOOP_LINEAR, "%s loops" % clip)
+
+
+func test_hang_and_mantle_use_the_climb_on_clip() -> void:
+	var nodes := _setup()
+	var player: PlayerController = nodes[0]
+	var animator: NinjaAnimator = nodes[1]
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(5)
+	var cfg := animator.config
+	animator.call("_on_traversal_state", TraversalComponent.State.HANG)
+	check(anim.assigned_animation == &"Climb_On" and not anim.is_playing(), "hanging holds the first Climb_On pose")
+	animator.call("_on_traversal_state", TraversalComponent.State.MANTLE)
+	check(anim.current_animation == &"Climb_On" and anim.is_playing(), "mantle plays Climb_On")
+	var expected: float = (cfg.mantle_end_time - cfg.mantle_start_time) / player.traversal.config.mantle_time
+	check_near(anim.speed_scale, expected, 0.01, "pull-up fitted to the mantle time")
+	var a := anim.get_animation(&"Climb_On")
+	var t := a.find_track(^"Armature/Skeleton3D:mixamorig_Hips", Animation.TYPE_POSITION_3D)
+	var p0 := a.position_track_interpolate(t, cfg.mantle_start_time)
+	var p1 := a.position_track_interpolate(t, cfg.mantle_end_time)
+	check(p0.distance_to(p1) < 5.0, "no root motion over the pull-up (%.0f cm)" % p0.distance_to(p1))

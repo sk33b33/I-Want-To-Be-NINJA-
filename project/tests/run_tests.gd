@@ -50,7 +50,7 @@ func _run() -> void:
 				suites.append("res://tests/%s_test.gd" % name.strip_edges())
 	for path in suites:
 		var script := load(path) as GDScript
-		if script == null:
+		if script == null or not script.can_instantiate():  # Missing or does not parse.
 			print("FAIL  %s could not be loaded" % path)
 			failures += 1
 			continue

@@ -15,16 +15,22 @@ extends Resource
 @export var idle_pose_clip: StringName = &"Jump"
 @export var idle_pose_time: float = 0.0
 
-@export_group("Traversal (Phase 2)")
-## The GLB has no climbing clips yet; these are stand-ins. Add Mixamo "Climbing" /
-## "Hanging Idle" / "Climbing To Top" clips to ninja.glb and put their names here.
-@export var climb_clip: StringName = &"Crouch_Walk"
-## Climb speed (m/s) at which climb_clip plays at 1x.
-@export var climb_reference_speed: float = 2.4
-@export var hang_clip: StringName = &"Jump"
-@export var hang_pose_time: float = 0.62
-@export var mantle_clip: StringName = &"Jump"
-@export var mantle_start_time: float = 1.15
+@export_group("Traversal (Phase 2; real clips since the owner's model update)")
+## Wall climbing: up and down clips (sideways uses the up clip). Their root motion is removed
+## (the body is moved by TraversalComponent) but the bob of each reach is kept.
+@export var climb_clip: StringName = &"Climb_Up_Wall"
+@export var climb_down_clip: StringName = &"Climb_Down_Wall"
+## Climb speed (m/s) at which the climb clips play at 1x, and the fastest playback.
+@export var climb_reference_speed: float = 1.2
+@export var climb_max_speed_scale: float = 2.5
+## Hanging from a ledge: a held pose from `hang_clip` at `hang_pose_time`.
+@export var hang_clip: StringName = &"Climb_On"
+@export var hang_pose_time: float = 0.0
+## Pulling up over the ledge: the slice [mantle_start_time, mantle_end_time] of `mantle_clip`
+## is played to fit TraversalConfig.mantle_time (the rest of Climb_On is standing up + walking).
+@export var mantle_clip: StringName = &"Climb_On"
+@export var mantle_start_time: float = 0.0
+@export var mantle_end_time: float = 2.9
 
 @export_group("Combat (Phase 4)")
 ## Attack clips/slices come from AttackDefinition resources; these cover the rest.

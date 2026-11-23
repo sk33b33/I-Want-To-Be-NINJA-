@@ -141,3 +141,10 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - **Release:** version 0.12.0, original app icon, `export_presets.cfg` (Android arm64 / Windows / Linux; tests excluded), `tools/build.sh` (checks → data-pack export for every preset → boots the exported game; installable builds when templates/SDK/keystore exist, otherwise lists what is missing). `docs/RELEASE_CHECKLIST.md`, `docs/KNOWN_ISSUES.md`.
 - Test runner: every `tests/*_test.gd` must be listed (a missing suite fails the run — a focused run had nearly committed a cut-down suite list); focused runs use `-- --only=qa,options` instead of editing the file.
 - Tests: `qa_test.gd` (14), `options_test.gd` (9). 195 total.
+
+## 2026-11-23 — Owner's model update: real climbing animations
+- `ninja.glb` replaced with the owner's new Mixamo export: same character and skeleton, the original 9 clips unchanged, plus **Climb_Up_Wall**, **Climb_Down_Wall** and **Climb_On**.
+- Climbing now plays Climb_Up_Wall going up/sideways and Climb_Down_Wall going down (paused when holding still, faster when climbing fast); hanging holds Climb_On's first frame (hands on the ledge); the mantle plays Climb_On's pull-up (0–2.9 s) fitted to the existing 0.45 s mantle — gameplay timing unchanged. The stand-ins (Crouch_Walk / Jump frames) are gone.
+- The clips' root motion (the climb rises 1.1 m per cycle; the pull-up 1.9 m up and 3.7 m forward) is removed at load with a straight-line "detrend" that keeps each reach and the heave, so they loop in place on the body that TraversalComponent moves.
+- Test runner hardening: a suite file that does not parse now fails the run (it counted as 0 tests before).
+- Tests: animator suite updated (12 clips, up/down/pause, in-place loops, hang + mantle fit); seen failing against the old model first.

@@ -48,4 +48,5 @@ extends Resource
 @export var detail_normals: bool = true
 ## A second, larger ground-texture sample that hides tiling (global uniform `anti_tile`).
 @export var anti_tile: bool = true
-
+## Leaf-spray cards around tree canopies (alpha-tested; extra overdraw). Off on Low.
+@export var leaf_cards: bool = true

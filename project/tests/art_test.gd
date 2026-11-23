@@ -59,3 +59,56 @@ func test_the_expedition_applies_the_preset_detail() -> void:
 	check(QualityProfile.surface_detail.get(&"anti_tile") == false, "a Low expedition turns anti-tiling off")
 	PlayerProfile.path = PlayerProfile.DEFAULT_PATH
 	_done()
+
+
+## Stage 2 (trees & plants): leaf cards on Medium/High only, the same tree either way, and every
+## jungle's canopy material carries the leaf-spray detail and broadleaf veins.
+func _jungle_tree_surfaces(cards: bool) -> Array:
+	var leaf := load("res://data/materials/foliage_leaf.tres") as Material
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4242
+	var card_mat: Material = Cc0Surfaces.leaf_cards_for(leaf) if cards else null
+	var mesh := ProceduralMeshes.jungle_tree(rng, load("res://data/materials/bark_vertex.tres"), leaf,
+			load("res://data/materials/foliage_vine.tres"), card_mat)
+	var out := []
+	for i in mesh.get_surface_count():
+		out.append([Cc0Surfaces.shader_name(mesh.surface_get_material(i)), mesh.surface_get_array_len(i)])
+	out.append(rng.randi())  # The tree's random stream must end in the same place.
+	return out
+
+
+func test_leaf_cards_only_add_a_surface_and_never_change_the_tree() -> void:
+	var plain := _jungle_tree_surfaces(false)
+	var carded := _jungle_tree_surfaces(true)
+	check(carded.size() == plain.size() + 1, "cards add exactly one surface (%d vs %d)" % [carded.size(), plain.size()])
+	var shaders: Array = carded.slice(0, carded.size() - 1).map(func(s: Array) -> String: return s[0])
+	check(shaders.has("leaf_card"), "the extra surface is leaf cards")
+	check(carded[-1] == plain[-1], "the tree's random stream is unchanged by cards (vines and later trees match)")
+
+
+func test_low_has_no_leaf_cards_high_does() -> void:
+	check(not (load("res://data/quality/low.tres") as QualityPreset).leaf_cards, "Low: no leaf cards")
+	check((load("res://data/quality/high.tres") as QualityPreset).leaf_cards, "High: leaf cards")
+	for tier in [&"low", &"high"]:
+		QualityProfile.force_tier(tier)
+		PlayerProfile.path = "user://test_profile_art.json"
+		var main := instantiate("res://scenes/main/main.tscn")
+		await process_frames(2)
+		var found := false
+		for mmi in main.find_children("*", "MultiMeshInstance3D", true, false):
+			var mesh := (mmi as MultiMeshInstance3D).multimesh.mesh
+			for i in mesh.get_surface_count():
+				if Cc0Surfaces.shader_name(mesh.surface_get_material(i)) == "leaf_card":
+					found = true
+		check(found == (tier == &"high"), "%s: leaf cards present = %s" % [tier, found])
+		main.free()
+		_nodes.erase(main)
+		PlayerProfile.path = PlayerProfile.DEFAULT_PATH
+	_done()
+
+
+func test_every_jungle_canopy_has_leaf_detail_and_veins() -> void:
+	for f: String in Cc0Surfaces.LEAF_FOLIAGE:
+		var m := load("res://data/materials/%s.tres" % f) as ShaderMaterial
+		check(m.get_shader_parameter("leaf_detail") != null and float(m.get_shader_parameter("detail_amount")) > 0.0, "%s: leaf-spray detail" % f)
+		check(float(m.get_shader_parameter("veins")) > 0.0, "%s: broadleaf veins" % f)

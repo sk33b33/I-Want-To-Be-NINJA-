@@ -89,10 +89,12 @@ func _place_trees() -> void:
 	var cfg := config
 	var jungle_meshes: Array[ArrayMesh] = []
 	var dead_meshes: Array[ArrayMesh] = []
+	# Leaf cards around canopies (Medium/High); made once from this jungle's canopy material.
+	var cards: Material = Cc0Surfaces.leaf_cards_for(leaf_material) if QualityProfile.current().leaf_cards else null
 	for v in cfg.tree_variants:
 		var vr := RandomNumberGenerator.new()
 		vr.seed = cfg.seed * 31 + v
-		jungle_meshes.append(ProceduralMeshes.jungle_tree(vr, bark_material, leaf_material, vine_material))
+		jungle_meshes.append(ProceduralMeshes.jungle_tree(vr, bark_material, leaf_material, vine_material, cards))
 		dead_meshes.append(ProceduralMeshes.dead_tree(vr, bark_material, vine_material))
 	var jungle_xf: Array = []
 	var dead_xf: Array = []

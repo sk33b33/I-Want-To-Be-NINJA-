@@ -1,6 +1,7 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
 
 [ext_resource type="Shader" path="res://shaders/foliage.gdshader" id="1_cs6wq"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/leaf_spray.png" id="2_b4vs7"]
 
 [resource]
 render_priority = 0
@@ -10,3 +11,10 @@ shader_parameter/wind_strength = 0.06
 shader_parameter/wind_speed = null
 shader_parameter/translucency = 0.4
 shader_parameter/brightness = 1.8
+shader_parameter/veins = 1.0
+shader_parameter/leaf_detail = ExtResource("2_b4vs7")
+shader_parameter/detail_amount = 0.8
+shader_parameter/detail_tile = null
+shader_parameter/variation = null
+shader_parameter/variation_amount = null
+shader_parameter/base_darkening = null

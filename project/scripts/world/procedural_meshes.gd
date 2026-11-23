@@ -23,6 +23,13 @@ static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector
 	_tri(st, a, c, d, ca, cc, cd)
 
 
+## Quad with UVs (a, b, c, d in order; uv per corner).
+static func _quad_uv(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3,
+		ca: Color, cb: Color, cc: Color, cd: Color, ua: Vector2, ub: Vector2, uc: Vector2, ud: Vector2) -> void:
+	for v in [[a, ca, ua], [b, cb, ub], [c, cc, uc], [a, ca, ua], [c, cc, uc], [d, cd, ud]]:
+		st.set_color(v[1]); st.set_uv(v[2]); st.add_vertex(v[0])
+
+
 static func _perp(dir: Vector3) -> Vector3:
 	var ref := Vector3.UP if absf(dir.normalized().y) < 0.95 else Vector3.RIGHT
 	return dir.cross(ref).normalized()
@@ -153,7 +160,8 @@ static func broadleaf(rng: RandomNumberGenerator, material: Material) -> ArrayMe
 		var stem_c := Color(0.04, 0.08, 0.03, 0.0)
 		var stem_c2 := Color(0.04, 0.08, 0.03, 0.4)
 		var s := _perp(stem_top) * 0.03
-		_quad(st, -s, s, stem_top + s, stem_top - s, stem_c, stem_c, stem_c2, stem_c2)
+		_quad_uv(st, -s, s, stem_top + s, stem_top - s, stem_c, stem_c, stem_c2, stem_c2,
+				Vector2.ZERO, Vector2.ZERO, Vector2.ZERO, Vector2.ZERO)
 		# Leaf blade: midrib from stem_top outward and drooping, folded slightly along the rib.
 		var length := rng.randf_range(0.8, 1.3)
 		var width := length * 0.42
@@ -176,7 +184,10 @@ static func broadleaf(rng: RandomNumberGenerator, material: Material) -> ArrayMe
 				var e1: Vector3 = rib[i + 1] + side * w1 * sgn + fold * w1 / width
 				var cm := mid_c; cm.a = 0.4 + t0 * 0.6
 				var ce := edge_c; ce.a = 0.4 + t1 * 0.6
-				_quad(st, rib[i], rib[i + 1], e1, e0, cm, cm, ce, ce)
+				# UV: u = across the blade (0 at the midrib, +-1 at the edge), v = 1 + base .. tip
+				# (v >= 1 tells foliage.gdshader "leaf blade: draw veins"; UV-less meshes read 0).
+				_quad_uv(st, rib[i], rib[i + 1], e1, e0, cm, cm, ce, ce,
+						Vector2(0.0, 1.0 + t0), Vector2(0.0, 1.0 + t1), Vector2(sgn, 1.0 + t1), Vector2(sgn, 1.0 + t0))
 	return _finish(st, null, material)
 
 
@@ -212,7 +223,10 @@ static func rock(rng: RandomNumberGenerator, material: Material) -> ArrayMesh:
 
 ## Giant jungle tree: buttress roots, tall trunk, branches, dark canopy blobs and hanging vines.
 ## Returns a mesh with surfaces [bark, leaves, vines].
-static func jungle_tree(rng: RandomNumberGenerator, bark: Material, leaves: Material, vines: Material) -> ArrayMesh:
+## `cards`: optional leaf-card material (leaf_card.gdshader) — when given, each canopy blob also
+## gets crossed leaf-spray cards around its upper surface for a leafy silhouette (Medium/High).
+static func jungle_tree(rng: RandomNumberGenerator, bark: Material, leaves: Material, vines: Material,
+		cards: Material = null) -> ArrayMesh:
 	var height := rng.randf_range(15.0, 22.0)
 	var r0 := rng.randf_range(0.8, 1.2)
 	var bark_c := Color(0.16, 0.12, 0.09)
@@ -261,14 +275,22 @@ static func jungle_tree(rng: RandomNumberGenerator, bark: Material, leaves: Mate
 	var leaf_top := Color(0.05, 0.1, 0.045, 0.12)
 	var leaf_bottom := Color(0.012, 0.03, 0.018, 0.05)
 	var vine_anchors: Array[Vector3] = []
+	var blobs: Array[Vector4] = []  # xyz centre, w radius (for leaf cards).
 	for p in canopy_points:
 		for k in rng.randi_range(2, 3):
 			var c := p + Vector3(rng.randf_range(-2.0, 2.0), rng.randf_range(-0.5, 1.0), rng.randf_range(-2.0, 2.0))
 			var rad := rng.randf_range(2.5, 4.2)
 			_blob(leaf_st, c, Vector3(rad, rad * 0.5, rad), rng, leaf_top, leaf_bottom, 4, 8, 0.25)
+			blobs.append(Vector4(c.x, c.y, c.z, rad))
 			for v in rng.randi_range(1, 3):
 				vine_anchors.append(c + Vector3(rng.randf_range(-rad, rad) * 0.7, -rad * 0.35, rng.randf_range(-rad, rad) * 0.7))
 	mesh = _finish(leaf_st, mesh, leaves)
+	if cards:
+		# Own RNG: cards must not shift the tree's random stream (vines, later variants), so a
+		# tree looks the same with and without cards (Low vs High).
+		var card_rng := RandomNumberGenerator.new()
+		card_rng.seed = rng.seed + 7919
+		mesh = _leaf_cards(card_rng, blobs, leaf_top, mesh, cards)
 
 	# Hanging vines.
 	var vine_st := _begin()
@@ -289,6 +311,34 @@ static func jungle_tree(rng: RandomNumberGenerator, bark: Material, leaves: Mate
 
 ## Gnarled dead tree: twisting trunk and recursive bare branches with grey hanging moss.
 ## Returns a mesh with surfaces [bark, moss].
+## Crossed leaf-spray cards scattered over the upper surface of canopy blobs (xyz centre, w radius).
+static func _leaf_cards(rng: RandomNumberGenerator, blobs: Array[Vector4], colour: Color, mesh: ArrayMesh,
+		material: Material) -> ArrayMesh:
+	var st := _begin()
+	for b in blobs:
+		var c := Vector3(b.x, b.y, b.z)
+		var rad := b.w
+		for i in 9:
+			# Point on the flattened blob's surface, mostly the upper half and the rim.
+			var ang := rng.randf() * TAU
+			var up := rng.randf_range(-0.35, 0.9)
+			var dir := Vector3(cos(ang) * sqrt(1.0 - up * up), up, sin(ang) * sqrt(1.0 - up * up))
+			var at := c + Vector3(dir.x * rad, dir.y * rad * 0.5, dir.z * rad) * 0.92
+			var size := rad * rng.randf_range(0.75, 1.05)
+			# Same hue as the canopy, a little brighter on the upper side (never towards white).
+			var col := colour * rng.randf_range(1.0, 1.35) * (1.0 + maxf(up, 0.0) * 0.4)
+			col.a = 0.18
+			var u := _perp(dir)
+			var v := dir.cross(u).normalized()
+			for k in 2:
+				var uu := (u if k == 0 else v) * size * 0.5
+				var vv := (dir * 0.6 + (v if k == 0 else -u) * 0.8).normalized() * size * 0.5
+				var o := at + dir * size * 0.15
+				_quad_uv(st, o - uu - vv, o + uu - vv, o + uu + vv, o - uu + vv, col, col, col, col,
+						Vector2(0, 1), Vector2(1, 1), Vector2(1, 0), Vector2(0, 0))
+	return _finish(st, mesh, material)
+
+
 static func dead_tree(rng: RandomNumberGenerator, bark: Material, moss: Material) -> ArrayMesh:
 	var st := _begin()
 	var moss_anchors: Array[Vector3] = []

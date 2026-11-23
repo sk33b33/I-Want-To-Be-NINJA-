@@ -174,3 +174,9 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Data: `data/combat/blade_trail.tres` (`TrailConfig`) and `AttackDefinition.trail_width / trail_intensity` (heavy set in the generator too). LOW quality uses less smoothing.
 - First look was a near-opaque white sheet (additive + scene glow): toned down to a translucent streak, brightest at the tip.
 - Tests: `trail_test.gd` (4).
+
+## 2026-11-23 — Fix: Godot crashed on Android a few seconds into light attacks
+- Owner report (Godot app on an Android phone; system notice "Godot Engine 4 is crashing frequently"). The crash began with the slash trails, which rebuilt their ribbon geometry every frame (ImmediateMesh: fresh GPU buffers every frame) — a pattern mobile GLES3 drivers handle badly. Desktop could not reproduce it.
+- The trail mesh is now a fixed 32-point strip built once; each frame only shader uniforms change (`shaders/slash_trail.gdshader` positions the vertices). Looks the same.
+- While verifying in the real renderer: unused trail points collapsed to the world origin and drew a streak to the ground — they now collapse onto the last real point.
+- Regression test: the trail mesh is the same object with the same fixed vertex count after repeated swings (failed on the old trail). Needs the owner's retest on the phone to confirm the crash is gone.

@@ -18,6 +18,9 @@
 - A single save profile (no slots, no cloud sync).
 - The keyboard "tap Shift to roll" shortcut follows whatever key is bound to Sprint.
 
+## Watch on device
+- Android crash during light attacks (2026-11-23) — fixed by making the slash trail's geometry static; awaiting confirmation on the owner's phone.
+
 ## Cosmetic / engine
 - Quitting while a sound is still playing prints "resources still in use at exit" in the console (engine shutdown message; no effect on players or saves).
 - On a very slow device the first frames of an expedition hitch while the world is generated (terrain and flora are built at load).

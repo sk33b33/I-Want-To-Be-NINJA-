@@ -68,3 +68,20 @@ func test_trail_colour_follows_the_blade_element() -> void:
 	var c := _trails(p)[0].current_color
 	check(c.r > c.b * 1.5, "fire blades leave an orange trail (%s)" % c)
 	p.combat.blade_element = &""
+
+
+## Regression (owner, Android): the Godot app crashed a few seconds into light-attack spam. The
+## trail rebuilt its geometry every frame (ImmediateMesh), which mobile GLES3 drivers handle badly.
+## The mesh must be built once and never change while swinging; only shader uniforms move.
+func test_trail_geometry_is_built_once_and_never_rebuilt() -> void:
+	var p := _player()
+	await physics_frames(40)
+	var tr := _trails(p)[0]
+	var mesh_before := tr.mesh
+	check(not (tr.mesh is ImmediateMesh), "no per-frame ImmediateMesh")
+	var surface_len := (tr.mesh as ArrayMesh).surface_get_array_len(0) if tr.mesh is ArrayMesh else -1
+	for i in 3:
+		await _swing(p, "attack_light")
+	check(tr.mesh == mesh_before, "same mesh object after three swings")
+	check(tr.mesh is ArrayMesh and (tr.mesh as ArrayMesh).surface_get_array_len(0) == surface_len and surface_len == WeaponTrail.MAX_POINTS * 2,
+			"vertex count fixed at %d" % surface_len)

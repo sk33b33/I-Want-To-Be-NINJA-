@@ -112,6 +112,13 @@ func test_choosing_the_hunt_puts_its_beast_in_the_arena_and_the_part_rewards_onc
 		var boss := main.get_node("Level/Boss") as BossController
 		check(boss.definition.id == StringName(row[0]), "%s is in the arena (got %s)" % [row[0], boss.definition.id])
 		check(m.boss == boss, "the expedition tracks it")
+		# Nothing of the jungle's first boss may come along (bodies, hurtboxes, hitboxes).
+		var scene_children := ((load("res://data/hunts/%s.tres" % row[0]) as HuntDefinition).boss_scene.instantiate())
+		var expected: Array = scene_children.get_children().map(func(c: Node) -> StringName: return c.name)
+		scene_children.free()
+		var got: Array = boss.get_children().map(func(c: Node) -> StringName: return c.name)
+		check(got == expected, "%s has only its own nodes (got %s)" % [row[0], got])
+		check(main.find_children("*", "BossController", true, false).size() == 1, "%s: one boss in the level" % row[0])
 		(main.get_node("Player") as PlayerController).global_position = Vector3(0, 0.5, -104)
 		await physics_frames(10)
 		check(m.arena_entered and m.timer.state == ExpeditionTimer.State.STOPPED, "%s: arena entered, timer stopped" % row[0])

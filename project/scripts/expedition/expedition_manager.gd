@@ -106,10 +106,18 @@ func _swap_in_hunt_boss() -> void:
 	if old == null:
 		return
 	var beast := hunt.boss_scene.instantiate() as Node3D
-	beast.name = old.name
-	beast.transform = old.transform
-	old.replace_by(beast)
+	# Not Node.replace_by(): that moves the old boss's children (body, hurtboxes, hitboxes)
+	# onto the new beast. Free the old boss first so the beast can take its exact name.
+	var parent := old.get_parent()
+	var index := old.get_index()
+	var xform := old.transform
+	var boss_name := old.name
+	parent.remove_child(old)
 	old.free()
+	beast.name = boss_name
+	beast.transform = xform
+	parent.add_child(beast)
+	parent.move_child(beast, index)
 	CrashReport.note("hunt beast: %s" % hunt.id)
 
 

@@ -27,7 +27,7 @@ void fragment() {
 			+ texture(detail_noise, world_pos.xz * scale).r * w.y
 			+ texture(detail_noise, world_pos.xy * scale).r * w.z;
 	float vein = smoothstep(0.03, 0.0, abs(n - 0.52));
-	vec3 col = mix(rock_dark, rock_light, smoothstep(0.3, 0.8, n)) * tt_detail(world_pos, w);
+	vec3 col = mix(rock_dark, rock_light, mix(0.5, smoothstep(0.3, 0.8, n), noise_amount)) * tt_detail(world_pos, w);
 	ALBEDO = col * (1.0 - vein * 0.5);
 	ROUGHNESS = 0.95;
 	if (detail_normals) {

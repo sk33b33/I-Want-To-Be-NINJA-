@@ -31,12 +31,12 @@ void fragment() {
 			+ texture(detail_noise, world_pos.xz * scale).r * w.y
 			+ texture(detail_noise, world_pos.xy * scale).r * w.z;
 	float big = texture(detail_noise, world_pos.xz * scale * 0.15 + world_pos.y * 0.05).r;
-	vec3 col = mix(stone_dark, stone_light, n) * tt_detail(world_pos, w);
+	vec3 col = mix(stone_dark, stone_light, mix(0.45, n, noise_amount)) * tt_detail(world_pos, w);
 	// Block seams (the CC0 stone-block texture has its own, so only without one).
 	float seam = smoothstep(0.03, 0.0, abs(fract(world_pos.y * 0.9) - 0.5) - 0.47) * seams;
 	col *= 1.0 - seam * 0.5;
 	float moss_w = smoothstep(0.35, 0.85, world_normal.y + big * 0.6 - 0.3) * moss_amount;
-	moss_w = max(moss_w, smoothstep(0.65, 0.9, big) * moss_amount * 0.7);
+	moss_w = max(moss_w, smoothstep(0.65, 0.9, big) * moss_amount * 0.7 * noise_amount);
 	col = mix(col, moss * (0.6 + n * 0.8), moss_w);
 	if (climb_marks > 0.0) {
 		// Staggered handhold notches on vertical faces only.

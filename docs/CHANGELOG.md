@@ -227,3 +227,12 @@ Owner approved Phase 13 scope: second beast per jungle → more weapons → secr
 - Bodies are procedural primitives (placeholder art, original designs).
 - Tests: `beasts_test.gd` (5) — complete data, every attack warns before it can hurt, the hunt puts its beast in the arena and the part rewards once, unlock order, and a gate bot that defeats each new beast (bringing the talisman for its weakness). 233 tests total, all passing.
 - Bug found by screenshot, fixed: swapping in the new beast with `Node.replace_by()` carried the jungle's first boss's body, hurtboxes and hitboxes along on the new beast (Kasai wore the Tortoise's horns). The old boss is now freed before the beast takes its place; the arena test checks the beast has only its own nodes (failed before the fix).
+
+## 2026-11-23 — Art pass, stage 1: ground & rocks (CC0 textures, painterly)
+Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground & rocks → trees & plants → lighting & mood → beasts), phones kept at 30 fps on Low.
+- Five CC0 texture sets from ambientCG (forest floor, mud path, cliff rock, stone blocks, bark; colour + normal map, ~2.7 MB total, VRAM-compressed with mipmaps), recorded in `assets/ASSET_LEDGER.md`.
+- Painterly use: the textures give the **detail** (twigs, leaf litter, cracks, block joints) while each jungle's palette gives the **colour**, so the four jungles share one small texture set and keep their own look. Each texture's 1×1 mip is its average colour, used to keep brightness under the palette's control.
+- Terrain (`terrain.gdshader`): textured ground cover, trodden path and triplanar rock on slopes. Route stone, ruins and climb walls (`stone`), basalt (`basalt`), reed rafts, scattered boulders, tree bark and wooden route pieces (new `painted.gdshader`) all get triplanar texture detail (`include/textured_triplanar.gdshaderinc`).
+- Quality: normal maps and the anti-tiling sample are global shader uniforms (`detail_normals`, `anti_tile`, project.godot `[shader_globals]`) set once per expedition from `QualityPreset` — **off on Low**. Texture choice per material: `Cc0Surfaces` (used by `tools/generate_visual_pass.gd`; `tools/apply_cc0_textures.gd` patches existing materials).
+- Reviewed with before/after screenshots in all four jungles (High and Low); stone walls and basalt toned down after the first round (the old noise pattern fought the texture).
+- Tests: `art_test.gd` (4).

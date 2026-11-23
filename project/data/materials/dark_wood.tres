@@ -10,6 +10,7 @@ shader = ExtResource("1_p6pek")
 shader_parameter/tt_tex = ExtResource("3_44ost")
 shader_parameter/tt_nrm = ExtResource("2_mqd85")
 shader_parameter/tt_tile = 1.6
+shader_parameter/noise_amount = null
 shader_parameter/tt_strength = 0.8
 shader_parameter/tt_normal_strength = null
 shader_parameter/base_color = Color(0.11, 0.075, 0.05, 1)

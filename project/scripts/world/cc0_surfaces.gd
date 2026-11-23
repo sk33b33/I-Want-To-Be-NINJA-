@@ -24,7 +24,8 @@ const BY_MATERIAL := {
 
 ## Per-shader / per-material tuning (material file name wins over shader name).
 const TUNING := {
-	"stone": {"tt_tile": 4.0, "tt_strength": 0.55, "tt_normal_strength": 0.6, "seams": 0.0},
+	"stone": {"tt_tile": 4.0, "tt_strength": 0.7, "tt_normal_strength": 0.6, "seams": 0.0, "noise_amount": 0.25},
+	"basalt": {"tt_tile": 5.0, "tt_strength": 1.0, "noise_amount": 0.3},
 	"bark_vertex": {"tt_tile": 1.6, "tt_strength": 0.8},
 	"dark_wood": {"tt_tile": 1.6, "tt_strength": 0.8},
 	"reed": {"tt_tile": 1.2},

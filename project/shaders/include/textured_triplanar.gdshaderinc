@@ -7,6 +7,9 @@ uniform sampler2D tt_tex : source_color, hint_default_white, repeat_enable, filt
 uniform sampler2D tt_nrm : hint_normal, repeat_enable, filter_linear_mipmap;
 // Metres per texture repeat.
 uniform float tt_tile = 2.5;
+// How much of the shader's older procedural noise pattern stays (1 = all; lower it when a
+// texture is assigned so the texture carries the detail).
+uniform float noise_amount : hint_range(0.0, 1.0) = 1.0;
 uniform float tt_strength : hint_range(0.0, 1.5) = 0.9;
 uniform float tt_normal_strength : hint_range(0.0, 2.0) = 1.0;
 // Set from QualityPreset.detail_normals (see project.godot [shader_globals]).

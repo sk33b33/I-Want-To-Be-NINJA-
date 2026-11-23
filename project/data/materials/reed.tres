@@ -11,6 +11,7 @@ shader = ExtResource("1_bx21q")
 shader_parameter/tt_tex = ExtResource("4_q0lda")
 shader_parameter/tt_nrm = ExtResource("3_xkbfl")
 shader_parameter/tt_tile = 1.2
+shader_parameter/noise_amount = null
 shader_parameter/tt_strength = null
 shader_parameter/tt_normal_strength = null
 shader_parameter/detail_noise = ExtResource("2_58wmi")

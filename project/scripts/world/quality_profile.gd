@@ -64,6 +64,7 @@ static func apply_to_scene(root: Node) -> void:
 				env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 				if env.sky:
 					env.sky.radiance_size = Sky.RADIANCE_SIZE_32
+	apply_brightness(root)
 	for n in root.find_children("*", "DirectionalLight3D", true, false):
 		var sun := n as DirectionalLight3D
 		sun.shadow_enabled = sun.shadow_enabled and q.moon_shadows
@@ -76,3 +77,18 @@ static func apply_to_scene(root: Node) -> void:
 		l.distance_fade_begin = q.light_fade_distance
 		l.distance_fade_length = 6.0
 		l.shadow_enabled = false
+
+
+## Picture brightness (GameSettings.brightness) on every WorldEnvironment under `root`. The
+## level's own values are remembered, so changing the slider never compounds.
+static func apply_brightness(root: Node) -> void:
+	var b := GameSettings.brightness
+	for n in root.find_children("*", "WorldEnvironment", true, false):
+		var env := (n as WorldEnvironment).environment
+		if env == null:
+			continue
+		if not env.has_meta(&"base_exposure"):
+			env.set_meta(&"base_exposure", env.tonemap_exposure)
+			env.set_meta(&"base_ambient", env.ambient_light_energy)
+		env.tonemap_exposure = float(env.get_meta(&"base_exposure")) * b
+		env.ambient_light_energy = float(env.get_meta(&"base_ambient")) * b

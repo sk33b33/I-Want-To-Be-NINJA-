@@ -209,3 +209,8 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 
 ## 2026-11-23 — Android crash confirmed fixed
 - Owner retest on the Galaxy S20: **no more crashes**. Confirmed cause: the engine's WAV loop wrap at the end of the 8 s ambience loop (round 5). The earlier rounds' changes are kept as phone hardening and diagnostics (static trail geometry, baked fists, sky written only on change and still on Low, shader warm-up, crash reports with breadcrumbs).
+
+## 2026-11-23 — Brighter by default + brightness setting; unlock all jungles for testing
+- Owner: "still a bit too dark". New **Brightness** slider (Settings, dojo and pause menu; 0.8–2.0×, live) scaling each jungle's exposure and ambient light; default **1.5×** (compared on Low at 1.0 / 1.5 / 1.8 — 1.5 shows the ground, ninja and props and still reads moody; 1.8 starts to wash out). `QualityProfile.apply_brightness()` remembers the level's own values so the slider never compounds.
+- Owner: "make the other jungles available so I can test". New dojo switch **Unlock all jungles (testing)** (saved; off by default) — the hunt board refreshes with all four hunts open. The normal unlock chain is unchanged when it is off.
+- Tests: `brightness_unlock_test.gd` (2). 228 total.

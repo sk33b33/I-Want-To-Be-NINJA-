@@ -23,6 +23,10 @@ static var screen_shake: bool = true
 static var bold_warnings: bool = false
 static var quality: String = "auto"
 static var difficulty: String = "normal"
+## Picture brightness multiplier (exposure + ambient light), 0.8 .. 2.0. Owner: "still a bit too dark".
+static var brightness: float = 1.5
+## Testing: open every jungle without the unlock chain.
+static var unlock_all: bool = false
 ## Touch button size multiplier (accessibility; 0.8 .. 1.4).
 static var touch_scale: float = 1.0
 static var master_volume: float = 1.0
@@ -47,6 +51,8 @@ static func load_settings() -> void:
 		bold_warnings = bool(cfg.get_value("readability", "bold_warnings", false))
 		quality = String(cfg.get_value("graphics", "quality", "auto"))
 		difficulty = String(cfg.get_value("game", "difficulty", "normal"))
+		brightness = float(cfg.get_value("graphics", "brightness", 1.5))
+		unlock_all = bool(cfg.get_value("game", "unlock_all", false))
 		touch_scale = float(cfg.get_value("controls", "touch_scale", 1.0))
 		InputRemap.load_from(cfg)
 		master_volume = float(cfg.get_value("audio", "master", 1.0))
@@ -57,6 +63,8 @@ static func load_settings() -> void:
 		bold_warnings = false
 		quality = "auto"
 		difficulty = "normal"
+		brightness = 1.5
+		unlock_all = false
 		touch_scale = 1.0
 		InputRemap.reset_to_defaults(false)
 		master_volume = 1.0
@@ -71,6 +79,8 @@ static func save_settings() -> void:
 	cfg.set_value("readability", "bold_warnings", bold_warnings)
 	cfg.set_value("graphics", "quality", quality)
 	cfg.set_value("game", "difficulty", difficulty)
+	cfg.set_value("graphics", "brightness", brightness)
+	cfg.set_value("game", "unlock_all", unlock_all)
 	cfg.set_value("controls", "touch_scale", touch_scale)
 	InputRemap.save_to(cfg)
 	cfg.set_value("audio", "master", master_volume)
@@ -108,6 +118,22 @@ static func difficulty_preset() -> DifficultyPreset:
 		load_settings()
 	var p := "res://data/difficulty/%s.tres" % difficulty
 	return load(p if ResourceLoader.exists(p) else "res://data/difficulty/normal.tres") as DifficultyPreset
+
+
+static func set_brightness(v: float) -> void:
+	brightness = clampf(v, 0.8, 2.0)
+	save_settings()
+
+
+static func set_unlock_all(on: bool) -> void:
+	unlock_all = on
+	save_settings()
+
+
+static func get_unlock_all() -> bool:
+	if not _loaded:
+		load_settings()
+	return unlock_all
 
 
 static func set_touch_scale(v: float) -> void:

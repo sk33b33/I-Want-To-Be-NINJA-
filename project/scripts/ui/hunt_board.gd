@@ -11,6 +11,9 @@ extends Control
 ## Recipes and item names for the forge.
 @export var crafting: CraftingCatalog
 
+## Tab to show when the board opens (set before reloading it).
+static var open_tab_on_ready: String = ""
+
 var _start_buttons: Dictionary = {}  # hunt id -> Button
 var materials_label: Label
 var forge: ForgePanel
@@ -140,6 +143,10 @@ func _build() -> void:
 	settings_scroll.add_child(settings_col)
 	settings = SettingsPanel.new(true)
 	settings.benchmark_requested.connect(func() -> void: BenchmarkRunner.start(get_tree()))
+	settings.unlock_changed.connect(func() -> void:
+		# Rebuild the board so the jungle cards show the new state; come back to this tab.
+		HuntBoard.open_tab_on_ready = "settings"
+		SceneFlow.go_to_hunt_board(get_tree()))
 	settings_col.add_child(settings)
 	controls = ControlsPanel.new()
 	settings_col.add_child(controls)
@@ -168,7 +175,10 @@ func _build() -> void:
 		grid.add_child(card)
 		if first == null and _start_buttons.has(biome.hunts[0].id if not biome.hunts.is_empty() else &""):
 			first = _start_buttons.get(biome.hunts[0].id)
-	if not BenchmarkRunner.last_results.is_empty() and BenchmarkRunner.show_results_once:
+	if open_tab_on_ready != "":
+		show_tab.call_deferred(open_tab_on_ready)
+		open_tab_on_ready = ""
+	elif not BenchmarkRunner.last_results.is_empty() and BenchmarkRunner.show_results_once:
 		BenchmarkRunner.show_results_once = false
 		show_tab.call_deferred("settings")
 	elif first:
@@ -217,7 +227,7 @@ func _materials_text() -> String:
 static func is_open(biome: BiomeDefinition, profile: PlayerProfile) -> bool:
 	if not biome.unlocked:
 		return false
-	if "--unlock-all" in OS.get_cmdline_user_args() or biome.requires_hunt == &"":
+	if "--unlock-all" in OS.get_cmdline_user_args() or biome.requires_hunt == &"" or GameSettings.get_unlock_all():
 		return true
 	return int(profile.hunts_completed.get(String(biome.requires_hunt), 0)) > 0
 

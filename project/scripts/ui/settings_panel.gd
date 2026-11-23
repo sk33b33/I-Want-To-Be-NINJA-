@@ -5,10 +5,13 @@ extends VBoxContainer
 ## (GameSettings, user://settings.cfg). Graphics changes apply from the next expedition.
 
 signal benchmark_requested
+signal unlock_changed
 
 var quality_button: Button
 var difficulty_button: Button
 var touch_slider: HSlider
+var brightness_slider: HSlider
+var unlock_button: Button
 var shake_button: Button
 var warnings_button: Button
 var sliders: Dictionary = {}  # bus name -> HSlider
@@ -26,6 +29,25 @@ func _ready() -> void:
 	quality_button = UiStyle.button("")
 	quality_button.pressed.connect(cycle_quality)
 	add_child(quality_button)
+	var brow := HBoxContainer.new()
+	brow.add_theme_constant_override("separation", 12)
+	var bl := UiStyle.label("Brightness", 18)
+	bl.custom_minimum_size.x = 200
+	brow.add_child(bl)
+	brightness_slider = HSlider.new()
+	brightness_slider.min_value = 0.8
+	brightness_slider.max_value = 2.0
+	brightness_slider.step = 0.05
+	brightness_slider.custom_minimum_size = Vector2(260, 44)
+	brightness_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	brightness_slider.value = GameSettings.brightness
+	brightness_slider.value_changed.connect(func(v: float) -> void:
+		GameSettings.set_brightness(v)
+		var scene := get_tree().current_scene
+		if scene:
+			QualityProfile.apply_brightness(scene))  # Live in the pause menu.
+	brow.add_child(brightness_slider)
+	add_child(brow)
 	difficulty_button = UiStyle.button("")
 	difficulty_button.pressed.connect(cycle_difficulty)
 	add_child(difficulty_button)
@@ -72,7 +94,13 @@ func _ready() -> void:
 		GameSettings.set_bold_warnings(not GameSettings.bold_warnings)
 		refresh())
 	add_child(warnings_button)
-	if _show_benchmark:
+	if _show_benchmark:  # Dojo only.
+		unlock_button = UiStyle.button("", UiStyle.MUTED)
+		unlock_button.pressed.connect(func() -> void:
+			GameSettings.set_unlock_all(not GameSettings.unlock_all)
+			refresh()
+			unlock_changed.emit())
+		add_child(unlock_button)
 		benchmark_button = UiStyle.button("Run benchmark (about 1 minute)", UiStyle.WARNING)
 		benchmark_button.pressed.connect(func() -> void: benchmark_requested.emit())
 		add_child(benchmark_button)
@@ -101,6 +129,8 @@ func refresh() -> void:
 	quality_button.text = "Graphics: %s" % label
 	shake_button.text = "Screen shake: %s" % ("On" if GameSettings.screen_shake else "Off")
 	warnings_button.text = "Bold attack warnings: %s" % ("On" if GameSettings.bold_warnings else "Off")
+	if unlock_button:
+		unlock_button.text = "Unlock all jungles (testing): %s" % ("On" if GameSettings.unlock_all else "Off")
 
 
 static func _volume(bus: String) -> float:

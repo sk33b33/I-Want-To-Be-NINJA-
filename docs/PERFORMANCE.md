@@ -55,6 +55,21 @@ re-draws the scene), terrain 119k (1 m grid), route boxes 68 draw calls; small l
 | Stormcrag | 163 / 106k | 255 / 360k | 345 / 626k |
 | **Budget** | **250 / 250k ✔** | **350 / 600k ✔** | **500 / 1.2M ✔** |
 
+### Art pass (CC0 textures + leaf cards), 2026-11-23 — worst viewpoint per jungle
+| Jungle | Low draws / tris | Medium draws / tris | High draws / tris |
+|---|---|---|---|
+| Verdant Canopy | 112 / 155k | 231 / 583k | 334 / 1024k |
+| Emberwild | 135 / 130k | 242 / 451k | 320 / 774k |
+| Moonfen | 151 / 138k | 260 / 484k | 326 / 831k |
+| Stormcrag | 123 / 97k | 223 / 370k | 311 / 648k |
+| **Budget** | **250 / 250k ✔** | **350 / 600k ✔ (Verdant tight)** | **500 / 1.2M ✔** |
+
+Leaf cards (Medium/High only) add ~50k triangles at the worst Verdant viewpoints; Low has none.
+Texture reads are the new cost: on the software renderer the Low frame went from 11–16 fps to
+9–12 fps at the same viewpoints (software rendering exaggerates texture cost; a phone GPU reads
+compressed, mipmapped textures far more cheaply). **The owner's phone benchmark is the real test**;
+if Low drops below 30 fps, the first lever is `QualityPreset` (e.g. a cheaper terrain path for Low).
+
 Low now draws **61–83% fewer triangles** than the old Low at the same viewpoints, and roughly a
 third of High. On the same (software) renderer a Low frame costs ~2.5× less than Medium and ~3×
 less than High.

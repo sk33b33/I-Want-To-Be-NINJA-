@@ -236,3 +236,9 @@ Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground 
 - Quality: normal maps and the anti-tiling sample are global shader uniforms (`detail_normals`, `anti_tile`, project.godot `[shader_globals]`) set once per expedition from `QualityPreset` — **off on Low**. Texture choice per material: `Cc0Surfaces` (used by `tools/generate_visual_pass.gd`; `tools/apply_cc0_textures.gd` patches existing materials).
 - Reviewed with before/after screenshots in all four jungles (High and Low); stone walls and basalt toned down after the first round (the old noise pattern fought the texture).
 - Tests: `art_test.gd` (4).
+
+## 2026-11-23 — Art pass, stage 2: trees & plants
+- **Leafy canopies:** a leaf-spray sprite composited from CC0 ambientCG leaves (`tools/art/leaf_cluster.py`, ledger) on crossed leaf cards around every canopy core (`leaf_card.gdshader`, alpha-tested, same wind sway, tinted per jungle) — Medium/High only (`QualityPreset.leaf_cards`). The cards use their own random stream, so a tree is identical with or without them.
+- **All tiers (no extra geometry):** canopy cores carry the leaf-spray texture as detail; broadleaf plants have veins (midrib + side veins drawn from new blade UVs) and darker edges; every plant is darker at its base and varies slowly in colour across the jungle; tree bark texture is stronger.
+- Benchmark: all presets inside their triangle/draw budgets (Medium Verdant tight: 583k of 600k); Low software-renderer frame time rose with the extra texture reads — see `docs/PERFORMANCE.md`; needs the owner's phone check.
+- Tests: `art_test.gd` +3 (cards only add a surface and never change the tree; Low has none, High has them; every jungle's canopy has leaf detail and veins).

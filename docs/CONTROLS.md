@@ -49,6 +49,8 @@ Moonfen: mud slows you and you cannot jump while in it; a stream current pushes 
 
 Stormcrag: on the storm plateau a pale ring appears where you stand — move on (or roll) before the bolt falls, or rest under a rock overhang. On the gale ridge, white chevrons show which way the next gust will blow; cross in the calm. Wet stone is slippery: you speed up and stop slowly.
 
+Sprinting into a climbable wall (sprint + jump at the wall) plays a kick-up onto the wall before the climb.
+
 Blades: draw / sheathe puts both blades in the left-hip sheath or back in hand. Standing still plays the full animation; on the move you keep running and the blades change place on time; a roll finishes it at once. Attacking with sheathed blades draws them and attacks in one press. Expeditions start with blades drawn.
 
 Notes:

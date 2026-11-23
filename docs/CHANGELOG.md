@@ -156,3 +156,8 @@ Owner feedback: wanted more landscape, more flora and fauna, more detailed terra
 - Never in the way: standing still plays the full animation; moving keeps running while the blades change place on time; a roll completes it instantly; attacking while sheathed draws and attacks in one press; an attack during the first part of a sheathe cancels it. Expeditions start with blades drawn (no change for existing play).
 - Placement bug found by screenshot: the sheath was first computed from the hip bone's rest pose and ended up in front of the body pointing sideways; it is now set in the player's frame and calibrated on the live standing pose (test checks left side, hip height, pointing back and down).
 - Tests: `blades_test.gd` (8); animator clip list updated to 14. 205 total.
+
+## 2026-11-23 — Sprint_To_Wall_Climb kick-up
+- Reaching a climbable wall at sprint speed (≥ 9 m/s, `NinjaAnimationConfig.wall_run_min_speed`) plays the kick-up part of the owner's **Sprint_To_Wall_Climb** (0.5–1.83 s; the run-up before it already happened in game) at 1.4×, then hands over to the climb loop; climbing down cancels it. A normal run still goes straight into the climb.
+- Bug found by screenshot: removing the clip's root motion anchored the hips where they are at the start of the slice — 1.9 m ahead after the run-up — so the ninja was drawn inside the wall. Hips are now anchored horizontally at the clip's first frame (over the feet); a test checks it.
+- Tests: animator suite +3 (sprint kick-up, no kick-up from a run, kick-up in place).

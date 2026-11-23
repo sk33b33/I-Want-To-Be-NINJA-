@@ -17,6 +17,8 @@ var _anim: AnimationPlayer
 var _air_clip: StringName
 var _land_timer: float = 0.0
 var _idle_name: StringName = &"Idle"
+var _approach_speed: float = 0.0  # Horizontal speed just before a climb started.
+var _wall_running: bool = false  # Playing the sprint kick-up at the start of a climb.
 
 
 func _ready() -> void:
@@ -68,6 +70,14 @@ func _physics_process(delta: float) -> void:
 			_enter_ground_state(_player.get_horizontal_speed())
 		return
 	if _player.traversal and _player.traversal.state != TraversalComponent.State.NONE:
+		if state == State.CLIMB and _wall_running:
+			# Sprint kick-up: let it finish unless the player climbs down or lets go.
+			var down := _player.traversal.get_climb_velocity().y < -0.1
+			if not down and _anim.current_animation == config.wall_run_clip \
+					and _anim.current_animation_position < config.wall_run_end_time:
+				return
+			_wall_running = false
+			_play(config.climb_clip, 0.15)
 		if state == State.CLIMB:
 			var v := _player.traversal.get_climb_velocity()
 			var clip := config.climb_down_clip if v.y < -0.1 and _anim.has_animation(config.climb_down_clip) else config.climb_clip
@@ -77,6 +87,7 @@ func _physics_process(delta: float) -> void:
 		return
 	var speed := _player.get_horizontal_speed()
 	var on_floor := _player.is_on_floor()
+	_approach_speed = speed  # Remembered for the moment a climb starts (traversal zeroes it).
 	match state:
 		State.AIR:
 			if _anim.current_animation == config.jump_clip and _anim.current_animation_position >= config.jump_hold_time:
@@ -183,7 +194,13 @@ func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
 	match traversal_state:
 		TraversalComponent.State.CLIMB:
 			state = State.CLIMB
-			_play(config.climb_clip, 0.1)
+			_wall_running = _approach_speed >= config.wall_run_min_speed and _anim.has_animation(config.wall_run_clip)
+			if _wall_running:
+				_play(config.wall_run_clip, 0.08)
+				_anim.seek(config.wall_run_start_time, true)
+				_anim.speed_scale = config.wall_run_speed
+			else:
+				_play(config.climb_clip, 0.1)
 		TraversalComponent.State.HANG:
 			state = State.HANG
 			_play(config.hang_clip, 0.08)
@@ -252,6 +269,8 @@ func _prepare_clips() -> void:
 			var a := _anim.get_animation(clip)
 			_detrend_hips(a, 0.0, a.length)
 			a.loop_mode = Animation.LOOP_LINEAR
+	if _anim.has_animation(config.wall_run_clip):
+		_detrend_hips(_anim.get_animation(config.wall_run_clip), config.wall_run_start_time, config.wall_run_end_time)
 	if _anim.has_animation(config.mantle_clip):
 		_detrend_hips(_anim.get_animation(config.mantle_clip), config.mantle_start_time, config.mantle_end_time)
 	for clip in config.strip_forward_motion:
@@ -291,7 +310,10 @@ func _detrend_hips(anim: Animation, from: float, to: float) -> void:
 		return
 	var a := anim.position_track_interpolate(track, from)
 	var b := anim.position_track_interpolate(track, to)
-	var anchor := Vector3(a.x, a.y, maxf(a.z, b.z))  # -z is up: the lower of the two ends.
+	# Horizontal: where the hips stand at the clip's first frame (over the feet), even when the
+	# slice starts later; vertical (-z is up): the lower of the two ends.
+	var first := anim.position_track_interpolate(track, 0.0)
+	var anchor := Vector3(first.x, first.y, maxf(a.z, b.z))
 	for k in anim.track_get_key_count(track):
 		var t := anim.track_get_key_time(track, k)
 		var w := clampf((t - from) / (to - from), 0.0, 1.0)

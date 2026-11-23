@@ -10,7 +10,7 @@ func _setup() -> Array:
 	return [player, animator]
 
 
-func test_ninja_model_and_all_fourteen_clips_are_present() -> void:
+func test_ninja_model_and_all_fifteen_clips_are_present() -> void:
 	var nodes := _setup()
 	var player: PlayerController = nodes[0]
 	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
@@ -18,7 +18,7 @@ func test_ninja_model_and_all_fourteen_clips_are_present() -> void:
 	if anim == null:
 		return
 	for clip in ["Run", "Sprint", "Jump", "Front_Flip", "Front_Flip_2", "Quick_Roll_To_Run",
-			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward", "Climb_Up_Wall", "Climb_Down_Wall", "Climb_On", "Draw_Sword", "Sheath_Sword"]:
+			"Dual_Weapon_Combo", "Crouch_Walk", "Death_Backward", "Climb_Up_Wall", "Climb_Down_Wall", "Climb_On", "Draw_Sword", "Sheath_Sword", "Sprint_To_Wall_Climb"]:
 		check(anim.has_animation(clip), "clip %s imported" % clip)
 	check(anim.has_animation("Idle"), "Idle pose generated (the GLB has no idle clip)")
 
@@ -195,3 +195,60 @@ func test_hang_and_mantle_use_the_climb_on_clip() -> void:
 	var p0 := a.position_track_interpolate(t, cfg.mantle_start_time)
 	var p1 := a.position_track_interpolate(t, cfg.mantle_end_time)
 	check(p0.distance_to(p1) < 5.0, "no root motion over the pull-up (%.0f cm)" % p0.distance_to(p1))
+
+
+func _climb_from(sprint: bool) -> Array:
+	make_floor(Vector3(100, 1, 100))
+	var wall := make_floor(Vector3(8, 8, 1), Vector3(0, 4, -12.0))
+	wall.collision_layer = 1 | 4
+	var player := make_player(Vector3(0, 0.05, 0))
+	var anim := player.get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(10)
+	press("move_forward")
+	if sprint:
+		press("sprint")
+	for i in 200:
+		await tree.physics_frame
+		if player.global_position.z < -9.6 and player.is_on_floor():
+			break
+	press("jump")
+	var seen := {}
+	for i in 90:
+		await tree.physics_frame
+		if player.traversal.state == TraversalComponent.State.CLIMB:
+			seen[anim.current_animation] = true
+	release("jump")
+	release("sprint")
+	release("move_forward")
+	return [player, anim, seen]
+
+
+## Owner request: Sprint_To_Wall_Climb when a sprint ends on a climbable wall.
+func test_sprinting_into_a_wall_kicks_up_with_sprint_to_wall_climb() -> void:
+	var r: Array = await _climb_from(true)
+	var seen: Dictionary = r[2]
+	check(seen.has(&"Sprint_To_Wall_Climb"), "kick-up played (saw %s)" % str(seen.keys()))
+	check(seen.has(&"Climb_Up_Wall"), "then the climb loop takes over")
+
+
+func test_walking_into_a_wall_climbs_without_the_kick_up() -> void:
+	var r: Array = await _climb_from(false)
+	var seen: Dictionary = r[2]
+	check(not seen.has(&"Sprint_To_Wall_Climb"), "no kick-up from a run (saw %s)" % str(seen.keys()))
+	check(seen.has(&"Climb_Up_Wall"), "climb loop")
+
+
+func test_kick_up_slice_has_no_root_motion() -> void:
+	var nodes := _setup()
+	var animator: NinjaAnimator = nodes[1]
+	var anim := (nodes[0] as PlayerController).get_node("Visual/NinjaModel/AnimationPlayer") as AnimationPlayer
+	await physics_frames(2)
+	var cfg := animator.config
+	var a := anim.get_animation(&"Sprint_To_Wall_Climb")
+	var t := a.find_track(^"Armature/Skeleton3D:mixamorig_Hips", Animation.TYPE_POSITION_3D)
+	var p0 := a.position_track_interpolate(t, cfg.wall_run_start_time)
+	var p1 := a.position_track_interpolate(t, cfg.wall_run_end_time)
+	check(p0.distance_to(p1) < 5.0, "kick-up stays in place (%.0f cm)" % p0.distance_to(p1))
+	# Standing hips sit within a few cm of the model origin (bone-space x/y are horizontal).
+	check(Vector2(p0.x, p0.y).length() < 30.0,
+			"the body stays over its feet, not pushed into the wall (%.0f cm ahead)" % Vector2(p0.x, p0.y).length())

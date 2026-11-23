@@ -23,6 +23,14 @@ extends Resource
 ## Climb speed (m/s) at which the climb clips play at 1x, and the fastest playback.
 @export var climb_reference_speed: float = 1.2
 @export var climb_max_speed_scale: float = 2.5
+## Reaching a climbable wall at sprint speed: the kick-up part of `wall_run_clip` (the run-up
+## before `wall_run_start_time` already happened in game), then the climb loop takes over.
+@export var wall_run_clip: StringName = &"Sprint_To_Wall_Climb"
+@export var wall_run_start_time: float = 0.5
+@export var wall_run_end_time: float = 1.83
+@export var wall_run_speed: float = 1.4
+## Approach speed (m/s) that counts as a sprint (run 7, sprint 11 in PlayerMovementConfig).
+@export var wall_run_min_speed: float = 9.0
 ## Hanging from a ledge: a held pose from `hang_clip` at `hang_pose_time`.
 @export var hang_clip: StringName = &"Climb_On"
 @export var hang_pose_time: float = 0.0

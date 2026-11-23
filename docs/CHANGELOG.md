@@ -242,3 +242,13 @@ Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground 
 - **All tiers (no extra geometry):** canopy cores carry the leaf-spray texture as detail; broadleaf plants have veins (midrib + side veins drawn from new blade UVs) and darker edges; every plant is darker at its base and varies slowly in colour across the jungle; tree bark texture is stronger.
 - Benchmark: all presets inside their triangle/draw budgets (Medium Verdant tight: 583k of 600k); Low software-renderer frame time rose with the extra texture reads — see `docs/PERFORMANCE.md`; needs the owner's phone check.
 - Tests: `art_test.gd` +3 (cards only add a surface and never change the tree; Low has none, High has them; every jungle's canopy has leaf detail and veins).
+
+## 2026-11-23 — Art pass, stage 3: lighting & mood
+- **`JungleMood`** (one per jungle in `data/mood/`, written by `tools/generate_moods.gd`, hand-tunable) applied once at load by `BiomeAtmosphere`: sun/moon colour and strength, ambient, exposure, **height fog that pools in valleys with a glow towards the sun**, saturation/contrast, a **split-tone colour grade** (shadows and highlights tinted separately; Environment colour-correction curve, verified on the compatibility renderer; off on Low via `QualityPreset.color_grade_lut`), light shafts (colour, strength, width) and stream water colour. Graded toward the concept art:
+  - Verdant Canopy: golden back-light in teal mist, wider golden light shafts, turquoise water (was cool blue-grey, desaturated).
+  - Emberwild: ash-grey haze, orange light.
+  - Moonfen: deep blue with **bioluminescent foliage** — leaf veins and the brightest canopy leaves glow cyan and magenta (`foliage.gdshader`/`leaf_card.gdshader` `glow_color`, `glow_color_b`).
+  - Stormcrag: slate storm light, full saturation (was 0.75), turquoise water.
+- Moonfen's wooden route walls a little lighter (they read as black).
+- The brightness slider scales each mood's exposure/ambient (unchanged behaviour).
+- Bug found and fixed while reviewing screenshots: the first version put `mood` before `script` in the scene files, so Godot dropped it and nothing changed. `art_test.gd` now checks every jungle's sun, fog, saturation, grade (off on Low) and brightness come from its mood (watched failing on the old order).

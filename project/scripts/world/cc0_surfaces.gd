@@ -46,7 +46,7 @@ const LEAF_SPRAY := "leaf_spray.png"
 const PAINTED := {
 	"bark_vertex": [Color(1, 1, 1), 0.95],
 	"rock_vertex": [Color(1, 1, 1), 0.9],
-	"dark_wood": [Color(0.11, 0.075, 0.05), 0.9],
+	"dark_wood": [Color(0.17, 0.12, 0.08), 0.9],  # Lighter in stage 3 (Moonfen walls read as black).
 }
 
 

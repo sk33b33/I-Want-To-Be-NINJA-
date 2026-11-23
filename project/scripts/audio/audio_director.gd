@@ -52,11 +52,13 @@ func _ready() -> void:
 		_players_3d.append(p3)
 	music = AudioStreamPlayer.new()
 	music.name = "Music"
+	music.finished.connect(_restart.bind("music"))
 	music.bus = &"Music"
 	music.volume_db = bank.music_volume_db
 	add_child(music)
 	ambience = AudioStreamPlayer.new()
 	ambience.name = "Ambience"
+	ambience.finished.connect(_restart.bind("ambience"))
 	ambience.bus = &"Ambience"
 	ambience.volume_db = bank.ambience_volume_db
 	add_child(ambience)
@@ -86,9 +88,11 @@ func setup(scene_root: Node, manager: ExpeditionManager) -> void:
 		manager.boss_arena_entered.connect(func(_r: float) -> void: _play_music(bank.music_boss))
 		manager.item_collected.connect(func(_it: ItemDefinition, _n: int) -> void: play(&"pickup"))
 		manager.hunt_completed.connect(func() -> void:
+			music_stopped = true
 			music.stop()
 			play(&"victory"))
 		manager.timer_expired.connect(func() -> void:
+			music_stopped = true
 			music.stop()
 			play(&"death"))
 		var boss := manager.boss
@@ -125,6 +129,21 @@ func _start_ambience(level: Node) -> void:
 	if bank.ambience.has(key):
 		ambience.stream = bank.ambience[key]
 		ambience.play()
+
+
+## Ambience and music loop by restarting when they end (no engine WAV looping — see
+## tools/generate_audio.gd). Stopped players (victory, timeout) are not restarted.
+var music_stopped: bool = false
+var loops_restarted: int = 0
+
+
+func _restart(which: String) -> void:
+	var p := music if which == "music" else ambience
+	if p.stream == null or (which == "music" and music_stopped) or not is_inside_tree():
+		return
+	loops_restarted += 1
+	CrashReport.note("%s loop restart" % which)
+	p.play()
 
 
 func _play_music(stream: AudioStream) -> void:

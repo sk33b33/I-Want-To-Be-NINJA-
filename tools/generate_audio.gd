@@ -81,10 +81,11 @@ func _save(samples: PackedFloat32Array, path: String, loop: bool) -> AudioStream
 	w.mix_rate = SR
 	w.stereo = false
 	w.data = bytes
-	if loop:
-		w.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		w.loop_begin = 0
-		w.loop_end = samples.size()
+	# Loops are NOT marked as WAV loops: the engine's WAV loop wrap crashed the Godot app on the
+	# owner's Android phone (Mali-G77 / S20) exactly when the 8 s ambience first looped.
+	# AudioDirector restarts loop streams itself when they finish; `loop` only shapes the
+	# content (seamless crossfaded ends).
+	w.loop_mode = AudioStreamWAV.LOOP_DISABLED
 	ResourceSaver.save(w, path)
 	return load(path) as AudioStreamWAV
 

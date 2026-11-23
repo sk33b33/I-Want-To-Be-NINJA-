@@ -19,7 +19,7 @@
 - The keyboard "tap Shift to roll" shortcut follows whatever key is bound to Sprint.
 
 ## Watch on device
-- Android crash a few seconds into an expedition (2026-11-23): slash-trail geometry made static, the per-frame finger modifier replaced by baked clips, and the sky no longer re-baked every frame (no sky flash / reflections on Low); awaiting confirmation on the owner's phone. If it recurs, the dojo shows a crash report to copy.
+- Android crash a few seconds into an expedition (2026-11-23): slash-trail geometry made static, the per-frame finger modifier replaced by baked clips, the sky no longer re-baked every frame (no sky flash / reflections on Low), shaders warmed up at load, and — the timing match — no more engine WAV looping (ambience/music restart themselves); awaiting confirmation on the owner's phone. If it recurs, the dojo shows a crash report to copy.
 
 ## Cosmetic / engine
 - Quitting while a sound is still playing prints "resources still in use at exit" in the console (engine shutdown message; no effect on players or saves).

@@ -24,10 +24,10 @@ func test_bank_has_every_cue_with_real_sound() -> void:
 		check(c != null and c.stream != null and c.stream.get_length() > 0.03, "%s has a sound" % id)
 	for key in ["verdant_canopy", "emberwild", "moonfen", "stormcrag"]:
 		var a := bank.ambience.get(key) as AudioStreamWAV
-		check(a != null and a.loop_mode == AudioStreamWAV.LOOP_FORWARD and a.get_length() >= 6.0, "%s ambience loops" % key)
+		check(a != null and a.get_length() >= 6.0, "%s ambience present" % key)
 		check(ResourceLoader.exists("res://scenes/biomes/%s.tscn" % key), "%s matches a biome scene" % key)
 	for m in [bank.music_explore, bank.music_boss]:
-		check(m is AudioStreamWAV and (m as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD, "music loops")
+		check(m is AudioStreamWAV, "music present")
 
 
 func test_audio_is_original_and_logged() -> void:
@@ -121,4 +121,28 @@ func test_hazards_have_sounds() -> void:
 		if m.audio.count(&"gust") > 0:
 			break
 	check(m.audio.count(&"gust") >= 1, "wind warning sound before a gust")
+	_done()
+
+
+
+## Regression (owner's Galaxy S20): the Godot app crashed exactly 8 s of audio into every
+## expedition — when the 8 s ambience loop first wrapped. No stream may use the engine's WAV
+## looping; ambience and music loop by restarting when they finish.
+func test_no_engine_wav_loops_and_loops_restart_themselves() -> void:
+	var bank := load(BANK) as SoundBank
+	var streams: Array = bank.ambience.values() + [bank.music_explore, bank.music_boss]
+	for c: SoundCue in bank.cues.values():
+		streams.append(c.stream)
+	for s in streams:
+		check((s as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_DISABLED, "%s does not use WAV looping" % (s as Resource).resource_path.get_file())
+	_profile()
+	var main := instantiate("res://scenes/main/expedition_moonfen.tscn")
+	var m := main.get_node("Expedition") as ExpeditionManager
+	await physics_frames(10)
+	m.audio.ambience.stop()
+	m.audio.ambience.finished.emit()
+	m.audio.music.stop()
+	m.audio.music.finished.emit()
+	check(m.audio.ambience.playing and m.audio.music.playing, "ambience and music start again when they end")
+	check(m.audio.loops_restarted == 2, "both restarts counted")
 	_done()

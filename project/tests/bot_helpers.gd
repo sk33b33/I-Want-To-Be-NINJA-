@@ -378,6 +378,7 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			var d := player.global_position - target
 			return Vector2(d.x, d.z).length() < 0.9 and absf(d.y) < 2.0
 		var prev := Vector3(pts[i - 1].x, pts[i - 1].y, pts[i - 1].z) if i > 0 else player.global_position
+		_face_camera(player, target)
 		var ok := await walk_toward(tc, player, target, reached, frames_per_leg, true, prev, true)
 		if respawns[0] != seen and retries < 6:
 			# Fell or died: like a player, pick the trail up again from the nearest waypoint.
@@ -532,4 +533,17 @@ static func _resume_index(pts: Array, p: Vector3) -> int:
 		if (pts[k] as Vector4).z >= p.z - 0.5:
 			idx = k
 	return idx
+
+
+## Like a player steering the camera along the trail: look along the next leg. Matters because a
+## climb reads the RAW stick (up = climb up, back = climb down): with the camera left facing the
+## other way (e.g. after a lock-on fight), walking "forward" into a wall means holding "back" on
+## the stick, and the climb then descends.
+static func _face_camera(player: PlayerController, target: Vector3) -> void:
+	var rig := player.get_node_or_null(player.camera_rig_path) as CameraRig
+	var dir := target - player.global_position
+	dir.y = 0.0
+	if rig and dir.length() > 1.0:
+		rig.set_yaw(atan2(-dir.x, -dir.z))
+		rig.snap_to_target()
 

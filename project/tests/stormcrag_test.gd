@@ -167,8 +167,11 @@ func test_stormcrag_has_every_distinct_hazard_and_its_own_look() -> void:
 	var main := instantiate(SCENE)
 	await physics_frames(3)
 	var t := main.get_tree()
-	check(t.get_nodes_in_group("gust_zones").size() == 1, "gale ridge gusts")
-	check(t.get_nodes_in_group("storm_callers").size() == 1, "storm plateau")
+	# The original route's hazards (the long route adds more of each, under RouteBuilder).
+	var original := func(group: String) -> int:
+		return t.get_nodes_in_group(group).filter(func(n: Node) -> bool: return not (n.get_parent() is RouteBuilder)).size()
+	check(original.call("gust_zones") == 1, "gale ridge gusts on the original route")
+	check(original.call("storm_callers") == 1, "storm plateau on the original route")
 	check(t.get_nodes_in_group("storm_shelters").size() == 2, "two shelters")
 	check(t.get_nodes_in_group("rain_fx").size() == 1, "rain")
 	check((main.get_node("Level/Hazards/GaleGust") as GustZone).traction < 0.5, "the ridge is slick")

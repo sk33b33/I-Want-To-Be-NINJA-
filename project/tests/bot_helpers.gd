@@ -241,7 +241,7 @@ static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: N
 ## `from`: where this leg started (the previous waypoint) — after a fight pulls the bot off the
 ## path it first walks back to the nearest point of the leg, like a player finding the trail again.
 static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3, done: Callable,
-		max_frames: int = 1500, fight: bool = true, from: Vector3 = Vector3.INF) -> bool:
+		max_frames: int = 1500, fight: bool = true, from: Vector3 = Vector3.INF, abort_on_respawn: bool = false) -> bool:
 	var last := player.global_position
 	var stuck := 0
 	# A fall or death respawns the player elsewhere: end this leg so the caller can pick the trail
@@ -251,7 +251,7 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 	player.respawned.connect(on_respawn)
 	for i in max_frames:
 		await tc.tree.physics_frame
-		if respawned[0]:
+		if respawned[0] and abort_on_respawn:
 			player.respawned.disconnect(on_respawn)
 			release_moves()
 			return false
@@ -336,7 +336,7 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			var d := player.global_position - target
 			return Vector2(d.x, d.z).length() < 0.9 and absf(d.y) < 2.0
 		var prev := Vector3(pts[i - 1].x, pts[i - 1].y, pts[i - 1].z) if i > 0 else player.global_position
-		var ok := await walk_toward(tc, player, target, reached, frames_per_leg, true, prev)
+		var ok := await walk_toward(tc, player, target, reached, frames_per_leg, true, prev, true)
 		if respawns[0] != seen and retries < 3:
 			# Fell or died: like a player, pick the trail up again from the nearest waypoint.
 			retries += 1

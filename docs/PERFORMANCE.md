@@ -70,6 +70,23 @@ Texture reads are the new cost: on the software renderer the Low frame went from
 compressed, mipmapped textures far more cheaply). **The owner's phone benchmark is the real test**;
 if Low drops below 30 fps, the first lever is `QualityPreset` (e.g. a cheaper terrain path for Low).
 
+### Long routes (Phase 13; terrain 2.4x larger, ~370 m to the beast) — worst viewpoint per jungle
+Measured with `tools/benchmark.gd` (software renderer: triangle and draw-call counts are exact, frame times are not).
+| Jungle | Low draws / tris | Medium draws / tris | High draws / tris |
+|---|---|---|---|
+| Verdant Canopy | 196 / 202k | 314 / 564k | 432 / 1085k |
+| Emberwild | 136 / 139k | 240 / 370k | 347 / 723k |
+| Moonfen | 144 / 144k | 333 / 441k | 387 / 806k |
+| Stormcrag | 173 / 126k | 282 / 342k | 365 / 647k |
+| **Budget** | **250 / 250k ✔** | **350 / 600k ✔** | **500 / 1.2M ✔** |
+
+What the long routes cost, and what was done about it (found by this benchmark):
+- **Trees are never distance-culled**, so their triangles follow their total count. Scaling the tree count with the larger terrain put Verdant on Low at 257k (over budget). `QualityPreset.tree_area_growth` now keeps the original tree count on Low and Medium (0), +20% on High (0.2). Regression test in `routes_test.gd`.
+- The terrain is **one mesh drawn in full (and again in the shadow pass)**: Medium and High now render it on a 2 m grid (`terrain_mesh_step = 2`, as Low already did; collision stays 1 m). That alone was ~165k triangles for Verdant.
+- Ground cover scales with the area (it is distance-culled, so it costs little in view).
+- **Idea if more is needed:** split the terrain render mesh into tiles so frustum and shadow culling drop the far parts.
+Frame time on the owner's phone is still the real test (Settings -> Run benchmark).
+
 Low now draws **61–83% fewer triangles** than the old Low at the same viewpoints, and roughly a
 third of High. On the same (software) renderer a Low frame costs ~2.5× less than Medium and ~3×
 less than High.

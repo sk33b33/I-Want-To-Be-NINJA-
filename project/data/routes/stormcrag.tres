@@ -1,0 +1,224 @@
+[gd_resource type="Resource" script_class="RouteLayout" load_steps=41 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/route/route_piece.gd" id="1_8bfpf"]
+[ext_resource type="Script" path="res://scripts/world/route/route_layout.gd" id="2_g26wx"]
+
+[sub_resource type="Resource" id="Resource_qigct"]
+script = ExtResource("1_8bfpf")
+kind = 15
+position = Vector3(4, 0, 226)
+
+[sub_resource type="Resource" id="Resource_bgw5j"]
+script = ExtResource("1_8bfpf")
+kind = 15
+position = Vector3(14, 0, 214)
+
+[sub_resource type="Resource" id="Resource_u1w4k"]
+script = ExtResource("1_8bfpf")
+kind = 15
+position = Vector3(21, 0, 200)
+
+[sub_resource type="Resource" id="Resource_7s25t"]
+script = ExtResource("1_8bfpf")
+kind = 12
+position = Vector3(24, 0, 190)
+size = Vector3(1, 1, 1)
+count = 3
+
+[sub_resource type="Resource" id="Resource_10ud3"]
+script = ExtResource("1_8bfpf")
+kind = 10
+position = Vector3(24, 2, 170)
+size = Vector3(10, 5, 20)
+
+[sub_resource type="Resource" id="Resource_om4x1"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 199.5)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_08hcv"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 194)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_0de60"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 188.5)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_q1wu2"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 183)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_mgxjj"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 177.5)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_kg5s6"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-16, -0.5, 172)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_tmnab"]
+script = ExtResource("1_8bfpf")
+kind = 10
+position = Vector3(-16, 2, 183.25)
+size = Vector3(8, 5, 36.5)
+phase = 0.7
+
+[sub_resource type="Resource" id="Resource_yjxwj"]
+script = ExtResource("1_8bfpf")
+kind = 14
+position = Vector3(-20, 0, 162)
+size = Vector3(1, 1, 1)
+item = "storm_glass"
+
+[sub_resource type="Resource" id="Resource_7lck5"]
+script = ExtResource("1_8bfpf")
+kind = 13
+position = Vector3(0, 0, 136)
+
+[sub_resource type="Resource" id="Resource_obcuu"]
+script = ExtResource("1_8bfpf")
+position = Vector3(6, -0.5, 122)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_fkoe2"]
+script = ExtResource("1_8bfpf")
+position = Vector3(6, -0.5, 116)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_jarvg"]
+script = ExtResource("1_8bfpf")
+position = Vector3(6, -0.5, 110)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_36hp3"]
+script = ExtResource("1_8bfpf")
+position = Vector3(6, -0.5, 104)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_fudns"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-6, -0.5, 121)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_lr58v"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-6, -0.5, 115.6)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_mqe6m"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-6, -0.5, 110.2)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_2jsud"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-6, -0.5, 104.8)
+size = Vector3(2, 1, 3)
+
+[sub_resource type="Resource" id="Resource_65et0"]
+script = ExtResource("1_8bfpf")
+kind = 10
+position = Vector3(-6, 2, 110.75)
+size = Vector3(8, 5, 24.5)
+phase = 0.7
+
+[sub_resource type="Resource" id="Resource_8bpfe"]
+script = ExtResource("1_8bfpf")
+position = Vector3(0, 2.5, 73)
+size = Vector3(26, 5, 34)
+
+[sub_resource type="Resource" id="Resource_btgq1"]
+script = ExtResource("1_8bfpf")
+kind = 1
+position = Vector3(0, 2.5, 90.5)
+size = Vector3(26, 5, 1)
+
+[sub_resource type="Resource" id="Resource_8exmd"]
+script = ExtResource("1_8bfpf")
+kind = 12
+position = Vector3(2, 5.1, 66)
+size = Vector3(1, 1, 1)
+count = 3
+
+[sub_resource type="Resource" id="Resource_kmpdg"]
+script = ExtResource("1_8bfpf")
+kind = 11
+position = Vector3(0, 8, 72)
+size = Vector3(24, 5, 32)
+
+[sub_resource type="Resource" id="Resource_5txn4"]
+script = ExtResource("1_8bfpf")
+position = Vector3(7, 7.6, 80)
+size = Vector3(3.6, 0.6, 3)
+
+[sub_resource type="Resource" id="Resource_ygrag"]
+script = ExtResource("1_8bfpf")
+position = Vector3(8.4, 6.2, 79)
+size = Vector3(0.6, 2.4, 0.6)
+
+[sub_resource type="Resource" id="Resource_4q8vf"]
+script = ExtResource("1_8bfpf")
+position = Vector3(5.6, 6.2, 81)
+size = Vector3(0.6, 2.4, 0.6)
+
+[sub_resource type="Resource" id="Resource_qv6uu"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-7, 7.6, 64)
+size = Vector3(3.6, 0.6, 3)
+
+[sub_resource type="Resource" id="Resource_ih4jx"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-5.6, 6.2, 63)
+size = Vector3(0.6, 2.4, 0.6)
+
+[sub_resource type="Resource" id="Resource_1yq44"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-8.4, 6.2, 65)
+size = Vector3(0.6, 2.4, 0.6)
+
+[sub_resource type="Resource" id="Resource_u7x2t"]
+script = ExtResource("1_8bfpf")
+position = Vector3(-18, 2.5, 72)
+size = Vector3(10, 5, 6)
+
+[sub_resource type="Resource" id="Resource_7q7vj"]
+script = ExtResource("1_8bfpf")
+kind = 14
+position = Vector3(-21, 5, 72)
+size = Vector3(1, 1, 1)
+item = "storm_glass"
+
+[sub_resource type="Resource" id="Resource_d71hu"]
+script = ExtResource("1_8bfpf")
+kind = 15
+position = Vector3(8, 5, 58)
+
+[sub_resource type="Resource" id="Resource_x7ycc"]
+script = ExtResource("1_8bfpf")
+kind = 12
+position = Vector3(0, 0, 36)
+size = Vector3(1, 1, 1)
+count = 2
+
+[sub_resource type="Resource" id="Resource_wfocm"]
+script = ExtResource("1_8bfpf")
+kind = 13
+position = Vector3(0, 0, 22)
+
+[resource]
+script = ExtResource("2_g26wx")
+biome_id = &"stormcrag"
+pieces = Array[ExtResource("1_8bfpf")]([SubResource("Resource_qigct"), SubResource("Resource_bgw5j"), SubResource("Resource_u1w4k"), SubResource("Resource_7s25t"), SubResource("Resource_10ud3"), SubResource("Resource_om4x1"), SubResource("Resource_08hcv"), SubResource("Resource_0de60"), SubResource("Resource_q1wu2"), SubResource("Resource_mgxjj"), SubResource("Resource_kg5s6"), SubResource("Resource_tmnab"), SubResource("Resource_yjxwj"), SubResource("Resource_7lck5"), SubResource("Resource_obcuu"), SubResource("Resource_fkoe2"), SubResource("Resource_jarvg"), SubResource("Resource_36hp3"), SubResource("Resource_fudns"), SubResource("Resource_lr58v"), SubResource("Resource_mqe6m"), SubResource("Resource_2jsud"), SubResource("Resource_65et0"), SubResource("Resource_8bpfe"), SubResource("Resource_btgq1"), SubResource("Resource_8exmd"), SubResource("Resource_kmpdg"), SubResource("Resource_5txn4"), SubResource("Resource_ygrag"), SubResource("Resource_4q8vf"), SubResource("Resource_qv6uu"), SubResource("Resource_ih4jx"), SubResource("Resource_1yq44"), SubResource("Resource_u7x2t"), SubResource("Resource_7q7vj"), SubResource("Resource_d71hu"), SubResource("Resource_x7ycc"), SubResource("Resource_wfocm")])
+bot_paths = {
+"risky": [Vector4(0, 0, 232, 0), Vector4(-16, 0, 208, 0), Vector4(-16, 0, 202.6, 1), Vector4(-16, 0, 200.5, 0), Vector4(-16, 0, 195, 1), Vector4(-16, 0, 189.5, 1), Vector4(-16, 0, 184, 1), Vector4(-16, 0, 178.5, 1), Vector4(-16, 0, 173, 1), Vector4(-16, 0, 167.5, 1), Vector4(-16, 0, 162, 0), Vector4(0, 0, 142, 0), Vector4(-6, 0, 126, 0), Vector4(-6, 0, 123, 1), Vector4(-6, 0, 120.4, 1), Vector4(-6, 0, 115, 1), Vector4(-6, 0, 109.6, 1), Vector4(-6, 0, 104.2, 1), Vector4(-6, 0, 97, 0), Vector4(3, 0, 93, 0), Vector4(3, 5, 87, 0), Vector4(10, 5, 82, 0), Vector4(10, 5, 60, 0), Vector4(2, 0, 52, 0), Vector4(0, 0, 8, 0)],
+"safe": [Vector4(0, 0, 232, 0), Vector4(12, 0, 216, 0), Vector4(24, 0, 204, 0), Vector4(24, 0, 158, 0), Vector4(0, 0, 142, 0), Vector4(6, 0, 126, 0), Vector4(6, 0, 123.5, 0), Vector4(6, 0, 120.3, 1), Vector4(6, 0, 117.5, 0), Vector4(6, 0, 114.3, 1), Vector4(6, 0, 111.5, 0), Vector4(6, 0, 108.3, 1), Vector4(6, 0, 105.5, 0), Vector4(6, 0, 102.3, 1), Vector4(6, 0, 97, 0), Vector4(3, 0, 93, 0), Vector4(3, 5, 87, 0), Vector4(10, 5, 82, 0), Vector4(10, 5, 60, 0), Vector4(2, 0, 52, 0), Vector4(0, 0, 8, 0)]
+}

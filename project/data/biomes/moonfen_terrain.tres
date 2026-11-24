@@ -4,9 +4,12 @@
 
 [resource]
 script = ExtResource("1_8vyd8")
+max_corner = Vector2(80, 290)
 seed = 6262
-route_points = PackedVector2Array(0, 30, 0, -50, 0, -71, 0, -130)
+route_points = PackedVector2Array(0, 275, 0, 226, 0, 226, -24, 206, -24, 206, -24, 158, -24, 158, 0, 142, 0, 226, 16, 210, 16, 210, 16, 158, 16, 158, 0, 142, 0, 142, 0, 30, 0, 30, 0, -50, 0, -71, 0, -130)
+clearings = Array[Vector3]([Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -16, 10), Vector3(0, -30, 9), Vector3(0, -46, 12), Vector3(0, -84, 15), Vector3(0, -120, 18), Vector3(-24, -22, 9), Vector3(18, 72, 8), Vector3(0, 228, 10)])
 hill_height = 3.0
 valley_wall_height = 14.0
 stream_z = -33.0
+pits = Array[Vector4]([Vector4(16, 184, 10, 18), Vector4(0, 112, 80, 12)])
 gorge_depth = -4.0

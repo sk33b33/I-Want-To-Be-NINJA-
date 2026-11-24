@@ -104,14 +104,16 @@ func _place_trees() -> void:
 		dead_xf.append([])
 	var placed := 0
 	var attempts := 0
-	var tree_scale := _preset.tree_density
+	# Trees are always drawn (no distance culling), so they grow less than the area (phone budget).
+	var tree_scale := _preset.tree_density * minf(area_scale(), 1.6)
 	var jungle_count := int(cfg.jungle_tree_count * tree_scale)
 	var total := jungle_count + int(cfg.dead_tree_count * tree_scale)
 	while placed < total and attempts < total * 40:
 		attempts += 1
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < cfg.tree_route_clearance or _terrain.is_in_gorge(p.y, 3.0) or _near_secret(p.x, p.y):
+		if d < cfg.tree_route_clearance or _terrain.is_in_gorge(p.y, 3.0) or _near_secret(p.x, p.y) \
+				or _terrain.is_in_pit(p.x, p.y, 3.0):
 			continue
 		if 1.0 - _terrain.get_normal(p.x, p.y).y > 0.5 or not _density_ok(d * 0.6):
 			continue
@@ -154,9 +156,16 @@ func _add_trunk_collision(at: Vector3, radius: float) -> void:
 	add_child(body)
 
 
+## Terrain area relative to the original 160 x 185 m jungles (Phase 13 long routes are ~2.3x):
+## counts were tuned for the original size, so they scale with the area to keep the density.
+func area_scale() -> float:
+	var c := _terrain.config
+	return maxf(1.0, (c.max_corner.x - c.min_corner.x) * (c.max_corner.y - c.min_corner.y) / (160.0 * 185.0))
+
+
 func _place_ground_cover() -> void:
 	var cfg := config
-	var k := _preset.flora_density
+	var k := _preset.flora_density * area_scale()
 	_scatter("Grass", int(cfg.grass_count * k), 2.2, 0.8, 1.4)
 	_scatter("Fern", int(cfg.fern_count * k), 3.5, 0.7, 1.5)
 	_scatter("Broadleaf", int(cfg.broadleaf_count * k), 4.5, 0.8, 1.6)
@@ -173,7 +182,7 @@ func _place_ground_cover() -> void:
 			p = _random_point()
 			if not _density_ok(_terrain.route_distance(p.x, p.y) * 1.5):
 				continue
-		if _terrain.is_in_gorge(p.y, 1.0) or _terrain.route_distance(p.x, p.y) < 3.0:
+		if _terrain.is_in_gorge(p.y, 1.0) or _terrain.is_in_pit(p.x, p.y, 1.0) or _terrain.route_distance(p.x, p.y) < 3.0:
 			continue
 		_add(kind, _ground_transform(p.x, p.y, _rng.randf_range(0.7, 1.6)))
 	var meshes := {
@@ -196,7 +205,7 @@ func _scatter(kind: String, count: int, min_route: float, min_scale: float, max_
 	for i in count:
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < min_route or _terrain.is_in_gorge(p.y, 0.5):
+		if d < min_route or _terrain.is_in_gorge(p.y, 0.5) or _terrain.is_in_pit(p.x, p.y, 0.5):
 			continue
 		if 1.0 - _terrain.get_normal(p.x, p.y).y > config.max_ground_slope or not _density_ok(d):
 			continue
@@ -207,7 +216,7 @@ func _place_logs() -> void:
 	for i in config.log_count:
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0) or _near_secret(p.x, p.y):
+		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0) or _near_secret(p.x, p.y) or _terrain.is_in_pit(p.x, p.y, 4.0):
 			continue
 		var mi := MeshInstance3D.new()
 		mi.mesh = ProceduralMeshes.log_mesh(_variant_rng(100 + i), bark_material)

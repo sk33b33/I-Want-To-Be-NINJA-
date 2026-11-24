@@ -19,6 +19,8 @@ static func release_moves() -> void:
 ## line, jumps at the rampart and each gorge gap; climbing/ledge grabs happen automatically.
 ## Returns true when stop_z was reached.
 static func run_route(tc: TestCase, player: PlayerController, stop_z: float, max_frames: int = 2600) -> bool:
+	if not await run_long_route(tc, player):
+		return false
 	var jump_at: Array[float] = [-43.0, -49.0, -55.0, -61.5, -68.0]
 	var next_jump := 0
 	tc.press("move_forward")
@@ -117,6 +119,8 @@ static func _walk_to_z(tc: TestCase, player: PlayerController, stop_z: float, ta
 ## Emberwild route: waits for the vent wave and runs behind it, takes the cool lane past the heat
 ## zone, waits for the sinking stones to rise, then crosses the lava river and climbs the far bank.
 static func run_route_emberwild(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	if not await run_long_route(tc, player):
+		return false
 	var vents: Array = []
 	for i in 4:
 		vents.append(level.get_node("Hazards/FireVent%d" % i))
@@ -172,6 +176,8 @@ static func run_route_emberwild(tc: TestCase, player: PlayerController, level: N
 ## keeps moving raft to raft across the deep bog — rafts sink under you, so it never waits — and
 ## climbs the root wall of the far bank.
 static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: float) -> bool:
+	if not await run_long_route(tc, player):
+		return false
 	if not await _walk_to_z(tc, player, -24.0, -0.5, 1200):  # Mud flats (slow).
 		return false
 	if not await _walk_to_z(tc, player, -37.0, 0.0):  # Stream; steering fights the drift.
@@ -201,6 +207,8 @@ static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: fl
 ## (lightning lands where you WERE), drops off the far edge, waits at the gale ridge until a gust
 ## has just blown past, then sprints the slick ridge in the calm.
 static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	if not await run_long_route(tc, player):
+		return false
 	if not await _walk_to_z(tc, player, -7.9, 0.0):
 		return false
 	tc.press("jump")
@@ -260,4 +268,45 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 				stuck = 0
 	release_moves()
 	return bool(done.call())
+
+
+
+
+## Phase 13 long routes: walk the new sections (RouteLayout.bot_paths, "safe" or "risky") from
+## the spawn to the start of the original route. Does nothing if the player already stands on
+## the original route (z < 20) or the jungle has no long route. Returns false if stuck.
+static func run_long_route(tc: TestCase, player: PlayerController, path_name: String = "safe") -> bool:
+	var builders := tc.tree.get_nodes_in_group("route_builder")
+	if builders.is_empty() or player.global_position.z < 20.0:
+		return true
+	var layout := (builders[0] as RouteBuilder).layout
+	return await follow_path(tc, player, layout.bot_paths.get(path_name, []))
+
+
+## Walk through waypoints Vector4(x, y, z, jump); at a jump point, jump and keep heading for the
+## next waypoint. A waypoint counts as reached within 0.9 m horizontally and 2 m vertically.
+static func follow_path(tc: TestCase, player: PlayerController, pts: Array, frames_per_leg: int = 900) -> bool:
+	for i in pts.size():
+		var w: Vector4 = pts[i]
+		var target := Vector3(w.x, w.y, w.z)
+		var reached := func() -> bool:
+			var d := player.global_position - target
+			return Vector2(d.x, d.z).length() < 0.9 and absf(d.y) < 2.0
+		if not await walk_toward(tc, player, target, reached, frames_per_leg):
+			push_warning("follow_path: stuck before waypoint %d %s at %s" % [i, target, player.global_position])
+			return false
+		if w.w > 0.5 and i + 1 < pts.size():
+			var nxt: Vector4 = pts[i + 1]
+			var to := Vector3(nxt.x, nxt.y, nxt.z) - player.global_position
+			to.y = 0.0
+			var local := player.get_camera_basis().inverse() * to.normalized()
+			Input.action_press("move_right", maxf(local.x, 0.0))
+			Input.action_press("move_left", maxf(-local.x, 0.0))
+			Input.action_press("move_back", maxf(local.z, 0.0))
+			Input.action_press("move_forward", maxf(-local.z, 0.0))
+			tc.press("jump")
+			await tc.physics_frames(14)
+			tc.release("jump")
+	release_moves()
+	return true
 

@@ -1,0 +1,228 @@
+[gd_resource type="Resource" script_class="RouteLayout" load_steps=41 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/route/route_piece.gd" id="1_4i5et"]
+[ext_resource type="Script" path="res://scripts/world/route/route_layout.gd" id="2_j4pyl"]
+
+[sub_resource type="Resource" id="Resource_n65h6"]
+script = ExtResource("1_4i5et")
+kind = 15
+position = Vector3(-4, 0, 226)
+
+[sub_resource type="Resource" id="Resource_o44uj"]
+script = ExtResource("1_4i5et")
+kind = 15
+position = Vector3(-14, 0, 214)
+
+[sub_resource type="Resource" id="Resource_hpqgq"]
+script = ExtResource("1_4i5et")
+kind = 15
+position = Vector3(-21, 0, 200)
+
+[sub_resource type="Resource" id="Resource_r8kuh"]
+script = ExtResource("1_4i5et")
+kind = 12
+position = Vector3(-24, 0, 190)
+size = Vector3(1, 1, 1)
+count = 3
+
+[sub_resource type="Resource" id="Resource_uf56t"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-27.5, 0.4, 180)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_d0rq2"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-20.5, 0.4, 175.5)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_4lt76"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-27.5, 0.4, 171)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_obhwf"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-20.5, 0.4, 166.5)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_50srs"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-27.5, 0.4, 162)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_ny22d"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-20.5, 0.4, 157.5)
+size = Vector3(5, 1, 6)
+
+[sub_resource type="Resource" id="Resource_dj4bq"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 199.5)
+
+[sub_resource type="Resource" id="Resource_dnjhn"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 194)
+
+[sub_resource type="Resource" id="Resource_k2q6v"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 188.5)
+
+[sub_resource type="Resource" id="Resource_0xj2f"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 183)
+
+[sub_resource type="Resource" id="Resource_vqucp"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 177.5)
+
+[sub_resource type="Resource" id="Resource_r3cdh"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(16, -0.2, 172)
+
+[sub_resource type="Resource" id="Resource_6vi2n"]
+script = ExtResource("1_4i5et")
+kind = 14
+position = Vector3(20, 0, 162)
+size = Vector3(1, 1, 1)
+item = "ruin_shard"
+
+[sub_resource type="Resource" id="Resource_illl6"]
+script = ExtResource("1_4i5et")
+kind = 13
+position = Vector3(0, 0, 136)
+
+[sub_resource type="Resource" id="Resource_bsnj7"]
+script = ExtResource("1_4i5et")
+position = Vector3(-6, -0.5, 122)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_5svix"]
+script = ExtResource("1_4i5et")
+position = Vector3(-6, -0.5, 116)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_kv8d7"]
+script = ExtResource("1_4i5et")
+position = Vector3(-6, -0.5, 110)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_sosgh"]
+script = ExtResource("1_4i5et")
+position = Vector3(-6, -0.5, 104)
+size = Vector3(0.9, 1, 4)
+material = "wood"
+
+[sub_resource type="Resource" id="Resource_jqrf6"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(6, -0.2, 121)
+
+[sub_resource type="Resource" id="Resource_ucuop"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(6, -0.2, 115.6)
+
+[sub_resource type="Resource" id="Resource_lc61n"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(6, -0.2, 110.2)
+
+[sub_resource type="Resource" id="Resource_surki"]
+script = ExtResource("1_4i5et")
+kind = 2
+position = Vector3(6, -0.2, 104.8)
+
+[sub_resource type="Resource" id="Resource_o3osp"]
+script = ExtResource("1_4i5et")
+position = Vector3(0, 2.5, 73)
+size = Vector3(26, 5, 34)
+
+[sub_resource type="Resource" id="Resource_pc64f"]
+script = ExtResource("1_4i5et")
+kind = 1
+position = Vector3(0, 2.5, 90.5)
+size = Vector3(26, 5, 1)
+
+[sub_resource type="Resource" id="Resource_ycpu1"]
+script = ExtResource("1_4i5et")
+kind = 12
+position = Vector3(-2, 5.1, 66)
+size = Vector3(1, 1, 1)
+count = 3
+
+[sub_resource type="Resource" id="Resource_sr6ab"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(4, 5.4, 84)
+size = Vector3(6, 1, 4)
+
+[sub_resource type="Resource" id="Resource_xestm"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-4, 5.4, 78)
+size = Vector3(6, 1, 4)
+
+[sub_resource type="Resource" id="Resource_ibw1q"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(5, 5.4, 70)
+size = Vector3(6, 1, 4)
+
+[sub_resource type="Resource" id="Resource_uuo6q"]
+script = ExtResource("1_4i5et")
+kind = 9
+position = Vector3(-5, 5.4, 62)
+size = Vector3(6, 1, 4)
+
+[sub_resource type="Resource" id="Resource_pvfex"]
+script = ExtResource("1_4i5et")
+position = Vector3(18, 2.5, 72)
+size = Vector3(10, 5, 6)
+
+[sub_resource type="Resource" id="Resource_oxgj3"]
+script = ExtResource("1_4i5et")
+kind = 14
+position = Vector3(21, 5, 72)
+size = Vector3(1, 1, 1)
+item = "ruin_shard"
+
+[sub_resource type="Resource" id="Resource_4x4vf"]
+script = ExtResource("1_4i5et")
+kind = 15
+position = Vector3(-8, 5, 58)
+
+[sub_resource type="Resource" id="Resource_nf12a"]
+script = ExtResource("1_4i5et")
+kind = 12
+position = Vector3(0, 0, 36)
+size = Vector3(1, 1, 1)
+count = 2
+
+[sub_resource type="Resource" id="Resource_a2ulk"]
+script = ExtResource("1_4i5et")
+kind = 13
+position = Vector3(0, 0, 22)
+
+[resource]
+script = ExtResource("2_j4pyl")
+biome_id = &"verdant_canopy"
+pieces = Array[ExtResource("1_4i5et")]([SubResource("Resource_n65h6"), SubResource("Resource_o44uj"), SubResource("Resource_hpqgq"), SubResource("Resource_r8kuh"), SubResource("Resource_uf56t"), SubResource("Resource_d0rq2"), SubResource("Resource_4lt76"), SubResource("Resource_obhwf"), SubResource("Resource_50srs"), SubResource("Resource_ny22d"), SubResource("Resource_dj4bq"), SubResource("Resource_dnjhn"), SubResource("Resource_k2q6v"), SubResource("Resource_0xj2f"), SubResource("Resource_vqucp"), SubResource("Resource_r3cdh"), SubResource("Resource_6vi2n"), SubResource("Resource_illl6"), SubResource("Resource_bsnj7"), SubResource("Resource_5svix"), SubResource("Resource_kv8d7"), SubResource("Resource_sosgh"), SubResource("Resource_jqrf6"), SubResource("Resource_ucuop"), SubResource("Resource_lc61n"), SubResource("Resource_surki"), SubResource("Resource_o3osp"), SubResource("Resource_pc64f"), SubResource("Resource_ycpu1"), SubResource("Resource_sr6ab"), SubResource("Resource_xestm"), SubResource("Resource_ibw1q"), SubResource("Resource_uuo6q"), SubResource("Resource_pvfex"), SubResource("Resource_oxgj3"), SubResource("Resource_4x4vf"), SubResource("Resource_nf12a"), SubResource("Resource_a2ulk")])
+bot_paths = {
+"risky": [Vector4(0, 0, 232, 0), Vector4(16, 0, 208, 0), Vector4(16, 0, 202.6, 1), Vector4(16, 0, 200.5, 0), Vector4(16, 0, 195, 1), Vector4(16, 0, 189.5, 1), Vector4(16, 0, 184, 1), Vector4(16, 0, 178.5, 1), Vector4(16, 0, 173, 1), Vector4(16, 0, 167.5, 1), Vector4(16, 0, 162, 0), Vector4(0, 0, 142, 0), Vector4(6, 0, 126, 0), Vector4(6, 0, 123, 1), Vector4(6, 0, 120.4, 1), Vector4(6, 0, 115, 1), Vector4(6, 0, 109.6, 1), Vector4(6, 0, 104.2, 1), Vector4(6, 0, 97, 0), Vector4(-3, 0, 93, 0), Vector4(-3, 5, 87, 0), Vector4(-10, 5, 82, 0), Vector4(-10, 5, 60, 0), Vector4(-2, 0, 52, 0), Vector4(0, 0, 8, 0)],
+"safe": [Vector4(0, 0, 232, 0), Vector4(-12, 0, 216, 0), Vector4(-24, 0, 204, 0), Vector4(-24, 0, 158, 0), Vector4(0, 0, 142, 0), Vector4(-6, 0, 126, 0), Vector4(-6, 0, 123.5, 0), Vector4(-6, 0, 120.3, 1), Vector4(-6, 0, 117.5, 0), Vector4(-6, 0, 114.3, 1), Vector4(-6, 0, 111.5, 0), Vector4(-6, 0, 108.3, 1), Vector4(-6, 0, 105.5, 0), Vector4(-6, 0, 102.3, 1), Vector4(-6, 0, 97, 0), Vector4(-3, 0, 93, 0), Vector4(-3, 5, 87, 0), Vector4(-10, 5, 82, 0), Vector4(-10, 5, 60, 0), Vector4(-2, 0, 52, 0), Vector4(0, 0, 8, 0)]
+}

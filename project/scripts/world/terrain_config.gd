@@ -43,6 +43,11 @@ extends Resource
 @export var stream_half_width: float = 2.5
 @export var stream_depth: float = 0.7
 
+@export_group("Pits")
+## Extra chasms (Phase 13 long routes): x, z centre and half sizes (Vector4(cx, cz, hx, hz)),
+## carved to gorge_depth like the gorge (falling in = respawn at the last checkpoint).
+@export var pits: Array[Vector4] = []
+
 @export_group("Gorge")
 ## Z range (exclusive) of the map-wide gorge the pit jumps cross. Its floor is below the kill height.
 @export var gorge_start_z: float = -50.0

@@ -46,6 +46,11 @@
 [ext_resource type="Resource" path="res://data/mood/moonfen.tres" id="mood_moonfen"]
 [ext_resource type="Script" path="res://scripts/world/secret_spots.gd" id="secret_spots_script"]
 [ext_resource type="Resource" path="res://data/secrets/moonfen.tres" id="secret_set_moonfen"]
+[ext_resource type="Script" path="res://scripts/world/route/route_builder.gd" id="route_builder_script"]
+[ext_resource type="Resource" path="res://data/routes/moonfen.tres" id="route_layout_moonfen"]
+[ext_resource type="Material" path="res://data/materials/stone.tres" id="route_stone_moonfen"]
+[ext_resource type="Material" path="res://data/materials/climb_stone.tres" id="route_climb_moonfen"]
+[ext_resource type="Material" path="res://data/materials/dark_wood.tres" id="route_wood_moonfen"]
 
 [sub_resource type="Sky" id="Sky_0y3cg"]
 sky_material = ExtResource("1_vwjt7")
@@ -666,3 +671,10 @@ climb_material = ExtResource("25_3sej3")
 rock_material = ExtResource("11_vknqk")
 beam_material = ExtResource("21_a4u7g")
 relic_color = Color(0.9, 0.6, 1.0, 1)
+
+[node name="RouteBuilder" type="Node3D" parent="."]
+script = ExtResource("route_builder_script")
+layout = ExtResource("route_layout_moonfen")
+stone_material = ExtResource("route_stone_moonfen")
+climb_material = ExtResource("route_climb_moonfen")
+wood_material = ExtResource("route_wood_moonfen")

@@ -63,7 +63,17 @@ func get_height(x: float, z: float) -> float:
 
 	if z < c.gorge_start_z and z > c.gorge_end_z:
 		h = c.gorge_depth
+	if is_in_pit(x, z):
+		h = c.gorge_depth
 	return h
+
+
+## Inside one of the extra chasms (TerrainConfig.pits), widened by `margin`.
+func is_in_pit(x: float, z: float, margin: float = 0.0) -> bool:
+	for p in config.pits:
+		if absf(x - p.x) < p.z + margin and absf(z - p.y) < p.w + margin:
+			return true
+	return false
 
 
 ## Bilinear height from the baked grid (what the collision shape uses).

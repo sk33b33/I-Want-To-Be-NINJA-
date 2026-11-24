@@ -46,6 +46,11 @@
 [ext_resource type="Resource" path="res://data/mood/stormcrag.tres" id="mood_stormcrag"]
 [ext_resource type="Script" path="res://scripts/world/secret_spots.gd" id="secret_spots_script"]
 [ext_resource type="Resource" path="res://data/secrets/stormcrag.tres" id="secret_set_stormcrag"]
+[ext_resource type="Script" path="res://scripts/world/route/route_builder.gd" id="route_builder_script"]
+[ext_resource type="Resource" path="res://data/routes/stormcrag.tres" id="route_layout_stormcrag"]
+[ext_resource type="Material" path="res://data/materials/crag_stone.tres" id="route_stone_stormcrag"]
+[ext_resource type="Material" path="res://data/materials/climb_stone.tres" id="route_climb_stormcrag"]
+[ext_resource type="Material" path="res://data/materials/dark_wood.tres" id="route_wood_stormcrag"]
 
 [sub_resource type="Sky" id="Sky_27w1h"]
 sky_material = ExtResource("1_j0b01")
@@ -574,3 +579,10 @@ climb_material = ExtResource("26_3fvnr")
 rock_material = ExtResource("11_4taoc")
 beam_material = ExtResource("21_5yvcu")
 relic_color = Color(0.6, 0.85, 1.0, 1)
+
+[node name="RouteBuilder" type="Node3D" parent="."]
+script = ExtResource("route_builder_script")
+layout = ExtResource("route_layout_stormcrag")
+stone_material = ExtResource("route_stone_stormcrag")
+climb_material = ExtResource("route_climb_stormcrag")
+wood_material = ExtResource("route_wood_stormcrag")

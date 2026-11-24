@@ -291,7 +291,16 @@ static func run_long_route(tc: TestCase, player: PlayerController, path_name: St
 	if builders.is_empty() or player.global_position.z < 20.0:
 		return true
 	var layout := (builders[0] as RouteBuilder).layout
-	return await follow_path(tc, player, layout.bot_paths.get(path_name, []))
+	var ok := await follow_path(tc, player, layout.bot_paths.get(path_name, []))
+	# Hand over like at the spawn: no lock-on, camera looking down the route (the original route
+	# bots steer with camera-relative "forward"; fights with lock-on turn the camera).
+	if player.combat.lock_target:
+		await tap(tc, "lock_on")
+	var rig := player.get_node_or_null(player.camera_rig_path) as CameraRig
+	if rig:
+		rig.set_yaw(0.0)
+		rig.snap_to_target()
+	return ok
 
 
 ## Walk through waypoints Vector4(x, y, z, jump); at a jump point, jump and keep heading for the
@@ -303,7 +312,7 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 	var retries := 0
 	var i := 0
 	while i < pts.size():
-		var seen := respawns[0]
+		var seen: int = respawns[0]
 		var w: Vector4 = pts[i]
 		var target := Vector3(w.x, w.y, w.z)
 		var reached := func() -> bool:

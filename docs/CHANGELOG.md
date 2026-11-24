@@ -259,4 +259,4 @@ Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground 
 - **Glowing markings** along each beast's back in its element colour: a slow pulse at rest that **flares during attack telegraphs** (an extra warning; the existing warnings are unchanged).
 - **Rim light** in each beast's colour and a lighter back / darker belly, so silhouettes read against the dark jungle.
 - Small fauna (bats, frogs, moths) keep their plain look (all new options default off).
-- Tests: `art_test.gd` +2 (every beast has skin/markings/rim, fauna unchanged; beast bodies are the smooth rebuild within a 6k-triangle budget and smooth mode is off at runtime).
+- Tests: `art_test.gd` +2 (every beast has skin/markings/rim, fauna unchanged; beast bodies are the smooth rebuild within a 6k-triangle budget and smooth mode is off at runtime). 243 tests, all passing.

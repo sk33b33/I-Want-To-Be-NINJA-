@@ -182,9 +182,10 @@ func _bot_path(safe: bool) -> Array:
 		add.call(SAFE_X, 158)
 	else:
 		add.call(RISKY_X, 208)
-		add.call(RISKY_X, 202.6, true)
+		add.call(RISKY_X, 202.6, true)  # Edge of the chasm.
 		for z in [199.5, 194.0, 188.5, 183.0, 177.5, 172.0, 166.5]:
-			add.call(RISKY_X, z + 1.0, z < 199.0)
+			add.call(RISKY_X, z)  # Land in the middle of the piece ...
+			add.call(RISKY_X, z - 0.9, z > 167.0)  # ... and take off from its far edge.
 		add.call(RISKY_X, 162.0)
 	add.call(0, 142)
 	var x := -6.0 if safe else 6.0
@@ -194,9 +195,10 @@ func _bot_path(safe: bool) -> Array:
 			add.call(x, z + 1.5)
 			add.call(x, z - 1.7, true)
 	else:
-		add.call(x, 123.0, true)
+		add.call(x, 123.5, true)
 		for z in [121.0, 115.6, 110.2, 104.8]:
-			add.call(x, z - 0.6, true)
+			add.call(x, z)
+			add.call(x, z - 0.9, true)
 	add.call(x, 97)
 	add.call(-3, 93)
 	add.call(-3, PLATEAU_Z.y - 3.0, false, PLATEAU_H)  # Walk into the wall: climb, mantle.

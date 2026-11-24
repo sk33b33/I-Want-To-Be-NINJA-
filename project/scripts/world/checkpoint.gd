@@ -45,8 +45,22 @@ func activate(player: PlayerController) -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	if body is PlayerController:
+	if body is PlayerController and _really_inside(body):
 		activate(body as PlayerController)
+
+
+## The physics engine can report an overlap from where a body was CREATED even though it was
+## moved before the first step (the long routes move the player from the scene origin — inside
+## the original spawn shrine — to the new spawn). Only take a player that is really here now.
+func _really_inside(body: Node3D) -> bool:
+	for c in get_children():
+		var cs := c as CollisionShape3D
+		if cs and cs.shape is BoxShape3D:
+			var local := cs.global_transform.affine_inverse() * body.global_position
+			var half := (cs.shape as BoxShape3D).size * 0.5 + Vector3.ONE * 1.5
+			if absf(local.x) <= half.x and absf(local.y) <= half.y + 1.0 and absf(local.z) <= half.z:
+				return true
+	return not get_children().any(func(c: Node) -> bool: return c is CollisionShape3D and (c as CollisionShape3D).shape is BoxShape3D)
 
 
 func _apply_visual() -> void:

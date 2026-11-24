@@ -100,3 +100,21 @@ func test_gate_bot_walks_the_safe_and_risky_way_in_every_jungle() -> void:
 			_nodes.erase(main)
 			await physics_frames(2)
 	_done()
+
+
+## Regression (found by the long-route gate): the player body is created at the scene origin,
+## inside the ORIGINAL spawn's checkpoint shrine, before the long route moves it to the new
+## spawn — and that stale overlap lit the shrine. A fall anywhere on the new route then sent you
+## to z ~ 1, skipping the whole new route (an exploit). Shrines must only take a player who is
+## really standing in them.
+func test_the_start_does_not_light_the_old_spawn_shrine() -> void:
+	for biome: StringName in SCENES:
+		var main := _start(biome)
+		await physics_frames(10)
+		var player := main.get_node("Player") as PlayerController
+		check(player.get_checkpoint().origin.z > 200.0, "%s: the checkpoint is the new spawn (z %.0f)" % [biome, player.get_checkpoint().origin.z])
+		var lit := main.find_children("*", "Checkpoint", true, false).filter(func(c: Checkpoint) -> bool: return c.is_active)
+		check(lit.is_empty(), "%s: no shrine lit at the start (%s)" % [biome, lit.map(func(c: Node) -> String: return c.name)])
+		main.free()
+		_nodes.erase(main)
+	_done()

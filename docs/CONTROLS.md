@@ -63,3 +63,5 @@ Notes:
 - Shift: a quick tap (under 0.2 s) rolls, holding it sprints. C is a dedicated dodge key.
 - Attacks only start on the ground. While locked on, the ninja faces the target and movement strafes around it; rolling with no direction rolls away from the target.
 - Touch layout: ATK (big) bottom-right, HVY, JUMP, ROLL, DASH and LOCK around it; CAM and II (pause) top-right.
+
+**Spirit shrines (exploration):** look for a thin beam of light above the canopy — a hidden shrine. Climb its pillar or find the gap in its ring of boulders and touch the relic. The pause menu counts them and gives a riddle for each one still missing. No new buttons: walking into a shrine pillar climbs it like any climbable wall.

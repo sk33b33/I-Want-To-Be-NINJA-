@@ -50,7 +50,7 @@ func build(def: SecretDefinition, set_data: SecretSet, ground: float, climb_mate
 	beam = Node3D.new()
 	beam.name = "SpiritBeam"
 	var quad := QuadMesh.new()
-	quad.size = Vector2(0.9, 22.0)
+	quad.size = Vector2(1.4, 22.0)
 	quad.material = beam_material
 	for k in 2:  # Two crossed planes read as a column of light.
 		var mi := MeshInstance3D.new()

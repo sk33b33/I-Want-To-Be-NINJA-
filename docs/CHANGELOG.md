@@ -275,3 +275,11 @@ Four new weapon **types**, one forged from each second beast's part (+ its hide 
 - The forge lists each weapon's type, how it plays and its numbers.
 - Bug found by the new test and fixed: the slash trails are created a few frames after the expedition equips the weapon, so they kept the katana's length; the mount now fits each trail as it is created (watched the test fail first).
 - Tests: `weapons_test.gd` (6) incl. the gate: the bot defeats Kurogale with each new weapon.
+
+## 2026-11-24 — Phase 13, part 3: secrets & exploration
+- **Hidden spirit shrines:** three per jungle (12), off the route on safe ground: **climb shrines** (a carved climbable pillar with the relic on top) and **hidden nooks** (a relic inside a ring of boulders with one narrow gap). A **spirit beam** rises from every unfound relic above the canopy so you can spot one from the path and go after it; it goes out once found.
+- **Rewards:** each relic gives a **Spirit Relic** (saved the moment you find it — kept even if the hunt is abandoned or the beast escapes; never twice). Finding all three in a jungle grants its **Shrine Blessing: +10 max health, permanently** (Blessing of the Canopy / Ember / Fen / Storm — up to +40). Five relics forge the **Spirit Charm** (talisman cooldown −1.5 s, talisman damage +15%, +10 max health).
+- **Hints and progress:** the pause menu shows "Spirit shrines x / 3" and a riddle for each one still missing; the hunt board shows each jungle's shrine count and blessing. A shrine bell and a banner announce each find, and the blessing when a jungle is complete.
+- Data-driven: `SecretSet` / `SecretDefinition` (`data/secrets/<jungle>.tres`, written by `tools/generate_secrets.gd`), placed by `SecretSpots` (one per jungle scene) as `SecretSite`s. Saved in `PlayerProfile.secrets_found` (profile v3; older saves load). Flora keeps trees, logs and ruins clear of shrines.
+- Found by the new tests and fixed before shipping: the first nook rings had boulders too big for the gap (no way in), tree trunks stood on three shrines, and one pillar overlapped Moonfen's arena wall; the spirit beams were too faint to spot.
+- Tests: `secrets_test.gd` (5), incl. the gate: a bot starting on the route reaches and takes all 12 relics using only the controls (walking through nook gaps, climbing pillars).

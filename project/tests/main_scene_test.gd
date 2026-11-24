@@ -8,7 +8,9 @@ func test_main_scene_player_lands_at_spawn() -> void:
 	var player := main.get_node("Player") as PlayerController
 	await physics_frames(60)
 	check(player.is_on_floor(), "player standing on the jungle floor")
-	check(player.global_position.distance_to(Vector3(0, 0, 0)) < 0.5, "player at the spawn point")
+	var spawn := (main.get_node("Level/SpawnPoint") as Node3D).global_position
+	check(spawn.z > 200.0, "the spawn is the start of the long route (z %.0f)" % spawn.z)
+	check(Vector2(player.global_position.x - spawn.x, player.global_position.z - spawn.z).length() < 0.5, "player at the spawn point")
 
 
 func test_route_spawn_to_gate_third_person() -> void:

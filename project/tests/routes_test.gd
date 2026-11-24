@@ -55,7 +55,9 @@ func test_terrain_carves_the_chasms_and_keeps_trees_out() -> void:
 		var terrain := main.find_children("*", "BiomeTerrain", true, false)[0] as BiomeTerrain
 		check(terrain.config.pits.size() == 2, "%s: two new chasms" % biome)
 		for pit in terrain.config.pits:
-			check(terrain.get_height(pit.x, pit.y) < -20.0, "%s: chasm at (%.0f, %.0f) is deep" % [biome, pit.x, pit.y])
+			# Verdant/Stormcrag: a drop to the kill height; Emberwild/Moonfen: lava/bog below route level.
+			check(terrain.get_height(pit.x, pit.y) <= terrain.config.gorge_depth + 0.01 and terrain.get_height(pit.x, pit.y) < -3.0,
+					"%s: chasm at (%.0f, %.0f) is carved (%.1f m)" % [biome, pit.x, pit.y, terrain.get_height(pit.x, pit.y)])
 		check(absf(terrain.get_height(0, 245)) < 0.5 and absf(terrain.get_height(0, 30)) < 0.5, "%s: the route is flat ground" % biome)
 		var flora := main.find_children("*", "FloraScatter", true, false)[0] as FloraScatter
 		var in_pit := flora.get_tree_positions().filter(func(t: Vector3) -> bool: return terrain.is_in_pit(t.x, t.z))

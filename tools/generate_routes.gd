@@ -23,7 +23,7 @@ const THEMES := {
 		"floor": K.LAVA, "lane": K.VENT, "field": K.VENT, "pickup": "ember_crystal"},
 	"moonfen": {"mirror": false, "stone": "stone", "climb": "climb_stone", "step": K.RAFT, "step_y": 0.0,
 		"floor": K.BOG, "lane": K.POISON, "field": K.POISON, "pickup": "spirit_moss"},
-	"stormcrag": {"mirror": true, "stone": "crag_stone", "climb": "climb_stone", "step": K.BOX, "step_y": -0.5,
+	"stormcrag": {"mirror": true, "stone": "crag_stone", "climb": "climb_stone", "step": K.CRUMBLE, "step_y": -0.2, "gusts": true,
 		"floor": -1, "lane": K.GUST, "field": K.STORM, "pickup": "storm_glass"},
 }
 
@@ -112,7 +112,7 @@ func _steps(t: Dictionary, x: float, z_start: float, z_end: float, spacing: floa
 				_add(kind, _v(x, float(t["step_y"]), z))
 		z -= spacing
 		i += 1
-	if kind == K.BOX:  # Gusts over the slick slabs.
+	if t.get("gusts", false):  # Stormcrag: gusts over the slick, crumbling slabs.
 		_add(K.GUST, _v(x, 2.0, (z_start + z_end) * 0.5), Vector3(8, 5, absf(z_start - z_end) + 4.0), {"phase": 0.7})
 
 
@@ -235,6 +235,7 @@ func _extend_terrain(biome: String) -> void:
 		if c.y < 30.0:
 			clearings.append(c)
 	clearings.append(Vector3(18 * _mirror, 72, 8))
+	clearings.append(Vector3(0, 73, 17))  # The plateau: no trees on or through it.
 	clearings.append(Vector3(0, 228, 10))
 	cfg.clearings = clearings
 	ResourceSaver.save(cfg, path)

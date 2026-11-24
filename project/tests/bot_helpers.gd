@@ -260,6 +260,11 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 			continue
 		var d := target - player.global_position
 		d.y = 0.0
+		if OS.has_environment("BOT_DEBUG") and i % 60 == 0:
+			print("[bot] to %s at %s floor=%s trav=%s combat=%s lock=%s stuck=%d sword=%s" % [target.round(),
+					player.global_position.snapped(Vector3.ONE * 0.1), player.is_on_floor(),
+					TraversalComponent.State.keys()[player.traversal.state], PlayerCombat.State.keys()[player.combat.state],
+					player.combat.lock_target.name if player.combat.lock_target else "-", stuck, player.combat.sword_drawn])
 		if d.length() < 0.05:
 			continue
 		var local := player.get_camera_basis().inverse() * d.normalized()

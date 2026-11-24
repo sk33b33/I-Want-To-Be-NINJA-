@@ -239,7 +239,7 @@ static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: N
 ## when stuck; walking into a climbable wall starts a climb and the climb tops out automatically.
 ## Stops when `done` returns true. Returns done's last value.
 static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3, done: Callable,
-		max_frames: int = 1500) -> bool:
+		max_frames: int = 1500, fight: bool = true) -> bool:
 	var last := player.global_position
 	var stuck := 0
 	for i in max_frames:
@@ -247,6 +247,10 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 		if done.call():
 			release_moves()
 			return true
+		if fight and nearest_thornling(tc, player, 9.0):
+			await fight_thornlings(tc, player, 9.0)  # Like a player: deal with the pack, then go on.
+			last = player.global_position
+			continue
 		var d := target - player.global_position
 		d.y = 0.0
 		if d.length() < 0.05:
@@ -344,4 +348,56 @@ static func _in_zone(zone: Area3D, p: Vector3) -> bool:
 			if absf(local.x) <= half.x and absf(local.z) <= half.z:
 				return true
 	return false
+
+
+static func nearest_thornling(tc: TestCase, player: PlayerController, radius: float) -> Thornling:
+	var best: Thornling = null
+	for n in tc.tree.get_nodes_in_group("lock_targets"):
+		var t := n as Thornling
+		if t and t.is_alive():
+			var d := t.global_position.distance_to(player.global_position)
+			if d < radius and (best == null or d < best.global_position.distance_to(player.global_position)):
+				best = t
+	return best
+
+
+## The Phase 4 combat gate's tactics (lock on, dodge each telegraphed lunge, hit in the
+## recovery) against every live Thornling within `radius`. Returns when they are all down
+## (or after 40 s).
+static func fight_thornlings(tc: TestCase, player: PlayerController, radius: float) -> void:
+	release_moves()
+	var dodge_side := 1.0
+	for frame in 60 * 40:
+		await tc.tree.physics_frame
+		var near := nearest_thornling(tc, player, radius + 4.0)
+		if near == null or player.combat.state == PlayerCombat.State.DEAD:
+			break
+		if player.combat.lock_target == null or not (player.combat.lock_target is Thornling) \
+				or not (player.combat.lock_target as Thornling).is_alive():
+			await tap(tc, "lock_on")
+		var threat: Thornling = null
+		for n in tc.tree.get_nodes_in_group("lock_targets"):
+			var t := n as Thornling
+			if t and t.is_alive() and t.state == Thornling.State.TELEGRAPH and t._t >= t.config.telegraph_time - 0.15 \
+					and t.global_position.distance_to(player.global_position) < 6.0:
+				threat = t
+		if threat and player.combat.state == PlayerCombat.State.READY:
+			dodge_side = -dodge_side
+			Input.action_press("move_right" if dodge_side > 0.0 else "move_left")
+			await tap(tc, "dodge")
+			release_moves()
+			continue
+		var target := player.combat.lock_target as Thornling
+		if target and target.is_alive():
+			var dist := target.global_position.distance_to(player.global_position)
+			var opening := target.state == Thornling.State.RECOVER or target.state == Thornling.State.STAGGER
+			if dist > 2.4:
+				Input.action_press("move_forward")
+			else:
+				Input.action_release("move_forward")
+				if opening or target.state == Thornling.State.CHASE:
+					await tap(tc, "attack_light")
+	release_moves()
+	if player.combat.lock_target:
+		await tap(tc, "lock_on")  # Release the lock to walk on freely.
 

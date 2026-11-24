@@ -280,6 +280,10 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 					player.global_position.snapped(Vector3.ONE * 0.1), player.is_on_floor(),
 					TraversalComponent.State.keys()[player.traversal.state], PlayerCombat.State.keys()[player.combat.state],
 					player.combat.lock_target.name if player.combat.lock_target else "-", stuck, player.combat.sword_drawn])
+			var near_alive := tc.tree.get_nodes_in_group("lock_targets").filter(func(n: Node) -> bool:
+				return n is Thornling and (n as Thornling).is_alive() and n.global_position.distance_to(player.global_position) < 15.0)
+			print("[bot]   near_thornlings=%s hp=%.0f state=%s" % [near_alive.map(func(t: Thornling) -> String: return "%s@%s/%s" % [t.name, t.global_position.round(), Thornling.State.keys()[t.state]]),
+					player.combat.health.current, PlayerCombat.State.keys()[player.combat.state]])
 			print("[bot]   blocks_jump=%s zones=%s vy=%.2f jump_held=%s input=%s" % [player.surface_blocks_jump(),
 					player.get("_surface_zones").map(func(z: Node) -> String: return z.name if is_instance_valid(z) else "<freed>"),
 					player.velocity.y, Input.is_action_pressed("jump"), player.input_enabled])

@@ -247,10 +247,15 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 	# A fall or death respawns the player elsewhere: end this leg so the caller can pick the trail
 	# up again from there (walking on towards a mid-chasm target from a checkpoint falls again).
 	var respawned := [false]
-	var on_respawn := func(_at: Vector3) -> void: respawned[0] = true
+	var lastp := [player.global_position]
+	var on_respawn := func(_at: Vector3) -> void:
+		respawned[0] = true
+		if OS.has_environment("BOT_DEBUG"):
+			print("[bot] RESPAWN after %s (heading to %s), now %s" % [(lastp[0] as Vector3).snapped(Vector3.ONE * 0.1), target.round(), player.global_position.round()])
 	player.respawned.connect(on_respawn)
 	for i in max_frames:
 		await tc.tree.physics_frame
+		lastp[0] = player.global_position
 		if respawned[0] and abort_on_respawn:
 			player.respawned.disconnect(on_respawn)
 			release_moves()
@@ -318,7 +323,16 @@ static func run_long_route(tc: TestCase, player: PlayerController, path_name: St
 	if not (force or walk_full_long_route):
 		# Fast path (most tests): start where the original route starts, exactly as before the long
 		# routes existed. Walking the new sections is covered by routes_test (both ways, every jungle).
-		player.respawn(Vector3(0, 0.1, 0))
+		# A plain teleport, not respawn(): tests that count respawns (falls) must not see this one.
+		var start := Vector3(0, 0.1, 0)
+		player.global_position = start
+		player.velocity = Vector3.ZERO
+		player.set_safe_position(start)
+		player.set_checkpoint(Transform3D(Basis.IDENTITY, start))
+		var rig0 := player.get_node_or_null(player.camera_rig_path) as CameraRig
+		if rig0:
+			rig0.set_yaw(0.0)
+			rig0.snap_to_target()
 		await tc.physics_frames(5)
 		return true
 	var layout := (builders[0] as RouteBuilder).layout

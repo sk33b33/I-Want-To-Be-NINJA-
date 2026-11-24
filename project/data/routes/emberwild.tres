@@ -186,6 +186,7 @@ phase = 96.8
 
 [sub_resource type="Resource" id="Resource_0k5rh"]
 script = ExtResource("1_h1oce")
+kind = 1
 position = Vector3(0, 2.5, 73)
 size = Vector3(26, 5, 34)
 
@@ -238,6 +239,7 @@ phase = 2.8
 
 [sub_resource type="Resource" id="Resource_ny76j"]
 script = ExtResource("1_h1oce")
+kind = 1
 position = Vector3(-18, 2.5, 72)
 size = Vector3(10, 5, 6)
 

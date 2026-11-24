@@ -147,7 +147,8 @@ func _section_two(t: Dictionary) -> void:
 	_steps(t["step2"], t, 6.0, 121.5, 100.0, 5.0, false)
 	# Climb to the plateau (top y = 5) and its hazard field.
 	var depth := PLATEAU_Z.y - PLATEAU_Z.x
-	_add(K.BOX, _v(0, PLATEAU_H * 0.5, (PLATEAU_Z.x + PLATEAU_Z.y) * 0.5), Vector3(26, PLATEAU_H, depth))
+	# Climbable on every side: knocked off in a fight, you can climb straight back up.
+	_add(K.CLIMB, _v(0, PLATEAU_H * 0.5, (PLATEAU_Z.x + PLATEAU_Z.y) * 0.5), Vector3(26, PLATEAU_H, depth))
 	_add(K.CLIMB, _v(0, PLATEAU_H * 0.5, PLATEAU_Z.y + 0.5), Vector3(26, PLATEAU_H, 1.0))
 	_add(K.ENEMY, _v(-2, PLATEAU_H + 0.1, 66), Vector3.ONE, {"count": 3})
 	match int(t["field"]):
@@ -169,7 +170,7 @@ func _section_two(t: Dictionary) -> void:
 				_add(K.BOX, _v(c.x - 1.4, PLATEAU_H + 1.2, c.z - 1.0), Vector3(0.6, 2.4, 0.6))
 				_add(K.BOX, _v(c.x + 1.4, PLATEAU_H + 1.2, c.z + 1.0), Vector3(0.6, 2.4, 0.6))
 	# Dead-end arm (east) with a reward; a lantern shows the way on.
-	_add(K.BOX, _v(18, PLATEAU_H * 0.5, 72), Vector3(10, PLATEAU_H, 6))
+	_add(K.CLIMB, _v(18, PLATEAU_H * 0.5, 72), Vector3(10, PLATEAU_H, 6))
 	_add(K.PICKUP, _v(21, PLATEAU_H, 72), Vector3.ONE, {"item": t["pickup"]})
 	_add(K.LANTERN, _v(-8, PLATEAU_H, 58))
 	# Final stretch: another pack, a checkpoint before the original route.

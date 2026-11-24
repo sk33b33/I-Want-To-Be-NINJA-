@@ -159,6 +159,7 @@ position = Vector3(6, -0.2, 101.5)
 
 [sub_resource type="Resource" id="Resource_ycpu1"]
 script = ExtResource("1_4i5et")
+kind = 1
 position = Vector3(0, 2.5, 73)
 size = Vector3(26, 5, 34)
 
@@ -201,6 +202,7 @@ size = Vector3(6, 1, 4)
 
 [sub_resource type="Resource" id="Resource_4x4vf"]
 script = ExtResource("1_4i5et")
+kind = 1
 position = Vector3(18, 2.5, 72)
 size = Vector3(10, 5, 6)
 

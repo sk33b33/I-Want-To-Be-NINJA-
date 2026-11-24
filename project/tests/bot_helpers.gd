@@ -275,6 +275,9 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 					player.global_position.snapped(Vector3.ONE * 0.1), player.is_on_floor(),
 					TraversalComponent.State.keys()[player.traversal.state], PlayerCombat.State.keys()[player.combat.state],
 					player.combat.lock_target.name if player.combat.lock_target else "-", stuck, player.combat.sword_drawn])
+			print("[bot]   blocks_jump=%s zones=%s vy=%.2f jump_held=%s input=%s" % [player.surface_blocks_jump(),
+					player.get("_surface_zones").map(func(z: Node) -> String: return z.name if is_instance_valid(z) else "<freed>"),
+					player.velocity.y, Input.is_action_pressed("jump"), player.input_enabled])
 		if d.length() < 0.05:
 			continue
 		var local := player.get_camera_basis().inverse() * d.normalized()

@@ -93,17 +93,19 @@ func _build_nook(gap_dir: Vector2, material: Material) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(secret.id)
 	var mesh := ProceduralMeshes.rock(rng, material)
-	var count := 9
+	# Boulders round the ring, leaving a clear ±45° opening at `gap` (about 1.4 m between the two
+	# boulders either side of it — a narrow gap a ninja fits through, tested by secrets_test).
+	var count := 8
 	for i in count:
-		var ang := gap + TAU * (float(i) + 0.5) / (count + 1)  # Leaves one slot open at `gap`.
-		var r := 2.6
+		var ang := gap + deg_to_rad(45.0) + deg_to_rad(270.0) * float(i) / float(count - 1)
+		var r := 3.0
 		var body := StaticBody3D.new()
 		body.name = "Boulder%d" % i
 		body.collision_layer = 1
 		body.collision_mask = 0
 		body.position = Vector3(cos(ang) * r, 0.0, sin(ang) * r)
 		body.rotation.y = rng.randf() * TAU
-		var s := rng.randf_range(1.5, 1.9)
+		var s := rng.randf_range(1.3, 1.5)
 		var shape := CollisionShape3D.new()
 		var sph := SphereShape3D.new()
 		sph.radius = 0.95 * s

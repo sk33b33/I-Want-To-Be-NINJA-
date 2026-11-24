@@ -38,6 +38,7 @@ func rebuild() -> void:
 		return
 	if not _terrain.is_built():
 		_terrain.rebuild()
+	_load_secret_points()
 	_rng.seed = config.seed
 	_low = QualityProfile.is_low()
 	_preset = QualityProfile.current()
@@ -110,7 +111,7 @@ func _place_trees() -> void:
 		attempts += 1
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < cfg.tree_route_clearance or _terrain.is_in_gorge(p.y, 3.0):
+		if d < cfg.tree_route_clearance or _terrain.is_in_gorge(p.y, 3.0) or _near_secret(p.x, p.y):
 			continue
 		if 1.0 - _terrain.get_normal(p.x, p.y).y > 0.5 or not _density_ok(d * 0.6):
 			continue
@@ -206,7 +207,7 @@ func _place_logs() -> void:
 	for i in config.log_count:
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0):
+		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0) or _near_secret(p.x, p.y):
 			continue
 		var mi := MeshInstance3D.new()
 		mi.mesh = ProceduralMeshes.log_mesh(_variant_rng(100 + i), bark_material)
@@ -225,7 +226,7 @@ func _place_pillars() -> void:
 		if _terrain.is_in_gorge(z, 3.0):
 			continue
 		var x := (_rng.randf_range(7.5, 14.0)) * (1.0 if _rng.randf() < 0.5 else -1.0)
-		if _terrain.route_distance(x, z) < 6.5 or _in_clearing(x, z):
+		if _terrain.route_distance(x, z) < 6.5 or _in_clearing(x, z) or _near_secret(x, z):
 			continue
 		var radius := _rng.randf_range(0.45, 0.8)
 		var height := _rng.randf_range(1.5, 6.5)
@@ -250,6 +251,30 @@ func _place_pillars() -> void:
 			body.position.y += radius * 0.6
 		add_child(body)
 		placed += 1
+
+
+## Hidden spirit shrines of this jungle (Phase 13): trees, logs and ruin pillars keep clear of
+## them so a shrine never has a trunk through it. The jungle comes from the flora data's file name
+## ("verdant_canopy_flora.tres" -> verdant_canopy).
+const SECRET_CLEARANCE := 6.5
+var _secret_points: Array[Vector2] = []
+
+
+func _load_secret_points() -> void:
+	_secret_points.clear()
+	if config == null or config.resource_path == "":
+		return
+	var set_data := SecretSet.for_biome(StringName(config.resource_path.get_file().get_basename().trim_suffix("_flora")))
+	if set_data:
+		for d in set_data.secrets:
+			_secret_points.append(d.position)
+
+
+func _near_secret(x: float, z: float) -> bool:
+	for p in _secret_points:
+		if Vector2(x, z).distance_to(p) < SECRET_CLEARANCE:
+			return true
+	return false
 
 
 func _in_clearing(x: float, z: float) -> bool:

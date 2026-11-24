@@ -28,7 +28,7 @@ const SETS := {
 			"hint": "Before the mud, east of the path, a stone stands out of the reeds. Look on top."},
 		{"id": &"fen_nook_west", "name": "Lantern Ring", "kind": SecretDefinition.Kind.NOOK, "pos": Vector2(-17, -86), "gap": Vector2(1, 0),
 			"hint": "Beyond the bog, west of the path, a ring of stones hides a lantern-light."},
-		{"id": &"fen_pillar_far", "name": "Drowned Spire", "kind": SecretDefinition.Kind.PILLAR, "pos": Vector2(15, -97), "height": 6.0,
+		{"id": &"fen_pillar_far", "name": "Drowned Spire", "kind": SecretDefinition.Kind.PILLAR, "pos": Vector2(15, -87), "height": 6.0,
 			"hint": "Near the serpent's water, east of the path, a spire rises from the fen."},
 	],
 	"stormcrag": [

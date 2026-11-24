@@ -103,7 +103,8 @@ func test_gate_bot_reaches_and_takes_every_relic() -> void:
 		(main.get_node("Expedition") as ExpeditionManager).secret_found.connect(
 				func(s: SecretDefinition, _c: bool) -> void: found.append(s.id))
 		for site in _spots(main).sites:
-			player.respawn(Vector3(0, 0.3, site.global_position.z))
+			# From the route a little nearer the spawn (as a player would spot the beam ahead).
+			player.respawn(Vector3(0, 0.3, site.global_position.z + 6.0))
 			await physics_frames(3)
 			var relic := site.relic.global_position
 			var ok: bool

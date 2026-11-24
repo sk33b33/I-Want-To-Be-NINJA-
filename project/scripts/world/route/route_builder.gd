@@ -200,7 +200,7 @@ func _bramble(label: String, p: RoutePiece) -> Area3D:
 	box.size = Vector3(p.size.x, 1.4, p.size.z)
 	var z := _zone(label, "res://scripts/world/hazards/surface_zone.gd", p, box)
 	z.set("speed_multiplier", 0.6)
-	z.set("damage_per_tick", 5.0)
+	z.set("damage_per_tick", 2.0)  # 4/s: brushing the brambles on the "safe" path stings, not kills.
 	z.set("element", &"nature")
 	z.set("attack_name", &"thorns")
 	var rng := RandomNumberGenerator.new()

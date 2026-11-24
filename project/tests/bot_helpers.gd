@@ -297,15 +297,28 @@ static func run_long_route(tc: TestCase, player: PlayerController, path_name: St
 ## Walk through waypoints Vector4(x, y, z, jump); at a jump point, jump and keep heading for the
 ## next waypoint. A waypoint counts as reached within 0.9 m horizontally and 2 m vertically.
 static func follow_path(tc: TestCase, player: PlayerController, pts: Array, frames_per_leg: int = 900) -> bool:
-	for i in pts.size():
+	var respawns := [0]
+	var on_respawn := func(_at: Vector3) -> void: respawns[0] += 1
+	player.respawned.connect(on_respawn)
+	var retries := 0
+	var i := 0
+	while i < pts.size():
+		var seen := respawns[0]
 		var w: Vector4 = pts[i]
 		var target := Vector3(w.x, w.y, w.z)
 		var reached := func() -> bool:
 			var d := player.global_position - target
 			return Vector2(d.x, d.z).length() < 0.9 and absf(d.y) < 2.0
 		var prev := Vector3(pts[i - 1].x, pts[i - 1].y, pts[i - 1].z) if i > 0 else player.global_position
-		if not await walk_toward(tc, player, target, reached, frames_per_leg, true, prev):
+		var ok := await walk_toward(tc, player, target, reached, frames_per_leg, true, prev)
+		if respawns[0] != seen and retries < 3:
+			# Fell or died: like a player, pick the trail up again from the nearest waypoint.
+			retries += 1
+			i = _nearest_waypoint(pts, player.global_position)
+			continue
+		if not ok:
 			push_warning("follow_path: stuck before waypoint %d %s at %s" % [i, target, player.global_position])
+			player.respawned.disconnect(on_respawn)
 			return false
 		if w.w > 0.5 and i + 1 < pts.size():
 			var nxt: Vector4 = pts[i + 1]
@@ -320,6 +333,8 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			tc.press("jump")
 			await tc.physics_frames(14)
 			tc.release("jump")
+		i += 1
+	player.respawned.disconnect(on_respawn)
 	release_moves()
 	return true
 
@@ -408,4 +423,14 @@ static func fight_thornlings(tc: TestCase, player: PlayerController, radius: flo
 	release_moves()
 	if player.combat.lock_target:
 		await tap(tc, "lock_on")  # Release the lock to walk on freely.
+
+
+static func _nearest_waypoint(pts: Array, p: Vector3) -> int:
+	var best := 0
+	for k in pts.size():
+		var w: Vector4 = pts[k]
+		var bw: Vector4 = pts[best]
+		if Vector2(w.x - p.x, w.z - p.z).length() < Vector2(bw.x - p.x, bw.z - p.z).length():
+			best = k
+	return best
 

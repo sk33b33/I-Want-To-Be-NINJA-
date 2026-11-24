@@ -13,6 +13,7 @@ var touch_slider: HSlider
 var brightness_slider: HSlider
 var unlock_button: Button
 var shake_button: Button
+var conditions_button: Button
 var warnings_button: Button
 var sliders: Dictionary = {}  # bus name -> HSlider
 var benchmark_button: Button
@@ -89,6 +90,11 @@ func _ready() -> void:
 		GameSettings.set_screen_shake(not GameSettings.screen_shake)
 		refresh())
 	add_child(shake_button)
+	conditions_button = UiStyle.button("")
+	conditions_button.pressed.connect(func() -> void:
+		GameSettings.set_varied_conditions(not GameSettings.varied_conditions)
+		refresh())
+	add_child(conditions_button)
 	warnings_button = UiStyle.button("")
 	warnings_button.pressed.connect(func() -> void:
 		GameSettings.set_bold_warnings(not GameSettings.bold_warnings)
@@ -129,6 +135,7 @@ func refresh() -> void:
 	quality_button.text = "Graphics: %s" % label
 	shake_button.text = "Screen shake: %s" % ("On" if GameSettings.screen_shake else "Off")
 	warnings_button.text = "Bold attack warnings: %s" % ("On" if GameSettings.bold_warnings else "Off")
+	conditions_button.text = "Time & weather: %s" % ("Varied" if GameSettings.varied_conditions else "Always clear day")
 	if unlock_button:
 		unlock_button.text = "Unlock all jungles (testing): %s" % ("On" if GameSettings.unlock_all else "Off")
 

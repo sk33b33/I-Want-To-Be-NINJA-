@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="WeatherDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/weather_definition.gd" id="1_sauma"]
+
+[resource]
+script = ExtResource("1_sauma")
+id = &"storm"
+display_name = "Storm"
+fog_density = 1.45
+rain = 1.0
+wetness = 1.0
+wind = 2.4
+lightning_interval = Vector2(4, 10)
+sky = 0.65

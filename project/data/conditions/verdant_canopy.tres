@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="JungleConditions" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/jungle_conditions.gd" id="1_yrrbd"]
+[ext_resource type="Script" path="res://scripts/world/conditions/time_of_day.gd" id="2_s6vhp"]
+[ext_resource type="Resource" path="res://data/conditions/time_day.tres" id="3_ansxn"]
+[ext_resource type="Resource" path="res://data/conditions/time_dawn.tres" id="4_h51hd"]
+[ext_resource type="Resource" path="res://data/conditions/time_dusk.tres" id="5_jq413"]
+[ext_resource type="Resource" path="res://data/conditions/time_night.tres" id="6_7hfku"]
+[ext_resource type="Resource" path="res://data/conditions/weather_rain.tres" id="7_y1nal"]
+[ext_resource type="Script" path="res://scripts/world/conditions/weather_definition.gd" id="8_7ivb6"]
+[ext_resource type="Resource" path="res://data/conditions/weather_clear.tres" id="9_mijwy"]
+[ext_resource type="Resource" path="res://data/conditions/weather_mist.tres" id="10_ououw"]
+
+[resource]
+script = ExtResource("1_yrrbd")
+biome_id = &"verdant_canopy"
+times = Array[ExtResource("2_s6vhp")]([ExtResource("3_ansxn"), ExtResource("4_h51hd"), ExtResource("5_jq413"), ExtResource("6_7hfku")])
+time_weights = PackedFloat32Array(3, 2, 2, 1)
+weathers = Array[ExtResource("8_7ivb6")]([ExtResource("9_mijwy"), ExtResource("10_ououw"), ExtResource("7_y1nal")])
+weather_weights = PackedFloat32Array(3, 2, 2)
+turn_chance = 0.35
+turn_to = ExtResource("7_y1nal")

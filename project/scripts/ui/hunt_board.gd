@@ -77,6 +77,7 @@ func _show_crash_report() -> void:
 
 ## Start the given hunt's expedition (also used by tests).
 func begin(biome: BiomeDefinition, hunt: HuntDefinition) -> Node:
+	Conditions.begin(biome.id)  # The forecast shown on the card is the one you get.
 	return SceneFlow.start_expedition(get_tree(), biome.expedition_scene, hunt)
 
 
@@ -260,6 +261,8 @@ func _biome_card(biome: BiomeDefinition) -> Control:
 	col.add_child(UiStyle.label(biome.display_name, 30, accent))
 	col.add_child(UiStyle.label(biome.mood, 18, UiStyle.MUTED))
 	var profile := PlayerProfile.load_profile()
+	if open:  # Phase 13: this jungle's forecast for the next expedition.
+		col.add_child(UiStyle.label("Forecast: " + Conditions.describe(Conditions.forecast_for(biome.id)), 18, UiStyle.BONE))
 	var secrets := SecretSet.for_biome(biome.id)
 	if secrets:  # Phase 13: exploration progress per jungle.
 		var done := secrets.is_complete(profile)

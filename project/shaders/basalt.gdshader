@@ -28,8 +28,11 @@ void fragment() {
 			+ texture(detail_noise, world_pos.xy * scale).r * w.z;
 	float vein = smoothstep(0.03, 0.0, abs(n - 0.52));
 	vec3 col = mix(rock_dark, rock_light, mix(0.5, smoothstep(0.3, 0.8, n), noise_amount)) * tt_detail(world_pos, w);
-	ALBEDO = col * (1.0 - vein * 0.5);
-	ROUGHNESS = 0.95;
+	vec3 albedo = col * (1.0 - vein * 0.5);
+	float rough = 0.95;
+	tt_wet(albedo, rough);
+	ALBEDO = albedo;
+	ROUGHNESS = rough;
 	if (detail_normals) {
 		NORMAL = normalize((VIEW_MATRIX * vec4(tt_normal(world_pos, world_normal, w), 0.0)).xyz);
 	}

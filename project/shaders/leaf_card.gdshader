@@ -9,6 +9,8 @@ uniform sampler2D leaves : source_color, hint_default_white, filter_linear_mipma
 uniform vec3 tint : source_color = vec3(1.0);
 uniform float wind_strength = 0.12;
 uniform float wind_speed = 1.3;
+// Weather (ConditionsDirector): storms sway plants harder. 1 = the jungle's own wind.
+global uniform float wind_boost;
 uniform float translucency = 0.35;
 uniform float brightness = 2.0;
 uniform float photo_colour : hint_range(0.0, 1.0) = 0.25;
@@ -23,8 +25,9 @@ void vertex() {
 	vec3 wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float phase = wp.x * 0.35 + wp.z * 0.27;
 	float sway = sin(TIME * wind_speed + phase) * 0.7 + sin(TIME * wind_speed * 2.3 + phase * 1.7) * 0.3;
-	VERTEX.x += sway * wind_strength * COLOR.a;
-	VERTEX.z += cos(TIME * wind_speed * 0.8 + phase) * wind_strength * 0.6 * COLOR.a;
+	float ws = wind_strength * wind_boost;
+	VERTEX.x += sway * ws * COLOR.a;
+	VERTEX.z += cos(TIME * wind_speed * 0.8 + phase) * ws * 0.6 * COLOR.a;
 	glow_mix = clamp(sin(wp.x * 0.11 + sin(wp.z * 0.07) * 2.0) * sin(wp.z * 0.09 + 1.3) * 0.5 + 0.5, 0.0, 1.0);
 }
 

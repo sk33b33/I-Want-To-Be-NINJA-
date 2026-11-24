@@ -27,6 +27,8 @@ static var difficulty: String = "normal"
 static var brightness: float = 1.5
 ## Testing: open every jungle without the unlock chain.
 static var unlock_all: bool = false
+## Phase 13: varied time of day and weather per expedition (off = always a clear day).
+static var varied_conditions: bool = true
 ## Touch button size multiplier (accessibility; 0.8 .. 1.4).
 static var touch_scale: float = 1.0
 static var master_volume: float = 1.0
@@ -53,6 +55,7 @@ static func load_settings() -> void:
 		difficulty = String(cfg.get_value("game", "difficulty", "normal"))
 		brightness = float(cfg.get_value("graphics", "brightness", 1.5))
 		unlock_all = bool(cfg.get_value("game", "unlock_all", false))
+		varied_conditions = bool(cfg.get_value("game", "varied_conditions", true))
 		touch_scale = float(cfg.get_value("controls", "touch_scale", 1.0))
 		InputRemap.load_from(cfg)
 		master_volume = float(cfg.get_value("audio", "master", 1.0))
@@ -65,6 +68,7 @@ static func load_settings() -> void:
 		difficulty = "normal"
 		brightness = 1.5
 		unlock_all = false
+		varied_conditions = true
 		touch_scale = 1.0
 		InputRemap.reset_to_defaults(false)
 		master_volume = 1.0
@@ -81,12 +85,18 @@ static func save_settings() -> void:
 	cfg.set_value("game", "difficulty", difficulty)
 	cfg.set_value("graphics", "brightness", brightness)
 	cfg.set_value("game", "unlock_all", unlock_all)
+	cfg.set_value("game", "varied_conditions", varied_conditions)
 	cfg.set_value("controls", "touch_scale", touch_scale)
 	InputRemap.save_to(cfg)
 	cfg.set_value("audio", "master", master_volume)
 	cfg.set_value("audio", "music", music_volume)
 	cfg.set_value("audio", "sfx", sfx_volume)
 	cfg.save(path)
+
+
+static func set_varied_conditions(on: bool) -> void:
+	varied_conditions = on
+	save_settings()
 
 
 static func set_screen_shake(on: bool) -> void:

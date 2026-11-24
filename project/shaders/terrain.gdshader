@@ -37,6 +37,8 @@ uniform float photo_colour : hint_range(0.0, 1.0) = 0.3;
 uniform float normal_strength : hint_range(0.0, 2.0) = 1.0;
 global uniform bool detail_normals;
 global uniform bool anti_tile;
+// Weather (ConditionsDirector, set once per expedition): 0 dry .. 1 soaked.
+global uniform float wetness;
 
 varying vec3 world_pos;
 varying vec3 world_normal;
@@ -97,7 +99,7 @@ void fragment() {
 	float rock_w = smoothstep(0.3, 0.7, COLOR.r + (rock_l - 1.0) * 0.25 + (d - 0.5) * 0.2);
 	vec3 col = mix(moss, trail, path_w);
 	col = mix(col, stone, rock_w);
-	float wet = COLOR.a;
+	float wet = max(COLOR.a, wetness * 0.85);
 	ALBEDO = col * (1.0 - wet * 0.35);
 	ROUGHNESS = mix(0.92, 0.35, wet * (0.5 + path_w * 0.5));
 	SPECULAR = 0.3 + wet * 0.3;

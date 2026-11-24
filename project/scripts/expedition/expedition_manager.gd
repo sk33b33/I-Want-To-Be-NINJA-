@@ -21,6 +21,10 @@ signal expedition_ended(result: Dictionary)
 ## A hidden spirit shrine was found (Phase 13). `completed` = that was the jungle's last one.
 signal secret_found(secret: SecretDefinition, completed: bool)
 
+## Time of day and weather for this expedition (Phase 13 part 4).
+## Made with the manager (so the HUD can connect whatever the ready order); set up in _ready.
+var conditions: ConditionsDirector = ConditionsDirector.new()
+
 @export var hunt: HuntDefinition
 ## Used when the hunt has no config of its own.
 @export var default_config: ExpeditionConfig
@@ -78,6 +82,13 @@ func _ready() -> void:
 	if boss:
 		boss.part_broken.connect(_on_part_broken)
 		boss.defeated.connect(_on_boss_defeated)
+	# Time of day & weather (Phase 13): applied once now, before the warm-up and the brightness
+	# slider. With no forecast (tests, benchmark) the jungle keeps its plain mood.
+	conditions.name = "Conditions"
+	add_child(conditions)
+	var level := get_parent().get_node_or_null("Level")
+	if level:
+		conditions.setup(level, Conditions.take_pending())
 	start_expedition()
 	audio.setup.call_deferred(get_parent(), self)  # After every sibling is ready.
 	if ShaderWarmup.is_needed():

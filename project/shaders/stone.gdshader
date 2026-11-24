@@ -49,8 +49,10 @@ void fragment() {
 		col = mix(col, stone_dark * 0.4, notch * 0.7);
 		EMISSION = climb_glow * notch * 0.12;
 	}
+	float rough = 0.9;
+	tt_wet(col, rough);
 	ALBEDO = col;
-	ROUGHNESS = 0.9;
+	ROUGHNESS = rough;
 	if (detail_normals) {
 		NORMAL = normalize((VIEW_MATRIX * vec4(tt_normal(world_pos, world_normal, w), 0.0)).xyz);
 	}

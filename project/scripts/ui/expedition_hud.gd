@@ -40,6 +40,9 @@ func _ready() -> void:
 			_toast.add_theme_color_override("font_color", item.color.lightened(0.3))
 			_toast_t = 2.5)
 		_manager.secret_found.connect(_on_secret_found)
+		if _manager.conditions:
+			_manager.conditions.weather_turned.connect(func(w: WeatherDefinition) -> void:
+				_show_banner("The weather turns: %s" % w.display_name, 3.5, Color(0.7, 0.85, 1.0)))
 		if _manager.timer.is_active():
 			_on_started(_manager.hunt, _manager.timer.duration)
 
@@ -177,7 +180,8 @@ func _on_started(hunt: HuntDefinition, _duration: float) -> void:
 	_box.visible = true
 	var who := hunt.full_name() if hunt else "Unknown beast"
 	_target.text = "Hunt: %s%s" % [who, "  (debug timer)" if _manager.is_debug_duration else ""]
-	_show_banner("Reach the arena before the trail goes cold", 3.5, UiStyle.BONE)
+	var sky := Conditions.describe(_manager.conditions.forecast) if _manager.conditions else ""
+	_show_banner("Reach the arena before the trail goes cold" + ("\n" + sky if sky != "" else ""), 3.5, UiStyle.BONE)
 
 
 func _on_arena(_remaining: float) -> void:

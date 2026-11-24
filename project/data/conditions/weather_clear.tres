@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="WeatherDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/weather_definition.gd" id="1_46fyc"]
+
+[resource]
+script = ExtResource("1_46fyc")
+fog_density = 0.85

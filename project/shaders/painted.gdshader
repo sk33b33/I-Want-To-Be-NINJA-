@@ -19,8 +19,11 @@ void vertex() {
 void fragment() {
 	vec3 w = pow(abs(world_normal), vec3(4.0));
 	w /= (w.x + w.y + w.z);
-	ALBEDO = base_color * COLOR.rgb * tt_detail(world_pos, w);
-	ROUGHNESS = roughness;
+	vec3 albedo = base_color * COLOR.rgb * tt_detail(world_pos, w);
+	float rough = roughness;
+	tt_wet(albedo, rough);
+	ALBEDO = albedo;
+	ROUGHNESS = rough;
 	if (detail_normals) {
 		vec3 n = tt_normal(world_pos, world_normal, w);
 		// Two-sided: flip for back faces so the bumps light from the visible side.

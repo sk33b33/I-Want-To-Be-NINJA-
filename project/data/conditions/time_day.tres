@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="TimeOfDay" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/time_of_day.gd" id="1_ed553"]
+
+[resource]
+script = ExtResource("1_ed553")

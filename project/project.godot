@@ -165,6 +165,14 @@ anti_tile={
 "type": "bool",
 "value": true
 }
+wetness={
+"type": "float",
+"value": 0.0
+}
+wind_boost={
+"type": "float",
+"value": 1.0
+}
 
 [rendering]
 

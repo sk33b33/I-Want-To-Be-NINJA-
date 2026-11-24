@@ -30,3 +30,12 @@ vec3 tt_normal(vec3 p, vec3 n, vec3 w) {
 	vec2 sz = (texture(tt_nrm, q.xy).xy * 2.0 - 1.0) * tt_normal_strength;
 	return normalize(n + vec3(0.0, sx.y, sx.x) * w.x + vec3(sy.x, 0.0, -sy.y) * w.y + vec3(sz.x, sz.y, 0.0) * w.z);
 }
+
+// Weather (ConditionsDirector, set once per expedition): rain makes stone darker and shinier.
+global uniform float wetness;
+
+void tt_wet(inout vec3 albedo, inout float roughness) {
+	albedo *= 1.0 - wetness * 0.3;
+	roughness = mix(roughness, 0.3, wetness * 0.75);
+}
+

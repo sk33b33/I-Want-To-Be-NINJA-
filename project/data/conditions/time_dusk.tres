@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TimeOfDay" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/time_of_day.gd" id="1_70cxy"]
+
+[resource]
+script = ExtResource("1_70cxy")
+id = &"dusk"
+display_name = "Dusk"
+sun_elevation = 9.0
+sun_turn = -70.0
+sun_color = Color(1.35, 0.7, 0.45, 1)
+sun_energy = 0.95
+ambient_color = Color(1.05, 0.9, 0.95, 1)
+fog_color = Color(1.35, 0.95, 0.8, 1)
+sky_zenith = Color(0.9, 0.75, 1, 1)
+sky_horizon = Color(1.8, 1, 0.7, 1)
+sky_glow = Color(1.9, 0.9, 0.6, 1)

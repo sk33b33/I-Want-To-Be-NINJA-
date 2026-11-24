@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="JungleConditions" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/conditions/jungle_conditions.gd" id="1_y7iut"]
+[ext_resource type="Script" path="res://scripts/world/conditions/time_of_day.gd" id="2_8adqp"]
+[ext_resource type="Resource" path="res://data/conditions/time_day.tres" id="3_d78ft"]
+[ext_resource type="Resource" path="res://data/conditions/time_dusk.tres" id="4_yprss"]
+[ext_resource type="Resource" path="res://data/conditions/time_night.tres" id="5_4gsg4"]
+[ext_resource type="Resource" path="res://data/conditions/weather_ashfall.tres" id="6_7o6tp"]
+[ext_resource type="Script" path="res://scripts/world/conditions/weather_definition.gd" id="7_iq0m0"]
+[ext_resource type="Resource" path="res://data/conditions/weather_clear.tres" id="8_onpki"]
+
+[resource]
+script = ExtResource("1_y7iut")
+biome_id = &"emberwild"
+times = Array[ExtResource("2_8adqp")]([ExtResource("3_d78ft"), ExtResource("4_yprss"), ExtResource("5_4gsg4")])
+time_weights = PackedFloat32Array(3, 2, 2)
+weathers = Array[ExtResource("7_iq0m0")]([ExtResource("8_onpki"), ExtResource("6_7o6tp")])
+weather_weights = PackedFloat32Array(3, 3)
+turn_chance = 0.3
+turn_to = ExtResource("6_7o6tp")

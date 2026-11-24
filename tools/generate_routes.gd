@@ -115,8 +115,10 @@ func _steps(kind: int, t: Dictionary, x: float, z_start: float, z_end: float, sp
 		z -= spacing
 		i += 1
 	if gust:
-		var mid := (z_start + z_end) * 0.5
-		_add(K.GUST, _v(x, 2.0, mid), Vector3(8, 5, 11.0), {"phase": 0.7})
+		# Exactly two slabs in the wind (z 175..185.5 for the risky chasm); the slab before it is
+		# outside, so you can wait there for a calm and then cross in two quick jumps.
+		var mid := (z_start + z_end) * 0.5 - 2.0
+		_add(K.GUST, _v(x, 2.0, mid), Vector3(8, 5, 10.0), {"phase": 0.7})
 
 
 func _section_one(t: Dictionary) -> void:

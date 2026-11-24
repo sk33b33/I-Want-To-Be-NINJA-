@@ -331,6 +331,8 @@ func _item(spec: Array) -> ItemDefinition:
 
 
 func _save(res: Resource, path: String) -> Resource:
+	if res is ShaderMaterial:
+		Cc0Surfaces.apply(res, path.get_file().get_basename())  # Beast skin (art pass stage 4).
 	if ResourceSaver.save(res, path) != OK:
 		push_error("save failed " + path)
 	return load(path)

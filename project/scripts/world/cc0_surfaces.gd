@@ -42,6 +42,29 @@ const LEAF_FOLIAGE := {
 const LEAF_SPRAY := "leaf_spray.png"
 
 
+## Beast skins (creature.gdshader, art pass stage 4). Material file -> skin texture + look.
+## Rim light uses the beast's own glow colour (dimmed) so each silhouette reads in its colour.
+const BEAST_SKIN := {"skin_strength": 1.0, "back_light": 0.7, "belly_dark": 0.45, "rim_strength": 0.9}
+const BEASTS := {
+	"kurogale_body": {"skin": "bark", "skin_tile": 1.4, "marking_amount": 0.8, "marking_scale": 1.2},
+	"kurogale_antlers": {"skin": "bark", "skin_tile": 0.8},
+	"oni_body": {"skin": "cliff_rock", "skin_tile": 2.0, "marking_amount": 0.9, "marking_scale": 0.9},
+	"oni_horns": {"skin": "cliff_rock", "skin_tile": 1.0},
+	"nami_body": {"skin": "scales", "skin_tile": 0.9, "marking_amount": 0.8, "marking_scale": 1.0},
+	"nami_lantern": {"skin": "scales", "skin_tile": 0.6},
+	"roc_body": {"skin": "hide", "skin_tile": 0.8, "marking_amount": 0.7, "marking_scale": 1.4},
+	"roc_crest": {"skin": "hide", "skin_tile": 0.6},
+	"kamakiri_body": {"skin": "bark", "skin_tile": 1.0, "marking_amount": 0.7, "marking_scale": 2.0},
+	"kamakiri_part": {"skin": "bark", "skin_tile": 0.7},
+	"kasai_body": {"skin": "scales", "skin_tile": 0.8, "marking_amount": 0.9, "marking_scale": 1.3},
+	"kasai_part": {"skin": "scales", "skin_tile": 0.6},
+	"gamakage_body": {"skin": "hide", "skin_tile": 0.7, "marking_amount": 0.8, "marking_scale": 1.1},
+	"gamakage_part": {"skin": "hide", "skin_tile": 0.5},
+	"kazekiri_body": {"skin": "hide", "skin_tile": 0.6, "marking_amount": 0.8, "marking_scale": 1.8},
+	"kazekiri_part": {"skin": "hide", "skin_tile": 0.5},
+}
+
+
 ## Materials that used to be StandardMaterial3D and are now `painted` (file -> base colour).
 const PAINTED := {
 	"bark_vertex": [Color(1, 1, 1), 0.95],
@@ -86,6 +109,17 @@ static func shader_name(mat: Material) -> String:
 ## Give `mat` its CC0 textures. `file` is the material's file name without extension ("reed"),
 ## for BY_MATERIAL overrides. Returns true if the material uses a textured shader.
 static func apply(mat: Material, file: String = "") -> bool:
+	if BEASTS.has(file) and shader_name(mat) == "creature":
+		var bm := mat as ShaderMaterial
+		var spec: Dictionary = BEAST_SKIN.merged(BEASTS[file], true)
+		bm.set_shader_parameter("skin_tex", load(DIR + spec["skin"] + "_albedo.jpg"))
+		bm.set_shader_parameter("skin_nrm", load(DIR + spec["skin"] + "_normal.jpg"))
+		var glow: Variant = bm.get_shader_parameter("glow_color")
+		bm.set_shader_parameter("rim_color", (glow as Color) * 0.35 if glow is Color else Color(0.3, 0.35, 0.4))
+		for k: String in spec:
+			if k != "skin":
+				bm.set_shader_parameter(k, spec[k])
+		return true
 	if LEAF_FOLIAGE.has(file) and shader_name(mat) == "foliage":
 		var fm := mat as ShaderMaterial
 		fm.set_shader_parameter("leaf_detail", load(DIR + LEAF_SPRAY))

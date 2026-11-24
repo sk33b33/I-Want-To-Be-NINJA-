@@ -138,3 +138,26 @@ func test_every_jungle_applies_its_mood() -> void:
 			_nodes.erase(main)
 	PlayerProfile.path = PlayerProfile.DEFAULT_PATH
 	_done()
+
+
+## Stage 4 (beasts): every beast has a skin, markings and rim light; small fauna keep the plain
+## look; beast meshes are the smooth rebuild (and within a sane budget); flora stays coarse.
+func test_every_beast_has_skin_markings_and_rim() -> void:
+	for f: String in Cc0Surfaces.BEASTS:
+		var m := load("res://data/materials/%s.tres" % f) as ShaderMaterial
+		check(m.get_shader_parameter("skin_tex") != null and float(m.get_shader_parameter("skin_strength")) > 0.0, "%s: skin texture" % f)
+		check(float(m.get_shader_parameter("rim_strength")) > 0.0, "%s: rim light" % f)
+		if f.ends_with("_body"):
+			check(float(m.get_shader_parameter("marking_amount")) > 0.0, "%s: glowing markings" % f)
+	var bat := load("res://data/materials/bat.tres") as ShaderMaterial
+	var strength: Variant = bat.get_shader_parameter("skin_strength")
+	check(strength == null or float(strength) == 0.0, "small fauna keep their plain look")
+
+
+func test_beast_meshes_are_smooth_and_flora_is_not() -> void:
+	check(ProceduralMeshes.smooth_level == 1, "smooth mode is off at runtime (flora/fauna stay cheap)")
+	for id: String in ["kurogale", "ashen_oni_tortoise", "nami", "raijins_echo", "kamakiri", "kasai", "gamakage", "kazekiri"]:
+		var b := (load("res://scenes/bosses/%s.tscn" % id) as PackedScene).instantiate()
+		var tris := (b.get_node("Visual/Body") as MeshInstance3D).mesh.get_faces().size() / 3
+		check(tris >= 1200 and tris <= 6000, "%s body is the smooth rebuild (%d triangles, budget 6000)" % [id, tris])
+		b.free()

@@ -1,6 +1,8 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
 
 [ext_resource type="Shader" path="res://shaders/creature.gdshader" id="1_d1q2r"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/hide_normal.jpg" id="2_s7050"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/hide_albedo.jpg" id="3_xpx65"]
 
 [resource]
 render_priority = 0
@@ -13,3 +15,16 @@ shader_parameter/glow_energy = 5.0
 shader_parameter/spine_color = Color(0.7, 0.85, 1, 1)
 shader_parameter/spine_idle = Color(0.25, 0.3, 0.42, 1)
 shader_parameter/spine_strength = 3.0
+shader_parameter/skin_tex = ExtResource("3_xpx65")
+shader_parameter/skin_nrm = ExtResource("2_s7050")
+shader_parameter/skin_tile = 0.8
+shader_parameter/skin_strength = 1.0
+shader_parameter/skin_normal_strength = null
+shader_parameter/back_light = 0.7
+shader_parameter/belly_dark = 0.45
+shader_parameter/marking_amount = 0.7
+shader_parameter/marking_scale = 1.4
+shader_parameter/marking_reach = null
+shader_parameter/marking_idle = null
+shader_parameter/rim_color = Color(0.24499999, 0.315, 0.35, 0.35)
+shader_parameter/rim_strength = 0.9

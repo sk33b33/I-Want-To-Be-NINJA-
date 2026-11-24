@@ -11,6 +11,11 @@ extends RefCounted
 
 # ---------------------------------------------------------------- helpers
 
+## Art pass stage 4: beasts are built with smooth_level 2 (tools/rebuild_beast_meshes.gd) — twice
+## the segments in blobs and tubes, extra rings along curved tubes, and noise-based lumps. Always
+## 1 for flora/fauna (performance); set it back to 1 after building.
+static var smooth_level: int = 1
+
 static func _tri(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, ca: Color, cb: Color, cc: Color) -> void:
 	st.set_color(ca); st.add_vertex(a)
 	st.set_color(cb); st.add_vertex(b)
@@ -38,6 +43,9 @@ static func _perp(dir: Vector3) -> Vector3:
 ## Tube along `spine` with per-point radius. `colors` per spine point.
 static func _tube(st: SurfaceTool, spine: PackedVector3Array, radii: PackedFloat32Array,
 		colors: PackedColorArray, sides: int, rng: RandomNumberGenerator, wobble: float = 0.0) -> void:
+	if smooth_level > 1:
+		_smooth_tube(st, spine, radii, colors, sides, rng, wobble)
+		return
 	var rings: Array[PackedVector3Array] = []
 	for i in spine.size():
 		var dir: Vector3 = (spine[mini(i + 1, spine.size() - 1)] - spine[maxi(i - 1, 0)]).normalized()
@@ -59,6 +67,15 @@ static func _tube(st: SurfaceTool, spine: PackedVector3Array, radii: PackedFloat
 ## Low-poly blob (lat/long sphere) with jitter. Colour picked per vertex via callback-free gradient.
 static func _blob(st: SurfaceTool, center: Vector3, radius: Vector3, rng: RandomNumberGenerator,
 		top: Color, bottom: Color, lat: int = 5, lon: int = 8, jitter: float = 0.15) -> void:
+	var noise: FastNoiseLite = null
+	if smooth_level > 1:
+		# Smooth mode: more segments, and lumps from low-frequency noise instead of per-vertex
+		# randomness (which would only make a finer mesh bumpier).
+		lat *= smooth_level
+		lon *= smooth_level
+		noise = FastNoiseLite.new()
+		noise.seed = rng.randi()
+		noise.frequency = 1.1
 	var pts: Array[PackedVector3Array] = []
 	var cols: Array[PackedColorArray] = []
 	for i in lat + 1:
@@ -68,7 +85,9 @@ static func _blob(st: SurfaceTool, center: Vector3, radius: Vector3, rng: Random
 		for j in lon:
 			var th := TAU * float(j) / lon
 			var n := Vector3(sin(phi) * cos(th), cos(phi), sin(phi) * sin(th))
-			var jit := 1.0 + (rng.randf_range(-jitter, jitter) if i > 0 and i < lat else 0.0)
+			var jit := 1.0
+			if i > 0 and i < lat:
+				jit += noise.get_noise_3dv(n) * jitter * 1.6 if noise else rng.randf_range(-jitter, jitter)
 			row.append(center + n * radius * jit)
 			crow.append(bottom.lerp(top, n.y * 0.5 + 0.5))
 		pts.append(row)
@@ -78,6 +97,48 @@ static func _blob(st: SurfaceTool, center: Vector3, radius: Vector3, rng: Random
 			var j2 := (j + 1) % lon
 			_quad(st, pts[i][j], pts[i][j2], pts[i + 1][j2], pts[i + 1][j],
 					cols[i][j], cols[i][j2], cols[i + 1][j2], cols[i + 1][j])
+
+
+## Smooth-mode tube: the spine is resampled along a Catmull-Rom curve (3 points per segment),
+## sides doubled, and the wobble follows slow noise around and along the tube.
+static func _smooth_tube(st: SurfaceTool, spine: PackedVector3Array, radii: PackedFloat32Array,
+		colors: PackedColorArray, sides: int, rng: RandomNumberGenerator, wobble: float) -> void:
+	var sp := PackedVector3Array()
+	var rr := PackedFloat32Array()
+	var cc := PackedColorArray()
+	var n := spine.size()
+	for i in n - 1:
+		var p0 := spine[maxi(i - 1, 0)]
+		var p1 := spine[i]
+		var p2 := spine[i + 1]
+		var p3 := spine[mini(i + 2, n - 1)]
+		for k in 3:
+			var t := float(k) / 3.0
+			var t2 := t * t
+			var t3 := t2 * t
+			sp.append(0.5 * ((2.0 * p1) + (-p0 + p2) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3))
+			rr.append(lerpf(radii[i], radii[i + 1], t))
+			cc.append(colors[i].lerp(colors[i + 1], t))
+	sp.append(spine[n - 1]); rr.append(radii[n - 1]); cc.append(colors[n - 1])
+	var noise := FastNoiseLite.new()
+	noise.seed = rng.randi()
+	noise.frequency = 0.9
+	var s2 := sides * 2
+	var rings: Array[PackedVector3Array] = []
+	for i in sp.size():
+		var dir: Vector3 = (sp[mini(i + 1, sp.size() - 1)] - sp[maxi(i - 1, 0)]).normalized()
+		var u := _perp(dir)
+		var v := dir.cross(u).normalized()
+		var ring := PackedVector3Array()
+		for s_i in s2:
+			var ang := TAU * float(s_i) / s2
+			var r := rr[i] * (1.0 + noise.get_noise_2d(float(i) * 0.7, ang * 1.3) * wobble * 1.6)
+			ring.append(sp[i] + (u * cos(ang) + v * sin(ang)) * r)
+		rings.append(ring)
+	for i in sp.size() - 1:
+		for s_i in s2:
+			var nx := (s_i + 1) % s2
+			_quad(st, rings[i][s_i], rings[i][nx], rings[i + 1][nx], rings[i + 1][s_i], cc[i], cc[i], cc[i + 1], cc[i + 1])
 
 
 static func _finish(st: SurfaceTool, mesh: ArrayMesh = null, material: Material = null) -> ArrayMesh:

@@ -252,3 +252,11 @@ Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground 
 - Moonfen's wooden route walls a little lighter (they read as black).
 - The brightness slider scales each mood's exposure/ambient (unchanged behaviour).
 - Bug found and fixed while reviewing screenshots: the first version put `mood` before `script` in the scene files, so Godot dropped it and nothing changed. `art_test.gd` now checks every jungle's sun, fog, saturation, grade (off on Low) and brightness come from its mood (watched failing on the old order).
+
+## 2026-11-24 — Art pass, stage 4: beasts
+- **Smoother bodies:** all eight beasts rebuilt with `ProceduralMeshes.smooth_level = 2` (`tools/rebuild_beast_meshes.gd`): twice the segments, curved tubes resampled along a spline, and lumps from low-frequency noise instead of per-vertex randomness. Same shapes, sizes, hitboxes and hurtboxes; each beast stays under ~4k triangles (one on screen at a time). Flora/fauna are unaffected (smooth mode is off at runtime).
+- **Skins** (`creature.gdshader`, painterly: texture = detail, beast colour = colour), projected in the beast's own space so they move with the body: bark (Kurogale, Kamakiri), stone (Oni-Tortoise shell), scales (Nami, Kasai — new CC0 Leather008), hide (Raijin's Echo, Gamakage, Kazekiri — new CC0 Leather030). Normal maps only off Low.
+- **Glowing markings** along each beast's back in its element colour: a slow pulse at rest that **flares during attack telegraphs** (an extra warning; the existing warnings are unchanged).
+- **Rim light** in each beast's colour and a lighter back / darker belly, so silhouettes read against the dark jungle.
+- Small fauna (bats, frogs, moths) keep their plain look (all new options default off).
+- Tests: `art_test.gd` +2 (every beast has skin/markings/rim, fauna unchanged; beast bodies are the smooth rebuild within a 6k-triangle budget and smooth mode is off at runtime).

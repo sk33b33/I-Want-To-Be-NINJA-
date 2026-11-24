@@ -1,6 +1,8 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3]
 
 [ext_resource type="Shader" path="res://shaders/creature.gdshader" id="1_2btuk"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_normal.jpg" id="2_ftfyg"]
+[ext_resource type="Texture2D" path="res://assets/textures/cc0/bark_albedo.jpg" id="3_aucas"]
 
 [resource]
 render_priority = 0
@@ -13,3 +15,16 @@ shader_parameter/glow_energy = null
 shader_parameter/spine_color = Color(1, 0.25, 0.05, 1)
 shader_parameter/spine_idle = Color(0.34, 0.3, 0.22, 1)
 shader_parameter/spine_strength = 0.6
+shader_parameter/skin_tex = ExtResource("3_aucas")
+shader_parameter/skin_nrm = ExtResource("2_ftfyg")
+shader_parameter/skin_tile = 0.8
+shader_parameter/skin_strength = 1.0
+shader_parameter/skin_normal_strength = null
+shader_parameter/back_light = 0.7
+shader_parameter/belly_dark = 0.45
+shader_parameter/marking_amount = null
+shader_parameter/marking_scale = null
+shader_parameter/marking_reach = null
+shader_parameter/marking_idle = null
+shader_parameter/rim_color = Color(0.3, 0.35, 0.4, 1)
+shader_parameter/rim_strength = 0.9

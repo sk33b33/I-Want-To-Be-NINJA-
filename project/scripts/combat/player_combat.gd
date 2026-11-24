@@ -64,6 +64,12 @@ var equipped_gear: Array[GearDefinition] = []
 ## Element overrides from gear (empty = default: fire talisman, physical blades).
 var skill_element_override: StringName = &""
 var blade_element: StringName = &""
+## Phase 13 weapons: the equipped weapon type and the combo adjusted for it (set_weapon_type).
+var weapon_type: WeaponType
+var light_combo: Array[AttackDefinition] = []
+var heavy_attack: AttackDefinition
+var _hitbox_base_size: Vector3 = Vector3.ZERO
+var _hitbox_base_offset: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
@@ -79,6 +85,27 @@ func _ready() -> void:
 	if hitbox:
 		hitbox.hit_landed.connect(_on_hit_landed)
 	body.respawned.connect(_on_body_respawned)
+	set_weapon_type(null)
+
+
+## Equip a weapon type (GearLoadout, at expedition start): the light combo and heavy are copies
+## of the config's attacks adjusted by the type, and the weapon hitbox is scaled by its reach.
+## null = twin katana (the config's attacks as they are). Never called per frame.
+func set_weapon_type(type: WeaponType) -> void:
+	weapon_type = type
+	light_combo.clear()
+	for a in config.light_combo:
+		light_combo.append(type.adapt(a) if type else a)
+	heavy_attack = type.adapt(config.heavy) if type and config.heavy else config.heavy
+	var shape_node := hitbox.get_child(0) as CollisionShape3D if hitbox and hitbox.get_child_count() > 0 else null
+	if shape_node and shape_node.shape is BoxShape3D:
+		if _hitbox_base_size == Vector3.ZERO:
+			_hitbox_base_size = (shape_node.shape as BoxShape3D).size
+			_hitbox_base_offset = shape_node.position
+			shape_node.shape = shape_node.shape.duplicate()  # Never resize the shared resource.
+		var r := type.reach if type else 1.0
+		(shape_node.shape as BoxShape3D).size = Vector3(_hitbox_base_size.x * r, _hitbox_base_size.y, _hitbox_base_size.z * r)
+		shape_node.position = Vector3(_hitbox_base_offset.x, _hitbox_base_offset.y, _hitbox_base_offset.z * r)
 
 
 ## Blades in hand (true) or sheathed at the hip (false). Sheathed blades cannot attack: an attack
@@ -171,11 +198,11 @@ func physics_update(delta: float, _input: Vector2, wish: Vector3) -> bool:
 		_swap_buffer = 0.0
 		if not is_swapping():
 			start_swap(not sword_drawn)
-	if _light_buffer > 0.0 and not config.light_combo.is_empty():
-		_start_attack(config.light_combo[0], 0, wish)
+	if _light_buffer > 0.0 and not light_combo.is_empty():
+		_start_attack(light_combo[0], 0, wish)
 		return true
-	if _heavy_buffer > 0.0 and config.heavy:
-		_start_attack(config.heavy, -1, wish)
+	if _heavy_buffer > 0.0 and heavy_attack:
+		_start_attack(heavy_attack, -1, wish)
 		return true
 	if _skill_buffer > 0.0 and config.skill and skill_cooldown_left <= 0.0:
 		_skill_buffer = 0.0
@@ -375,6 +402,10 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 			info.element = blade_element
 		info.source = body
 		info.attack_name = a.id
+		if weapon_type and not a.projectile_scene:
+			info.part_multiplier = weapon_type.part_damage_multiplier
+			info.poison_dps = weapon_type.poison_dps
+			info.poison_seconds = weapon_type.poison_seconds
 		if a.projectile_scene:
 			_throw(a, info)
 		else:
@@ -389,8 +420,8 @@ func _update_attack(delta: float, wish: Vector3) -> void:
 			hitbox.deactivate()
 			_start_dodge(wish)
 			return
-		if _light_buffer > 0.0 and combo_index >= 0 and combo_index + 1 < config.light_combo.size():
-			_start_attack(config.light_combo[combo_index + 1], combo_index + 1, wish)
+		if _light_buffer > 0.0 and combo_index >= 0 and combo_index + 1 < light_combo.size():
+			_start_attack(light_combo[combo_index + 1], combo_index + 1, wish)
 			return
 	if _t >= a.total_seconds():
 		hitbox.deactivate()

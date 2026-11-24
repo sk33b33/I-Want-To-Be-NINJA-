@@ -40,6 +40,10 @@ func receive(info: DamageInfo) -> bool:
 	if not health.apply_damage(info):
 		return false
 	hit_received.emit(info)
+	if info.poison_dps > 0.0:
+		# Poison follows the target's element table too (a poison beast shrugs it off).
+		var m := elements.multiplier(&"poison") if elements else 1.0
+		health.poison(info.poison_dps * m, info.poison_seconds)
 	if part_id != &"":
 		part_hit.emit(part_id, info)
 	var fx := get_tree().get_first_node_in_group("combat_fx")

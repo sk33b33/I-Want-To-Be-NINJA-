@@ -159,6 +159,19 @@ func set_sheathed(value: bool) -> void:
 		b.visible = value
 
 
+## Swap both hand blades and the sheathed pair to a weapon type's blade shape, and move the
+## slash trails to its length (GearLoadout, once at expedition start). null = katana.
+func set_weapon_type(type: WeaponType) -> void:
+	var builder := type.blade_mesh if type else &"ninja_blade"
+	var mesh: Mesh = ProceduralMeshes.new().call(builder, blade_material)
+	for b in blades + sheathed_blades:
+		b.mesh = mesh
+	for t in trails:
+		t.base_override = type.trail_base if type else -1.0
+		t.tip_override = type.trail_tip if type else -1.0
+	CrashReport.note("weapon: %s" % (type.id if type else &"katana"))
+
+
 ## Recolour the blades (forged weapons). Multiplies the blade's vertex colours.
 func set_tint(color: Color) -> void:
 	for blade in blades + sheathed_blades:

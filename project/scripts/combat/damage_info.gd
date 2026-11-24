@@ -13,6 +13,11 @@ var source: Node3D
 var hit_position: Vector3 = Vector3.ZERO
 ## Name of the attack that caused this hit (for feedback and debugging).
 var attack_name: StringName = &""
+## Weapon traits (WeaponType, Phase 13): extra damage towards breaking parts, and poison applied
+## by the target's Hurtbox after the hit lands.
+var part_multiplier: float = 1.0
+var poison_dps: float = 0.0
+var poison_seconds: float = 0.0
 
 
 func copy() -> DamageInfo:
@@ -23,6 +28,9 @@ func copy() -> DamageInfo:
 	d.element = element
 	d.team = team
 	d.source = source
+	d.part_multiplier = part_multiplier
+	d.poison_dps = poison_dps
+	d.poison_seconds = poison_seconds
 	d.hit_position = hit_position
 	d.attack_name = attack_name
 	return d

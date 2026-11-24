@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_hh581"]
+[ext_resource type="Resource" path="res://data/items/gale_fang.tres" id="2_7b1k0"]
+[ext_resource type="Resource" path="res://data/items/gale_pelt.tres" id="3_pti32"]
+[ext_resource type="Resource" path="res://data/items/storm_glass.tres" id="4_hu3e2"]
+[ext_resource type="Resource" path="res://data/gear/gale_greatblades.tres" id="5_2tykm"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="6_nhioa"]
+
+[resource]
+script = ExtResource("6_nhioa")
+id = &"gale_greatblades"
+result = ExtResource("5_2tykm")
+inputs = Array[ExtResource("1_hh581")]([ExtResource("2_7b1k0"), ExtResource("3_pti32"), ExtResource("4_hu3e2")])
+counts = PackedInt32Array(1, 1, 2)

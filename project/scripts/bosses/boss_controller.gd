@@ -333,7 +333,7 @@ func _on_part_hit(part_id: StringName, info: DamageInfo) -> void:
 	var part := definition.get_part(part_id)
 	if part == null:
 		return
-	part_damage[part_id] = float(part_damage.get(part_id, 0.0)) + info.amount
+	part_damage[part_id] = float(part_damage.get(part_id, 0.0)) + info.amount * info.part_multiplier
 	if float(part_damage[part_id]) >= part.break_health:
 		broken_parts[part_id] = true
 		var intact := get_node_or_null(part.intact_node) as Node3D

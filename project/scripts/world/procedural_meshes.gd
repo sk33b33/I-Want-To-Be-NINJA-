@@ -622,6 +622,99 @@ static func ninja_blade(material: Material) -> ArrayMesh:
 	return _finish(st, null, material)
 
 
+# ---------------------------------------------------------------- weapon types (Phase 13)
+# Same handle as ninja_blade (grip at the origin, blade along +Y, edge towards +Z) so
+# WeaponMount's fist maths holds for every weapon.
+
+static func _handle(st: SurfaceTool, rng: RandomNumberGenerator, length: float, wrap: Color, guard: Color) -> void:
+	_tube(st, PackedVector3Array([Vector3(0, -length, 0), Vector3(0, 0.08, 0)]), PackedFloat32Array([0.019, 0.018]),
+			PackedColorArray([wrap, wrap]), 6, rng)
+	_blob(st, Vector3(0, 0.09, 0), Vector3(0.045, 0.012, 0.045), rng, guard, guard, 2, 8, 0.0)
+
+
+## Flat blade along a centre line: `pts` (centre), `widths` (towards +Z), single edge.
+static func _flat_blade(st: SurfaceTool, pts: Array[Vector3], widths: Array[float], col: Color, thick: float = 0.004) -> void:
+	for i in pts.size() - 1:
+		for sgn in [-1.0, 1.0]:
+			var th := Vector3(thick * sgn, 0, 0)
+			_quad(st, pts[i] + th, pts[i + 1] + th, pts[i + 1] + Vector3(0, 0, widths[i + 1]) + th * 0.2,
+					pts[i] + Vector3(0, 0, widths[i]) + th * 0.2, col, col, col, col)
+
+
+## Mantis Kama: a sickle — short shaft, then a blade hooking forward (+Z) like a mantis scythe.
+static func kama_blade(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 21
+	_handle(st, rng, 0.14, Color(0.1, 0.12, 0.06), Color(0.3, 0.36, 0.18))
+	_tube(st, PackedVector3Array([Vector3(0, 0.08, 0), Vector3(0, 0.32, 0)]), PackedFloat32Array([0.016, 0.014]),
+			PackedColorArray([Color(0.22, 0.2, 0.12), Color(0.22, 0.2, 0.12)]), 6, rng)
+	var pts: Array[Vector3] = []
+	var widths: Array[float] = []
+	for i in 9:
+		var t := float(i) / 8.0
+		var ang := t * 2.3  # Curls from straight up to forward and down.
+		pts.append(Vector3(0, 0.32 + sin(ang) * 0.22, (1.0 - cos(ang)) * 0.22))
+		widths.append(-0.045 * (1.0 - t * 0.85))  # Edge on the inside of the curve.
+	_flat_blade(st, pts, widths, Color(0.72, 0.8, 0.62))
+	return _finish(st, null, material)
+
+
+## Cinder Claws: three curved claws rising from the fist (short reach).
+static func claw_blade(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 22
+	_handle(st, rng, 0.1, Color(0.12, 0.06, 0.04), Color(0.45, 0.2, 0.08))
+	for k in 3:
+		var x := (float(k) - 1.0) * 0.03
+		var pts: Array[Vector3] = []
+		var widths: Array[float] = []
+		for i in 6:
+			var t := float(i) / 5.0
+			pts.append(Vector3(x, 0.1 + t * 0.3, sin(t * 1.6) * 0.06))
+			widths.append(0.02 * (1.0 - t * 0.9))
+		_flat_blade(st, pts, widths, Color(0.85, 0.55, 0.3), 0.005)
+	return _finish(st, null, material)
+
+
+## Venom Tanto: a short straight dagger with a hollow-ground, venom-green edge.
+static func venom_tanto(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 23
+	_handle(st, rng, 0.11, Color(0.06, 0.08, 0.06), Color(0.2, 0.35, 0.15))
+	var pts: Array[Vector3] = []
+	var widths: Array[float] = []
+	for i in 5:
+		var t := float(i) / 4.0
+		pts.append(Vector3(0, 0.1 + t * 0.34, 0))
+		widths.append(0.026 * (1.0 - pow(t, 3.0)))
+	_flat_blade(st, pts, widths, Color(0.55, 0.85, 0.45))
+	return _finish(st, null, material)
+
+
+## Gale Greatblades: long, broad blades with a notched back (long reach).
+static func gale_greatblade(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 24
+	_handle(st, rng, 0.2, Color(0.06, 0.07, 0.1), Color(0.35, 0.4, 0.55))
+	var pts: Array[Vector3] = []
+	var widths: Array[float] = []
+	for i in 9:
+		var t := float(i) / 8.0
+		pts.append(Vector3(0, 0.1 + t * 0.95, sin(t * 1.2) * 0.05))
+		widths.append(0.05 * (1.0 - t * 0.5) if i < 8 else 0.0)
+	_flat_blade(st, pts, widths, Color(0.75, 0.82, 0.95), 0.006)
+	# Notches on the back edge.
+	for n in 3:
+		var y := 0.35 + n * 0.2
+		_tri(st, Vector3(0, y, -0.004), Vector3(0, y + 0.06, -0.004), Vector3(0, y + 0.03, -0.03),
+				Color(0.5, 0.55, 0.7), Color(0.5, 0.55, 0.7), Color(0.5, 0.55, 0.7))
+	return _finish(st, null, material)
+
+
 # ---------------------------------------------------------------- boss (Phase 5)
 
 ## Kurogale body: tall thorn-backed stag (~2.4 m at the shoulder), facing -Z, head at z ≈ -2.

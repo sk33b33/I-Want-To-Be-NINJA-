@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponType" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/weapon_type.gd" id="1_rruhe"]
+
+[resource]
+script = ExtResource("1_rruhe")
+id = &"tanto"
+display_name = "Venom Tanto"
+play_style = "Quick short daggers that poison: the beast keeps bleeding while you dodge."
+speed_multiplier = 1.15
+damage_multiplier = 0.78
+stagger_multiplier = 0.85
+reach = 0.85
+poison_dps = 6.0
+poison_seconds = 5.0
+blade_mesh = &"venom_tanto"
+trail_tip = 0.44

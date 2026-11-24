@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponType" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/weapon_type.gd" id="1_by5ta"]
+
+[resource]
+script = ExtResource("1_by5ta")
+id = &"greatblade"
+display_name = "Greatblades"
+play_style = "Slow, long and heavy: big hits and big stagger — swing into openings."
+speed_multiplier = 0.78
+damage_multiplier = 1.4
+stagger_multiplier = 1.7
+reach = 1.35
+trail_width_multiplier = 1.5
+blade_mesh = &"gale_greatblade"
+trail_base = 0.15
+trail_tip = 1.0

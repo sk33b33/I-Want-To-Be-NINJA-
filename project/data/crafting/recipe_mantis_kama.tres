@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_0pru2"]
+[ext_resource type="Resource" path="res://data/items/mantis_scythe.tres" id="2_pmyvh"]
+[ext_resource type="Resource" path="res://data/items/ironbark_carapace.tres" id="3_nara7"]
+[ext_resource type="Resource" path="res://data/items/ruin_shard.tres" id="4_s15qv"]
+[ext_resource type="Resource" path="res://data/gear/mantis_kama.tres" id="5_4n4wf"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="6_iu6k6"]
+
+[resource]
+script = ExtResource("6_iu6k6")
+id = &"mantis_kama"
+result = ExtResource("5_4n4wf")
+inputs = Array[ExtResource("1_0pru2")]([ExtResource("2_pmyvh"), ExtResource("3_nara7"), ExtResource("4_s15qv")])
+counts = PackedInt32Array(1, 1, 2)

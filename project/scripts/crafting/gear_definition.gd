@@ -12,6 +12,9 @@ enum Slot { WEAPON, ARMOR, CHARM }
 ## Tint shown on the gear in game (blades) and in the forge UI.
 @export var color: Color = Color(0.8, 0.8, 0.8)
 
+## Weapons only: how it plays (speed, reach, trait, blade shape). Null = twin katana.
+@export var weapon_type: WeaponType
+
 @export_group("Stats")
 ## Multiplier on blade (light/heavy) damage. 1.25 = +25%.
 @export var blade_damage_multiplier: float = 1.0
@@ -36,6 +39,9 @@ static func slot_name(s: Slot) -> String:
 ## Human-readable stat lines for the forge, e.g. "Blade damage +25%".
 func stat_lines() -> PackedStringArray:
 	var lines: PackedStringArray = []
+	if weapon_type:
+		lines.append(weapon_type.display_name + (": " + weapon_type.play_style if weapon_type.play_style != "" else ""))
+		lines.append_array(weapon_type.stat_lines())
 	if blade_damage_multiplier != 1.0:
 		lines.append("Blade damage %+d%%" % int(round((blade_damage_multiplier - 1.0) * 100.0)))
 	if max_health_bonus != 0.0:

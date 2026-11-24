@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GearDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/crafting/gear_definition.gd" id="1_onae4"]
+[ext_resource type="Resource" path="res://data/weapons/tanto.tres" id="2_rarx6"]
+
+[resource]
+script = ExtResource("1_onae4")
+id = &"venom_tanto"
+display_name = "Venom Tanto"
+description = "Edges coated from Gamakage's toxin sac."
+color = Color(0.55, 1, 0.4, 1)
+weapon_type = ExtResource("2_rarx6")
+blade_damage_multiplier = 1.5
+blade_element = &"poison"

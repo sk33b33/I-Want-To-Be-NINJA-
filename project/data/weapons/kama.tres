@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="WeaponType" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/weapon_type.gd" id="1_1f7w3"]
+
+[resource]
+script = ExtResource("1_1f7w3")
+id = &"kama"
+display_name = "Twin Kama"
+play_style = "Hooked sickles that tear at horns, tails and crests: breaks beast parts far sooner."
+damage_multiplier = 0.95
+reach = 1.1
+part_damage_multiplier = 1.6
+blade_mesh = &"kama_blade"
+trail_base = 0.32
+trail_tip = 0.62

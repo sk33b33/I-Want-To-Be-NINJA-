@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_72lwy"]
+[ext_resource type="Resource" path="res://data/items/toxin_sac.tres" id="2_v4reg"]
+[ext_resource type="Resource" path="res://data/items/bog_toad_hide.tres" id="3_bj36d"]
+[ext_resource type="Resource" path="res://data/items/spirit_moss.tres" id="4_dkxkp"]
+[ext_resource type="Resource" path="res://data/gear/venom_tanto.tres" id="5_kku0n"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="6_1quq3"]
+
+[resource]
+script = ExtResource("6_1quq3")
+id = &"venom_tanto"
+result = ExtResource("5_kku0n")
+inputs = Array[ExtResource("1_72lwy")]([ExtResource("2_v4reg"), ExtResource("3_bj36d"), ExtResource("4_dkxkp")])
+counts = PackedInt32Array(1, 1, 2)

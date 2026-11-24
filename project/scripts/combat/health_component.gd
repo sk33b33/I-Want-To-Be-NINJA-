@@ -18,6 +18,7 @@ var dead: bool = false
 
 func _ready() -> void:
 	current = max_health
+	set_process(false)
 
 
 ## Returns true when the damage was applied.
@@ -34,6 +35,39 @@ func apply_damage(info: DamageInfo) -> bool:
 	return true
 
 
+## Poison (Venom Tanto): `dps` for `seconds`, ticking every POISON_TICK. A new dose refreshes
+## the timer and keeps the stronger dps — poison never stacks.
+const POISON_TICK := 0.5
+var poison_dps: float = 0.0
+var poison_left: float = 0.0
+var _poison_tick: float = 0.0
+var _poison_element: StringName = &"poison"
+
+
+func poison(dps: float, seconds: float) -> void:
+	if dead or dps <= 0.0 or seconds <= 0.0:
+		return
+	poison_dps = maxf(poison_dps if poison_left > 0.0 else 0.0, dps)
+	poison_left = seconds
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	if poison_left <= 0.0 or dead:
+		poison_left = 0.0
+		set_process(false)
+		return
+	poison_left -= delta
+	_poison_tick += delta
+	while _poison_tick >= POISON_TICK:
+		_poison_tick -= POISON_TICK
+		var info := DamageInfo.new()
+		info.amount = poison_dps * POISON_TICK
+		info.element = _poison_element
+		info.attack_name = &"poison"
+		apply_damage(info)
+
+
 func heal(amount: float) -> void:
 	if dead:
 		return
@@ -46,6 +80,7 @@ func reset() -> void:
 	current = max_health
 	dead = false
 	invulnerable = false
+	poison_left = 0.0
 	changed.emit(current, max_health)
 	revived.emit()
 

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponType" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/weapon_type.gd" id="1_vab3d"]
+
+[resource]
+script = ExtResource("1_vab3d")
+id = &"claws"
+display_name = "Claws"
+play_style = "Fast, close and relentless: many light hits, little stagger."
+speed_multiplier = 1.35
+damage_multiplier = 0.72
+stagger_multiplier = 0.7
+reach = 0.8
+trail_width_multiplier = 0.7
+blade_mesh = &"claw_blade"
+trail_base = 0.2
+trail_tip = 0.42

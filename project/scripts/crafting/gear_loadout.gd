@@ -15,6 +15,7 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 	var tint := Color(0, 0, 0, 0)
 	var skill_element := &""
 	var blade_element := &""
+	var weapon_type: WeaponType = null
 	for g in gear:
 		blade *= g.blade_damage_multiplier
 		health_bonus += g.max_health_bonus
@@ -23,6 +24,7 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 		skill *= g.skill_damage_multiplier
 		if g.slot == GearDefinition.Slot.WEAPON:
 			tint = g.color
+			weapon_type = g.weapon_type
 		if g.skill_element != &"":
 			skill_element = g.skill_element
 		if g.blade_element != &"":
@@ -38,4 +40,7 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 	var mount := player.get_node_or_null("WeaponMount") as WeaponMount
 	if mount and tint.a > 0.0:
 		mount.set_tint(tint)
+	combat.set_weapon_type(weapon_type)
+	if mount:
+		mount.set_weapon_type(weapon_type)
 	combat.equipped_gear = gear

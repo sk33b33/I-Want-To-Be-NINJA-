@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_4xub7"]
+[ext_resource type="Resource" path="res://data/items/cinder_tail.tres" id="2_1xcav"]
+[ext_resource type="Resource" path="res://data/items/salamander_hide.tres" id="3_2cb1m"]
+[ext_resource type="Resource" path="res://data/items/ember_crystal.tres" id="4_m48xl"]
+[ext_resource type="Resource" path="res://data/gear/cinder_claws.tres" id="5_5cytf"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="6_sh14l"]
+
+[resource]
+script = ExtResource("6_sh14l")
+id = &"cinder_claws"
+result = ExtResource("5_5cytf")
+inputs = Array[ExtResource("1_4xub7")]([ExtResource("2_1xcav"), ExtResource("3_2cb1m"), ExtResource("4_m48xl")])
+counts = PackedInt32Array(1, 1, 2)

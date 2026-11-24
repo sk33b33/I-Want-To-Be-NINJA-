@@ -62,6 +62,11 @@ static func _build_strip() -> ArrayMesh:
 	return m
 
 
+## Weapon-type blade length (metres from the grip); < 0 = use the TrailConfig.
+var base_override: float = -1.0
+var tip_override: float = -1.0
+
+
 func sample_count() -> int:
 	return _samples.size()
 
@@ -75,8 +80,8 @@ func _process(delta: float) -> void:
 		current_width = a.trail_width
 		current_color = _color() * a.trail_intensity
 		var g := blade.global_transform
-		var tip := g * Vector3(0, config.tip, 0)
-		var base := g * Vector3(0, config.base, 0)
+		var tip := g * Vector3(0, tip_override if tip_override >= 0.0 else config.tip, 0)
+		var base := g * Vector3(0, base_override if base_override >= 0.0 else config.base, 0)
 		# Heavier swings draw a wider band: extend it down the blade.
 		base = tip.lerp(base, clampf(current_width, 0.5, 2.0))
 		_samples.append({"a": base, "b": tip, "t": _time})

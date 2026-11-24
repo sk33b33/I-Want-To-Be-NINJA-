@@ -18,6 +18,8 @@ extends Node
 @export var trail_config: TrailConfig = preload("res://data/combat/blade_trail.tres")
 
 var trails: Array[WeaponTrail] = []
+## Equipped weapon type (set_weapon_type); null = katana.
+var weapon_type: WeaponType
 
 ## Sheath placement in the player's own frame (the "Visual" node: forward = -Z, left = -X, up = +Y;
 ## metres from the feet): at the left hip, handles forward, blades sloping down and back.
@@ -145,6 +147,7 @@ func _hook_combat() -> void:
 		trail.name = "Trail" + blade.get_parent().name
 		add_child(trail)
 		trail.setup(blade, combat, trail_config)
+		_fit_trail(trail)
 		trails.append(trail)
 	combat.sword_state_changed.connect(func(drawn: bool) -> void: set_sheathed(not drawn))
 	set_sheathed(not combat.sword_drawn)
@@ -162,14 +165,21 @@ func set_sheathed(value: bool) -> void:
 ## Swap both hand blades and the sheathed pair to a weapon type's blade shape, and move the
 ## slash trails to its length (GearLoadout, once at expedition start). null = katana.
 func set_weapon_type(type: WeaponType) -> void:
+	weapon_type = type
 	var builder := type.blade_mesh if type else &"ninja_blade"
 	var mesh: Mesh = ProceduralMeshes.new().call(builder, blade_material)
 	for b in blades + sheathed_blades:
 		b.mesh = mesh
 	for t in trails:
-		t.base_override = type.trail_base if type else -1.0
-		t.tip_override = type.trail_tip if type else -1.0
+		_fit_trail(t)
 	CrashReport.note("weapon: %s" % (type.id if type else &"katana"))
+
+
+## The trails are made a few frames after the mount (after the fist is baked), which is AFTER
+## the loadout equips the weapon at expedition start — so each new trail fits itself here too.
+func _fit_trail(t: WeaponTrail) -> void:
+	t.base_override = weapon_type.trail_base if weapon_type else -1.0
+	t.tip_override = weapon_type.trail_tip if weapon_type else -1.0
 
 
 ## Recolour the blades (forged weapons). Multiplies the blade's vertex colours.

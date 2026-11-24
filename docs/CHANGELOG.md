@@ -260,3 +260,18 @@ Owner chose: free CC0 assets + code, stylized painterly look, all areas (ground 
 - **Rim light** in each beast's colour and a lighter back / darker belly, so silhouettes read against the dark jungle.
 - Small fauna (bats, frogs, moths) keep their plain look (all new options default off).
 - Tests: `art_test.gd` +2 (every beast has skin/markings/rim, fauna unchanged; beast bodies are the smooth rebuild within a 6k-triangle budget and smooth mode is off at runtime). 243 tests, all passing.
+
+## 2026-11-24 — Phase 13, part 2: more weapons
+Four new weapon **types**, one forged from each second beast's part (+ its hide + a gatherable from that jungle). The ninja has one set of weapon animations, so types differ by feel — swing speed, damage per hit, stagger, reach (hitbox size), blade shape, slash-trail length — and one trait. Damage × speed stays within 15% of the twin katana (a test enforces it): the choice is play style and the beast's weakness, not raw power.
+| Weapon | From | Plays like | Trait / element |
+|---|---|---|---|
+| **Mantis Kama** (twin sickles) | Kamakiri's scythe | katana speed, a bit more reach | breaks beast parts 60% sooner; nature |
+| **Cinder Claws** | Kasai's tail | 35% faster, short reach, light hits | fire |
+| **Venom Tanto** | Gamakage's sac | 15% faster, short | poison: 6 damage/s for 5 s after each hit (refreshes, never stacks; scaled by the beast's poison resistance) |
+| **Gale Greatblades** | Kazekiri's fangs | 22% slower, long reach, heavy | +70% stagger; lightning |
+- Data: `WeaponType` (`data/weapons/`) on `GearDefinition.weapon_type`; written by `tools/generate_weapons.gd` (gear, recipes, catalog). Weapons without a type (the four earlier blades) are twin katana as before.
+- `PlayerCombat.set_weapon_type()` builds adjusted copies of the combo once per expedition (the shared attack data is never changed) and scales the weapon hitbox; `WeaponMount.set_weapon_type()` swaps both hand blades and the sheathed pair to the new shape and fits the slash trails to its length. New blade meshes in `ProceduralMeshes` (`kama_blade`, `claw_blade`, `venom_tanto`, `gale_greatblade`) share the katana's handle so the grip stays right.
+- Traits: `DamageInfo.part_multiplier` (counted towards part breaks), `DamageInfo.poison_*` → `HealthComponent.poison()`.
+- The forge lists each weapon's type, how it plays and its numbers.
+- Bug found by the new test and fixed: the slash trails are created a few frames after the expedition equips the weapon, so they kept the katana's length; the mount now fits each trail as it is created (watched the test fail first).
+- Tests: `weapons_test.gd` (6) incl. the gate: the bot defeats Kurogale with each new weapon.

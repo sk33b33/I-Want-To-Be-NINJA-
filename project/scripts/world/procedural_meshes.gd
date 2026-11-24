@@ -710,7 +710,10 @@ static func gale_greatblade(material: Material) -> ArrayMesh:
 	# Notches on the back edge.
 	for n in 3:
 		var y := 0.35 + n * 0.2
-		_tri(st, Vector3(0, y, -0.004), Vector3(0, y + 0.06, -0.004), Vector3(0, y + 0.03, -0.03),
+		# Follow the blade's curve (centre line z = sin(t * 1.2) * 0.05) so the notches sit on its back.
+		var z0 := sin((y - 0.1) / 0.95 * 1.2) * 0.05
+		var z1 := sin((y + 0.06 - 0.1) / 0.95 * 1.2) * 0.05
+		_tri(st, Vector3(0, y, z0 - 0.002), Vector3(0, y + 0.06, z1 - 0.002), Vector3(0, y + 0.03, (z0 + z1) * 0.5 - 0.028),
 				Color(0.5, 0.55, 0.7), Color(0.5, 0.55, 0.7), Color(0.5, 0.55, 0.7))
 	return _finish(st, null, material)
 

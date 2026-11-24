@@ -73,6 +73,8 @@ func test_equipping_a_weapon_changes_speed_reach_blades_and_trail() -> void:
 	var shape := (combat.hitbox.get_child(0) as CollisionShape3D).shape as BoxShape3D
 	check(shape.size.z > 1.9 * 1.3, "hitbox reaches further (%.2f m deep)" % shape.size.z)
 	var mount := player.get_node("WeaponMount") as WeaponMount
+	await process_frames(4)  # The slash trails are made a couple of frames after the mount.
+	check(mount.trails.size() == 2, "both blades have a slash trail")
 	var length := mount.blades[0].mesh.get_aabb().size.y
 	check(length > 1.0, "hand blades are the long greatblades (%.2f m)" % length)
 	check(mount.sheathed_blades[0].mesh == mount.blades[0].mesh, "the sheathed pair matches")

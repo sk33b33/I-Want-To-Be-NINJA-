@@ -39,7 +39,9 @@ func test_presets_are_ordered_from_cheap_to_rich() -> void:
 	for f in ["render_scale", "flora_density", "tree_density", "draw_distance_scale", "mist_scale", "rain_scale", "particle_scale", "light_fade_distance", "shadow_distance"]:
 		check(float(low.get(f)) <= float(med.get(f)) and float(med.get(f)) <= float(high.get(f)), "%s rises low -> medium -> high" % f)
 	check(not low.moon_shadows and high.moon_shadows, "phones skip moon shadows")
-	check(low.terrain_mesh_step >= 2 and high.terrain_mesh_step == 1, "coarser terrain mesh on phones")
+	# Phase 13: the long routes made the terrain 2.4x larger, so Medium and High also render it on
+	# a 2 m grid (collision stays 1 m); the phone's mesh is never finer than High's.
+	check(low.terrain_mesh_step >= 2 and low.terrain_mesh_step >= high.terrain_mesh_step, "terrain mesh on phones is not finer than High's")
 	check(low.render_scale <= 0.75, "phones render at reduced resolution")
 
 

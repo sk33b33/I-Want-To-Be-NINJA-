@@ -386,7 +386,8 @@ static func nearest_thornling(tc: TestCase, player: PlayerController, radius: fl
 	var best: Thornling = null
 	for n in tc.tree.get_nodes_in_group("lock_targets"):
 		var t := n as Thornling
-		if t and t.is_alive():
+		# Only enemies on the bot's own level (one on a ledge above can't be fought from below).
+		if t and t.is_alive() and absf(t.global_position.y - player.global_position.y) < 2.0:
 			var d := t.global_position.distance_to(player.global_position)
 			if d < radius and (best == null or d < best.global_position.distance_to(player.global_position)):
 				best = t

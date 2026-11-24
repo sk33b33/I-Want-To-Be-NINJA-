@@ -9,7 +9,7 @@ const TIMES := {
 	"dawn": {"display_name": "Dawn", "sun_elevation": 12.0, "sun_turn": 70.0, "sun_color": Color(1.25, 0.85, 0.7),
 		"sun_energy": 0.9, "ambient_color": Color(1.05, 0.95, 1.0), "fog_color": Color(1.3, 1.05, 1.0),
 		"sky_zenith": Color(1.0, 0.9, 1.1), "sky_horizon": Color(1.6, 1.15, 1.0), "sky_glow": Color(1.6, 1.1, 0.8)},
-	"dusk": {"display_name": "Dusk", "sun_elevation": 9.0, "sun_turn": -70.0, "sun_color": Color(1.35, 0.7, 0.45),
+	"dusk": {"display_name": "Dusk", "sun_elevation": 9.0, "sun_turn": -70.0, "sun_color": Color(1.25, 0.78, 0.56),
 		"sun_energy": 0.95, "ambient_color": Color(1.05, 0.9, 0.95), "fog_color": Color(1.35, 0.95, 0.8),
 		"sky_zenith": Color(0.9, 0.75, 1.0), "sky_horizon": Color(1.8, 1.0, 0.7), "sky_glow": Color(1.9, 0.9, 0.6)},
 	"night": {"display_name": "Night", "sun_elevation": 35.0, "sun_turn": 160.0, "sun_color": Color(0.65, 0.8, 1.35),

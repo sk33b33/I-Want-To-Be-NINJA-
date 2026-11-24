@@ -52,6 +52,9 @@ func _run_route(mode: CameraRig.Mode) -> void:
 		if s == TraversalComponent.State.CLIMB: climbs[0] += 1
 		if s == TraversalComponent.State.HANG: hangs[0] += 1)
 	await physics_frames(30)
+	# Phase 13 long routes: this test is about the ORIGINAL route (rampart, gorge, gate), so it
+	# starts where that route starts (routes_test walks the new sections).
+	await BotHelpers.run_long_route(self, player)
 	# Jump points along -Z: rampart face, then each gorge gap, then into the far-bank wall.
 	var jump_at: Array[float] = [-43.0, -49.0, -55.0, -61.5, -68.0]
 	var next_jump := 0

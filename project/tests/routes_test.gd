@@ -122,3 +122,22 @@ func test_the_start_does_not_light_the_old_spawn_shrine() -> void:
 		_nodes.erase(main)
 	_done()
 
+
+
+## Regression (found by the Low benchmark): trees are never distance-culled, so their triangles
+## scale with their TOTAL count. Scaling the tree count with the terrain area (x1.6) pushed the
+## Verdant Canopy on Low to 257k triangles (budget 250k). Low and Medium keep the original count.
+func test_low_and_medium_keep_the_original_tree_count() -> void:
+	for tier in [&"low", &"medium"]:
+		QualityProfile.force_tier(tier)
+		var main := _start(&"verdant_canopy")
+		await physics_frames(2)
+		var flora := main.find_children("*", "FloraScatter", true, false)[0] as FloraScatter
+		var preset := QualityProfile.current()
+		var limit := int((flora.config.jungle_tree_count + flora.config.dead_tree_count) * preset.tree_density) + 1
+		var n := flora.get_tree_positions().size()
+		check(n <= limit, "%s: %d trees (the original-size limit is %d)" % [tier, n, limit])
+		main.free()
+		_nodes.erase(main)
+	QualityProfile.force_tier(&"")
+	_done()

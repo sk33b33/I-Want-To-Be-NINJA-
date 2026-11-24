@@ -29,6 +29,10 @@ extends Resource
 ## Multiplies grass/fern/broadleaf/rock/mushroom counts.
 @export_range(0.1, 1.0, 0.05) var flora_density: float = 1.0
 @export_range(0.1, 1.0, 0.05) var tree_density: float = 1.0
+## How much of a bigger terrain's extra area becomes extra TREES (0 = the original tree count, 1 =
+## scaled with the area, capped at 1.6x). Trees are never distance-culled, so their triangles grow
+## with their total count: Low and Medium keep the original count (budgets, docs/PERFORMANCE.md).
+@export_range(0.0, 1.0, 0.1) var tree_area_growth: float = 1.0
 ## Multiplies flora draw distances.
 @export_range(0.3, 1.0, 0.05) var draw_distance_scale: float = 1.0
 ## Terrain render mesh uses every Nth height sample (collision always uses all of them).

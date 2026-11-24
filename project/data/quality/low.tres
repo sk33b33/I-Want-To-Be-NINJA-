@@ -13,6 +13,7 @@ shadow_splits = 1
 shadow_distance = 25.0
 light_fade_distance = 22.0
 flora_density = 0.35
+tree_area_growth = 0.0
 tree_density = 0.65
 draw_distance_scale = 0.45
 terrain_mesh_step = 2

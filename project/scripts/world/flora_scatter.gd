@@ -104,8 +104,8 @@ func _place_trees() -> void:
 		dead_xf.append([])
 	var placed := 0
 	var attempts := 0
-	# Trees are always drawn (no distance culling), so they grow less than the area (phone budget).
-	var tree_scale := _preset.tree_density * minf(area_scale(), 1.6)
+	# Trees are always drawn (no distance culling): their count follows the preset's tree_area_growth.
+	var tree_scale := _preset.tree_density * lerpf(1.0, minf(area_scale(), 1.6), _preset.tree_area_growth)
 	var jungle_count := int(cfg.jungle_tree_count * tree_scale)
 	var total := jungle_count + int(cfg.dead_tree_count * tree_scale)
 	while placed < total and attempts < total * 40:

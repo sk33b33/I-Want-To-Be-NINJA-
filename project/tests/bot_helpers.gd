@@ -303,7 +303,15 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 			stuck = 0
 		if stuck > 45:
 			tc.press("jump")
-			await tc.physics_frames(8)
+			if OS.has_environment("BOT_DEBUG"):
+				for k in 14:
+					await tc.tree.physics_frame
+					print("[bot] JUMP+%d pos=%s vel=%s floor=%s trav=%s cooldown=%s busy=%s input=(%s)" % [k, player.global_position.snapped(Vector3.ONE * 0.1),
+							player.velocity.snapped(Vector3.ONE * 0.1), player.is_on_floor(), TraversalComponent.State.keys()[player.traversal.state],
+							snappedf(float(player.traversal.get("_cooldown")), 0.01), player.combat.is_busy(),
+							Input.get_vector("move_left", "move_right", "move_forward", "move_back").snapped(Vector2.ONE * 0.01)])
+			else:
+				await tc.physics_frames(8)
 			tc.release("jump")
 			stuck = 0
 	if player.respawned.is_connected(on_respawn):

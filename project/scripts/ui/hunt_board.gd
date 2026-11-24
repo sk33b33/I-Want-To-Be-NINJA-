@@ -260,6 +260,11 @@ func _biome_card(biome: BiomeDefinition) -> Control:
 	col.add_child(UiStyle.label(biome.display_name, 30, accent))
 	col.add_child(UiStyle.label(biome.mood, 18, UiStyle.MUTED))
 	var profile := PlayerProfile.load_profile()
+	var secrets := SecretSet.for_biome(biome.id)
+	if secrets:  # Phase 13: exploration progress per jungle.
+		var done := secrets.is_complete(profile)
+		col.add_child(UiStyle.label("Spirit shrines %d / %d%s" % [secrets.found_count(profile), secrets.secrets.size(),
+				"  ·  %s" % secrets.blessing_name if done else ""], 18, Color(0.6, 0.95, 1.0) if done else UiStyle.MUTED))
 	for hunt in biome.hunts:
 		var hunt_open := open and is_hunt_open(biome, hunt, profile)
 		col.add_child(UiStyle.label(hunt.full_name(), 22, UiStyle.BONE if hunt_open else UiStyle.MUTED))

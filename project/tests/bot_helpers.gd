@@ -225,3 +225,39 @@ static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: N
 	var ok := await _walk_to_z(tc, player, stop_z, 0.0)
 	release_moves()
 	return ok
+
+
+## Phase 13: hold the move keys towards a world point (camera-relative, like a stick), jumping
+## when stuck; walking into a climbable wall starts a climb and the climb tops out automatically.
+## Stops when `done` returns true. Returns done's last value.
+static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3, done: Callable,
+		max_frames: int = 1500) -> bool:
+	var last := player.global_position
+	var stuck := 0
+	for i in max_frames:
+		await tc.tree.physics_frame
+		if done.call():
+			release_moves()
+			return true
+		var d := target - player.global_position
+		d.y = 0.0
+		if d.length() < 0.05:
+			continue
+		var local := player.get_camera_basis().inverse() * d.normalized()
+		Input.action_press("move_right", maxf(local.x, 0.0))
+		Input.action_press("move_left", maxf(-local.x, 0.0))
+		Input.action_press("move_back", maxf(local.z, 0.0))
+		Input.action_press("move_forward", maxf(-local.z, 0.0))
+		if i % 30 == 29:
+			var moved := player.global_position.distance_to(last)
+			last = player.global_position
+			var climbing := player.traversal and player.traversal.state != TraversalComponent.State.NONE
+			stuck = stuck + 1 if moved < 0.3 and not climbing else 0
+			if stuck >= 2 and player.is_on_floor():
+				tc.press("jump")
+				await tc.physics_frames(8)
+				tc.release("jump")
+				stuck = 0
+	release_moves()
+	return bool(done.call())
+

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CraftingCatalog" load_steps=41 format=3]
+[gd_resource type="Resource" script_class="CraftingCatalog" load_steps=43 format=3]
 
 [ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_xdif1"]
 [ext_resource type="Resource" path="res://data/items/thornback_antler.tres" id="2_nrpnu"]
@@ -33,6 +33,7 @@
 [ext_resource type="Resource" path="res://data/crafting/recipe_fenscale_mail.tres" id="21_aqplj"]
 [ext_resource type="Resource" path="res://data/items/gale_fang.tres" id="21_q3svh"]
 [ext_resource type="Resource" path="res://data/items/gale_pelt.tres" id="22_5n00k"]
+[ext_resource type="Resource" path="res://data/items/spirit_relic.tres" id="23_0o36d"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_stone_charm.tres" id="25_g1esg"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_thunderfang_blades.tres" id="26_ljun1"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_galeweave_garb.tres" id="27_j6qbm"]
@@ -40,8 +41,9 @@
 [ext_resource type="Resource" path="res://data/crafting/recipe_cinder_claws.tres" id="37_d55ad"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_venom_tanto.tres" id="38_0o36d"]
 [ext_resource type="Resource" path="res://data/crafting/recipe_gale_greatblades.tres" id="39_kjev5"]
+[ext_resource type="Resource" path="res://data/crafting/recipe_spirit_charm.tres" id="41_kjev5"]
 
 [resource]
 script = ExtResource("10_msck7")
-recipes = Array[ExtResource("6_a6yit")]([ExtResource("7_ar6xg"), ExtResource("8_fq8v7"), ExtResource("9_wxoic"), ExtResource("13_msck7"), ExtResource("14_ndnp6"), ExtResource("15_wg5dk"), ExtResource("19_j682c"), ExtResource("20_48p10"), ExtResource("21_aqplj"), ExtResource("25_g1esg"), ExtResource("26_ljun1"), ExtResource("27_j6qbm"), ExtResource("36_s1v7c"), ExtResource("37_d55ad"), ExtResource("38_0o36d"), ExtResource("39_kjev5")])
-items = Array[ExtResource("1_xdif1")]([ExtResource("2_nrpnu"), ExtResource("3_p3yp2"), ExtResource("4_rrhiq"), ExtResource("5_5g8hp"), ExtResource("6_ar6xg"), ExtResource("7_fq8v7"), ExtResource("8_wxoic"), ExtResource("9_n6ycm"), ExtResource("10_ycgp0"), ExtResource("11_a760h"), ExtResource("12_m07ye"), ExtResource("13_vucuk"), ExtResource("14_hp28m"), ExtResource("15_hp28m"), ExtResource("16_g1esg"), ExtResource("17_ljun1"), ExtResource("18_j6qbm"), ExtResource("19_ghft6"), ExtResource("20_5i4b7"), ExtResource("21_q3svh"), ExtResource("22_5n00k")])
+recipes = Array[ExtResource("6_a6yit")]([ExtResource("7_ar6xg"), ExtResource("8_fq8v7"), ExtResource("9_wxoic"), ExtResource("13_msck7"), ExtResource("14_ndnp6"), ExtResource("15_wg5dk"), ExtResource("19_j682c"), ExtResource("20_48p10"), ExtResource("21_aqplj"), ExtResource("25_g1esg"), ExtResource("26_ljun1"), ExtResource("27_j6qbm"), ExtResource("36_s1v7c"), ExtResource("37_d55ad"), ExtResource("38_0o36d"), ExtResource("39_kjev5"), ExtResource("41_kjev5")])
+items = Array[ExtResource("1_xdif1")]([ExtResource("2_nrpnu"), ExtResource("3_p3yp2"), ExtResource("4_rrhiq"), ExtResource("5_5g8hp"), ExtResource("6_ar6xg"), ExtResource("7_fq8v7"), ExtResource("8_wxoic"), ExtResource("9_n6ycm"), ExtResource("10_ycgp0"), ExtResource("11_a760h"), ExtResource("12_m07ye"), ExtResource("13_vucuk"), ExtResource("14_hp28m"), ExtResource("15_hp28m"), ExtResource("16_g1esg"), ExtResource("17_ljun1"), ExtResource("18_j6qbm"), ExtResource("19_ghft6"), ExtResource("20_5i4b7"), ExtResource("21_q3svh"), ExtResource("22_5n00k"), ExtResource("23_0o36d")])

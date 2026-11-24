@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_sc0ch"]
+
+[resource]
+script = ExtResource("1_sc0ch")
+id = &"spirit_relic"
+display_name = "Spirit Relic"
+description = "A crystal from a hidden jungle shrine. It is warm, and it remembers."
+color = Color(0.6, 0.95, 1, 1)
+rarity = 2

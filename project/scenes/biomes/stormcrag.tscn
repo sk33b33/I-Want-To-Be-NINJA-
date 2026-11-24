@@ -44,6 +44,8 @@
 [ext_resource type="PackedScene" path="res://scenes/world/pickup_glowcap.tscn" id="42_k3rhp"]
 [ext_resource type="PackedScene" path="res://scenes/world/lore_stone.tscn" id="43_oey2t"]
 [ext_resource type="Resource" path="res://data/mood/stormcrag.tres" id="mood_stormcrag"]
+[ext_resource type="Script" path="res://scripts/world/secret_spots.gd" id="secret_spots_script"]
+[ext_resource type="Resource" path="res://data/secrets/stormcrag.tres" id="secret_set_stormcrag"]
 
 [sub_resource type="Sky" id="Sky_27w1h"]
 sky_material = ExtResource("1_j0b01")
@@ -564,3 +566,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5, 0, -6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5, 0, -80)
 title = "Raijin's Echo"
 text = "The storm god left; his echo stayed, and grew wings. Lightning cannot touch what is rooted in old stone — the dojo's stone-charms ground its fury. Strike the crest when it bows to shear."
+
+[node name="SecretSpots" type="Node3D" parent="."]
+script = ExtResource("secret_spots_script")
+secret_set = ExtResource("secret_set_stormcrag")
+climb_material = ExtResource("26_3fvnr")
+rock_material = ExtResource("11_4taoc")
+beam_material = ExtResource("21_5yvcu")
+relic_color = Color(0.6, 0.85, 1.0, 1)

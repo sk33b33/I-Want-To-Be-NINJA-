@@ -52,6 +52,7 @@ func open() -> void:
 	_mouse_mode_before = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_manager.set_paused(true)
+	_refresh_secrets()
 	visible = true
 	_resume.grab_focus()  # Gamepad navigation.
 
@@ -61,6 +62,26 @@ func close() -> void:
 	if _manager:
 		_manager.set_paused(false)
 	Input.mouse_mode = _mouse_mode_before
+
+
+var secrets_label: Label
+
+
+func _refresh_secrets() -> void:
+	if secrets_label == null:
+		return
+	var spots := get_tree().get_first_node_in_group("secret_spots") as SecretSpots
+	var set_data := spots.secret_set if spots else null
+	secrets_label.visible = set_data != null
+	if set_data == null:
+		return
+	var profile := PlayerProfile.load_profile()
+	var lines: PackedStringArray = ["Spirit shrines: %d / %d%s" % [set_data.found_count(profile), set_data.secrets.size(),
+			"  —  %s (+%d max health)" % [set_data.blessing_name, int(set_data.blessing_health)] if set_data.is_complete(profile) else ""]]
+	for d in set_data.secrets:
+		if not profile.has_secret(d.id):
+			lines.append("• " + d.hint)
+	secrets_label.text = "\n".join(lines)
 
 
 func _build() -> void:
@@ -75,6 +96,11 @@ func _build() -> void:
 	var note := UiStyle.label("The trail waits for you. The timer is frozen.", 20, UiStyle.MUTED)
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(note)
+	# Phase 13: this jungle's hidden spirit shrines — count, and a riddle for each still missing.
+	secrets_label = UiStyle.label("", 18, UiStyle.MUTED)
+	secrets_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	secrets_label.custom_minimum_size = Vector2(520, 0)
+	col.add_child(secrets_label)
 	_resume = UiStyle.button("Resume")
 	_resume.pressed.connect(close)
 	col.add_child(_resume)

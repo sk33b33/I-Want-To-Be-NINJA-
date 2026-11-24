@@ -55,6 +55,19 @@ func _noise_tex(seed: int, freq: float, size: int = 256, normal: bool = false, o
 	return t
 
 
+## Phase 13 part 3: the jungle's hidden spirit shrines (data/secrets/<biome>.tres).
+func _add_secret_spots(biome: String, climb: String, shaft: String, relic_color: Color) -> void:
+	var spots := Node3D.new()
+	spots.name = "SecretSpots"
+	spots.set_script(load("res://scripts/world/secret_spots.gd"))
+	spots.set("secret_set", load("res://data/secrets/%s.tres" % biome))
+	spots.set("climb_material", load(MAT + climb + ".tres"))
+	spots.set("rock_material", load(MAT + "rock_vertex.tres"))
+	spots.set("beam_material", load(MAT + shaft + ".tres"))
+	spots.set("relic_color", relic_color)
+	_root.add_child(spots)
+
+
 func _shader_mat(shader: String, params: Dictionary) -> ShaderMaterial:
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/%s.gdshader" % shader)
@@ -483,6 +496,7 @@ func _level_scene() -> void:
 	atmos.set("waterfall_material", load(MAT + "waterfall.tres"))
 	atmos.set("water_material", load(MAT + "water.tres"))
 	_root.add_child(atmos)
+	_add_secret_spots("verdant_canopy", "climb_stone", "light_shaft", Color(0.6, 1.0, 0.75))  # Phase 13 secrets (tools/generate_secrets.gd).
 
 	var geo := Node3D.new()
 	geo.name = "RouteGeometry"
@@ -1746,6 +1760,7 @@ func _emberwild_level() -> void:
 	atmos.set("lightning_sky_flash", 0.4)
 	atmos.set("lightning_sun_boost", 0.6)
 	_root.add_child(atmos)
+	_add_secret_spots("emberwild", "basalt_climb", "shaft_ember", Color(1.0, 0.75, 0.4))  # Phase 13 secrets (tools/generate_secrets.gd).
 	var geo := Node3D.new()
 	geo.name = "RouteGeometry"
 	_root.add_child(geo)
@@ -2384,6 +2399,7 @@ func _moonfen_level() -> void:
 	atmos.set("lightning_sky_flash", 0.35)
 	atmos.set("lightning_sun_boost", 0.5)
 	_root.add_child(atmos)
+	_add_secret_spots("moonfen", "climb_stone", "shaft_moon", Color(0.9, 0.6, 1.0))  # Phase 13 secrets (tools/generate_secrets.gd).
 	var geo := Node3D.new()
 	geo.name = "RouteGeometry"
 	_root.add_child(geo)
@@ -2962,6 +2978,7 @@ func _stormcrag_level() -> void:
 	atmos.set("lightning_sky_flash", 0.9)
 	atmos.set("lightning_sun_boost", 1.6)
 	_root.add_child(atmos)
+	_add_secret_spots("stormcrag", "climb_stone", "shaft_storm", Color(0.6, 0.85, 1.0))  # Phase 13 secrets (tools/generate_secrets.gd).
 	var rain := CPUParticles3D.new()
 	rain.name = "Rain"
 	rain.set_script(load("res://scripts/world/rain_fx.gd"))

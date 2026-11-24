@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RecipeDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/items/item_definition.gd" id="1_kvjku"]
+[ext_resource type="Resource" path="res://data/items/spirit_relic.tres" id="2_5p8xu"]
+[ext_resource type="Resource" path="res://data/gear/spirit_charm.tres" id="3_acruc"]
+[ext_resource type="Script" path="res://scripts/crafting/recipe_definition.gd" id="4_rpcqj"]
+
+[resource]
+script = ExtResource("4_rpcqj")
+id = &"spirit_charm"
+result = ExtResource("3_acruc")
+inputs = Array[ExtResource("1_kvjku")]([ExtResource("2_5p8xu")])
+counts = PackedInt32Array(5)

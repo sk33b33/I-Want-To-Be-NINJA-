@@ -3,7 +3,8 @@ extends RefCounted
 ## Applies equipped gear to the player at the start of an expedition.
 
 
-static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void:
+## `blessing_health`: permanent max health from Shrine Blessings (completed secret sets).
+static func apply(player: PlayerController, gear: Array[GearDefinition], blessing_health: float = 0.0) -> void:
 	var combat := player.combat if player.combat else player.get_node_or_null("Combat") as PlayerCombat
 	if combat == null:
 		return
@@ -34,7 +35,7 @@ static func apply(player: PlayerController, gear: Array[GearDefinition]) -> void
 	combat.skill_cooldown_reduction = cd
 	combat.skill_element_override = skill_element
 	combat.blade_element = blade_element
-	combat.health.max_health = combat.config.max_health + health_bonus
+	combat.health.max_health = combat.config.max_health + health_bonus + blessing_health
 	combat.health.damage_taken_multiplier = 1.0 - clampf(reduction, 0.0, 0.9)
 	combat.health.reset()
 	var mount := player.get_node_or_null("WeaponMount") as WeaponMount

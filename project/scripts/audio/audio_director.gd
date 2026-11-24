@@ -87,6 +87,7 @@ func setup(scene_root: Node, manager: ExpeditionManager) -> void:
 	if manager:
 		manager.boss_arena_entered.connect(func(_r: float) -> void: _play_music(bank.music_boss))
 		manager.item_collected.connect(func(_it: ItemDefinition, _n: int) -> void: play(&"pickup"))
+		manager.secret_found.connect(func(_s: SecretDefinition, _done: bool) -> void: play(&"checkpoint"))  # Shrine bell.
 		manager.hunt_completed.connect(func() -> void:
 			music_stopped = true
 			music.stop()

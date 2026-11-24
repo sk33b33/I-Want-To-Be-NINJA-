@@ -18,6 +18,8 @@ signal hunt_completed
 ## result: {"outcome": "escaped"|"victory", "hunt", "elapsed", and for victory:
 ##          "parts_broken": Array[StringName], "rewards": {item id: count}, "items": {item id: ItemDefinition}}
 signal expedition_ended(result: Dictionary)
+## A hidden spirit shrine was found (Phase 13). `completed` = that was the jungle's last one.
+signal secret_found(secret: SecretDefinition, completed: bool)
 
 @export var hunt: HuntDefinition
 ## Used when the hunt has no config of its own.
@@ -68,7 +70,8 @@ func _ready() -> void:
 		trigger.player_entered.connect(enter_boss_arena)
 	timer.expired.connect(_on_timer_expired)
 	if _player and crafting:
-		GearLoadout.apply(_player, Forge.equipped_gear(PlayerProfile.load_profile(), crafting))
+		var profile := PlayerProfile.load_profile()
+		GearLoadout.apply(_player, Forge.equipped_gear(profile, crafting), SecretSet.blessing_health_total(profile))
 	_swap_in_hunt_boss()
 	boss = get_node_or_null(boss_path) as BossController
 	_apply_difficulty(GameSettings.difficulty_preset())
@@ -199,6 +202,29 @@ func abandon() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		abandon()  # Closing the game window / app keeps what was gathered.
+
+
+## A hidden spirit shrine was found (SecretSite). Saved to the profile at once — secrets are
+## exploration progress, kept even if the hunt is later abandoned or the beast escapes. The relic
+## item goes straight into the saved materials (not the run's rewards, so it is never doubled).
+func find_secret(secret: SecretDefinition, set_data: SecretSet) -> void:
+	var profile := PlayerProfile.load_profile()
+	if not profile.add_secret(secret.id):
+		return
+	if set_data and set_data.relic_item:
+		profile.add_material(set_data.relic_item.id, 1)
+	profile.save()
+	var completed := set_data != null and set_data.is_complete(profile)
+	CrashReport.note("secret found: %s%s" % [secret.id, " (set complete)" if completed else ""])
+	secret_found.emit(secret, completed)
+
+
+## The SecretSet that holds `secret_id` (any jungle), or null.
+func find_secret_set(secret_id: StringName) -> SecretSet:
+	for s in SecretSet.all_sets():
+		if s.find(secret_id):
+			return s
+	return null
 
 
 ## Gather a material on the way (Pickup). Kept even if the beast escapes.

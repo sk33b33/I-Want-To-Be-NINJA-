@@ -7,7 +7,7 @@ extends RefCounted
 ## that cannot be read is set aside as `<path>.corrupt` and the backup is loaded instead.
 
 const DEFAULT_PATH := "user://profile.json"
-const VERSION := 2  # v2 (Phase 7) adds gear_owned / equipped; v1 files still load.
+const VERSION := 3  # v2 (Phase 7) gear_owned / equipped; v3 (Phase 13) secrets_found. Older files still load.
 
 static var path: String = DEFAULT_PATH
 
@@ -18,6 +18,8 @@ var hunts_completed: Dictionary = {}
 var gear_owned: Array = []
 ## Slot name ("Weapon"/"Armor"/"Charm") -> gear id.
 var equipped: Dictionary = {}
+## Ids of hidden spirit shrines found (Phase 13 secrets), saved the moment each is found.
+var secrets_found: Array = []
 
 
 static func load_profile() -> PlayerProfile:
@@ -51,6 +53,8 @@ static func _read(file_path: String) -> PlayerProfile:
 	var owned: Variant = d.get("gear_owned")
 	p.gear_owned = (owned as Array).filter(func(v: Variant) -> bool: return v is String) if owned is Array else []
 	p.equipped = _dict(d.get("equipped"))
+	var secrets: Variant = d.get("secrets_found")
+	p.secrets_found = (secrets as Array).filter(func(v: Variant) -> bool: return v is String) if secrets is Array else []
 	return p
 
 
@@ -64,12 +68,24 @@ func save() -> bool:
 	if f == null:
 		return false
 	f.store_string(JSON.stringify({"version": VERSION, "materials": materials, "hunts_completed": hunts_completed,
-			"gear_owned": gear_owned, "equipped": equipped}, "  "))
+			"gear_owned": gear_owned, "equipped": equipped, "secrets_found": secrets_found}, "  "))
 	f.close()
 	var real := ProjectSettings.globalize_path(path)
 	if FileAccess.file_exists(path) and _read(path) != null:
 		DirAccess.copy_absolute(real, real + ".bak")  # Last good save.
 	return DirAccess.rename_absolute(ProjectSettings.globalize_path(tmp), real) == OK
+
+
+func has_secret(id: StringName) -> bool:
+	return secrets_found.has(String(id))
+
+
+## Returns false if it was already found.
+func add_secret(id: StringName) -> bool:
+	if has_secret(id):
+		return false
+	secrets_found.append(String(id))
+	return true
 
 
 func add_material(id: StringName, count: int = 1) -> void:

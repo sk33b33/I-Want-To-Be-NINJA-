@@ -39,6 +39,7 @@ func _ready() -> void:
 			_toast.text = "+%d %s" % [n, item.display_name]
 			_toast.add_theme_color_override("font_color", item.color.lightened(0.3))
 			_toast_t = 2.5)
+		_manager.secret_found.connect(_on_secret_found)
 		if _manager.timer.is_active():
 			_on_started(_manager.hunt, _manager.timer.duration)
 
@@ -187,6 +188,21 @@ func _on_arena(_remaining: float) -> void:
 
 func _on_expired() -> void:
 	_box.visible = false
+
+
+## Phase 13 secrets: "Spirit shrine found (2/3)", then the jungle's blessing when it completes.
+func _on_secret_found(secret: SecretDefinition, completed: bool) -> void:
+	var set_data := _manager.find_secret_set(secret.id)
+	var profile := PlayerProfile.load_profile()
+	if completed and set_data:
+		_show_banner("%s\nAll spirit shrines found: +%d max health" % [set_data.blessing_name, int(set_data.blessing_health)], 5.0, Color(0.7, 1.0, 0.95))
+	else:
+		var n := set_data.found_count(profile) if set_data else 1
+		var total := set_data.secrets.size() if set_data else 1
+		_show_banner("Spirit shrine found: %s (%d/%d)" % [secret.display_name, n, total], 3.5, Color(0.6, 0.95, 1.0))
+	_toast.text = "+1 Spirit Relic"
+	_toast.add_theme_color_override("font_color", Color(0.7, 1.0, 1.0))
+	_toast_t = 2.5
 
 
 func _show_banner(text: String, seconds: float, color: Color) -> void:

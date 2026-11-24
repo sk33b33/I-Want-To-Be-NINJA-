@@ -718,6 +718,34 @@ static func gale_greatblade(material: Material) -> ArrayMesh:
 	return _finish(st, null, material)
 
 
+# ---------------------------------------------------------------- secrets (Phase 13)
+
+## Spirit relic: a tall floating crystal with three small shards around it (emissive material).
+static func spirit_relic(material: Material) -> ArrayMesh:
+	var st := _begin()
+	var c := Color(1, 1, 1)
+	var top := Vector3(0, 0.55, 0)
+	var bottom := Vector3(0, -0.45, 0)
+	var ring: Array[Vector3] = []
+	for i in 6:
+		var a := TAU * float(i) / 6.0
+		ring.append(Vector3(cos(a) * 0.2, 0.05, sin(a) * 0.2))
+	for i in 6:
+		var a := ring[i]
+		var b := ring[(i + 1) % 6]
+		_tri(st, top, b, a, c, c, c)
+		_tri(st, bottom, a, b, c, c, c)
+	for k in 3:
+		var ang := TAU * float(k) / 3.0 + 0.4
+		var p := Vector3(cos(ang) * 0.45, -0.05 + 0.12 * k, sin(ang) * 0.45)
+		var s := 0.08
+		_tri(st, p + Vector3(0, s * 1.6, 0), p + Vector3(s, 0, 0), p + Vector3(0, 0, s), c, c, c)
+		_tri(st, p + Vector3(0, s * 1.6, 0), p + Vector3(0, 0, s), p + Vector3(-s, 0, 0), c, c, c)
+		_tri(st, p + Vector3(0, -s * 1.6, 0), p + Vector3(0, 0, s), p + Vector3(s, 0, 0), c, c, c)
+		_tri(st, p + Vector3(0, -s * 1.6, 0), p + Vector3(-s, 0, 0), p + Vector3(0, 0, s), c, c, c)
+	return _finish(st, null, material)
+
+
 # ---------------------------------------------------------------- boss (Phase 5)
 
 ## Kurogale body: tall thorn-backed stag (~2.4 m at the shoulder), facing -Z, head at z ≈ -2.

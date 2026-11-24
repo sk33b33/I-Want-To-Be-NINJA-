@@ -290,16 +290,18 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 		Input.action_press("move_left", maxf(-local.x, 0.0))
 		Input.action_press("move_back", maxf(local.z, 0.0))
 		Input.action_press("move_forward", maxf(-local.z, 0.0))
-		if i % 30 == 29:
-			var moved := player.global_position.distance_to(last)
-			last = player.global_position
-			var climbing := player.traversal and player.traversal.state != TraversalComponent.State.NONE
-			stuck = stuck + 1 if moved < 0.3 and not climbing else 0
-			if stuck >= 2 and player.is_on_floor():
-				tc.press("jump")
-				await tc.physics_frames(8)
-				tc.release("jump")
-				stuck = 0
+		# Blocked (e.g. at the foot of a climbable wall, which can only be entered from the air):
+		# on the ground and barely moving for 0.75 s -> jump, like a player would.
+		var climbing := player.traversal and player.traversal.state != TraversalComponent.State.NONE
+		if player.is_on_floor() and not climbing and player.get_horizontal_speed() < 0.5:
+			stuck += 1
+		else:
+			stuck = 0
+		if stuck > 45:
+			tc.press("jump")
+			await tc.physics_frames(8)
+			tc.release("jump")
+			stuck = 0
 	if player.respawned.is_connected(on_respawn):
 		player.respawned.disconnect(on_respawn)
 	release_moves()
@@ -365,10 +367,10 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			return Vector2(d.x, d.z).length() < 0.9 and absf(d.y) < 2.0
 		var prev := Vector3(pts[i - 1].x, pts[i - 1].y, pts[i - 1].z) if i > 0 else player.global_position
 		var ok := await walk_toward(tc, player, target, reached, frames_per_leg, true, prev, true)
-		if respawns[0] != seen and retries < 3:
+		if respawns[0] != seen and retries < 6:
 			# Fell or died: like a player, pick the trail up again from the nearest waypoint.
 			retries += 1
-			i = _nearest_waypoint(pts, player.global_position)
+			i = _resume_index(pts, player.global_position)
 			continue
 		if not ok:
 			push_warning("follow_path: stuck before waypoint %d %s at %s" % [i, target, player.global_position])
@@ -508,4 +510,14 @@ static func _nearest_waypoint(pts: Array, p: Vector3) -> int:
 		if Vector2(w.x - p.x, w.z - p.z).length() < Vector2(bw.x - p.x, bw.z - p.z).length():
 			best = k
 	return best
+
+
+## After a fall or death: resume from the last waypoint on the respawn point's side of the route
+## (the paths run towards decreasing z), not the nearest one — which can be across a chasm.
+static func _resume_index(pts: Array, p: Vector3) -> int:
+	var idx := 0
+	for k in pts.size():
+		if (pts[k] as Vector4).z >= p.z - 0.5:
+			idx = k
+	return idx
 

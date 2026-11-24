@@ -91,6 +91,9 @@ func test_gate_bot_walks_the_safe_and_risky_way_in_every_jungle() -> void:
 			await physics_frames(5)
 			var player := main.get_node("Player") as PlayerController
 			player.combat.health.invulnerable = true
+			# The bot's own dodge rolls switch `invulnerable` off again when they end; a zero damage
+			# multiplier survives them (this test is about navigation, not survival).
+			player.combat.health.damage_taken_multiplier = 0.0
 			var falls := [0]
 			player.respawned.connect(func(_at: Vector3) -> void: falls[0] += 1)
 			var ok := await BotHelpers.run_long_route(self, player, way, true)

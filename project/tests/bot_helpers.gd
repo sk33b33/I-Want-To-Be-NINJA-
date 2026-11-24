@@ -244,9 +244,19 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 		max_frames: int = 1500, fight: bool = true, from: Vector3 = Vector3.INF) -> bool:
 	var last := player.global_position
 	var stuck := 0
+	# A fall or death respawns the player elsewhere: end this leg so the caller can pick the trail
+	# up again from there (walking on towards a mid-chasm target from a checkpoint falls again).
+	var respawned := [false]
+	var on_respawn := func(_at: Vector3) -> void: respawned[0] = true
+	player.respawned.connect(on_respawn)
 	for i in max_frames:
 		await tc.tree.physics_frame
+		if respawned[0]:
+			player.respawned.disconnect(on_respawn)
+			release_moves()
+			return false
 		if done.call():
+			player.respawned.disconnect(on_respawn)
 			release_moves()
 			return true
 		if fight and nearest_thornling(tc, player, 9.0):
@@ -282,6 +292,8 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 				await tc.physics_frames(8)
 				tc.release("jump")
 				stuck = 0
+	if player.respawned.is_connected(on_respawn):
+		player.respawned.disconnect(on_respawn)
 	release_moves()
 	return bool(done.call())
 

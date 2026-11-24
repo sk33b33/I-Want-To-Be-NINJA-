@@ -382,12 +382,18 @@ static func _in_zone(zone: Area3D, p: Vector3) -> bool:
 	return false
 
 
+## Thornlings the bot gave up on (it could not get closer to them, e.g. one stuck behind a wall),
+## by instance id — like a player leaving an enemy it cannot reach.
+static var unreachable: Dictionary = {}
+
+
 static func nearest_thornling(tc: TestCase, player: PlayerController, radius: float) -> Thornling:
 	var best: Thornling = null
 	for n in tc.tree.get_nodes_in_group("lock_targets"):
 		var t := n as Thornling
 		# Only enemies on the bot's own level (one on a ledge above can't be fought from below).
-		if t and t.is_alive() and absf(t.global_position.y - player.global_position.y) < 2.0:
+		if t and t.is_alive() and absf(t.global_position.y - player.global_position.y) < 2.0 \
+				and not unreachable.has(t.get_instance_id()):
 			var d := t.global_position.distance_to(player.global_position)
 			if d < radius and (best == null or d < best.global_position.distance_to(player.global_position)):
 				best = t
@@ -400,6 +406,8 @@ static func nearest_thornling(tc: TestCase, player: PlayerController, radius: fl
 static func fight_thornlings(tc: TestCase, player: PlayerController, radius: float) -> void:
 	release_moves()
 	var dodge_side := 1.0
+	var best_dist := INF
+	var since_closer := 0
 	for frame in 60 * 40:
 		await tc.tree.physics_frame
 		var near := nearest_thornling(tc, player, radius + 4.0)
@@ -423,6 +431,18 @@ static func fight_thornlings(tc: TestCase, player: PlayerController, radius: flo
 		var target := player.combat.lock_target as Thornling
 		if target and target.is_alive():
 			var dist := target.global_position.distance_to(player.global_position)
+			# Give up on a target that stays out of reach for 6 s (blocked by terrain).
+			if dist < best_dist - 0.5:
+				best_dist = dist
+				since_closer = 0
+			else:
+				since_closer += 1
+			if since_closer > 360 and dist > 2.4:
+				unreachable[target.get_instance_id()] = true
+				await tap(tc, "lock_on")
+				best_dist = INF
+				since_closer = 0
+				continue
 			var opening := target.state == Thornling.State.RECOVER or target.state == Thornling.State.STAGGER
 			if dist > 2.4:
 				Input.action_press("move_forward")

@@ -165,9 +165,12 @@ func test_moonfen_has_every_distinct_hazard_and_its_own_look() -> void:
 		mud += 1 if z.blocks_jump else 0
 		current += 1 if z.current != Vector3.ZERO else 0
 	check(mud == 1 and current == 1, "mud flats and a stream current")
-	check(t.get_nodes_in_group("poison_pools").size() == 3, "three poison pools")
+	# The original route's hazards (the long route adds more of each, under RouteBuilder).
+	var original := func(group: String) -> int:
+		return t.get_nodes_in_group(group).filter(func(n: Node) -> bool: return not (n.get_parent() is RouteBuilder or (n.get_parent() and n.get_parent().get_parent() is RouteBuilder))).size()
+	check(original.call("poison_pools") == 3, "three poison pools on the original route")
 	check(t.get_nodes_in_group("fog_zones").size() == 1, "a fog bank")
-	check(t.get_nodes_in_group("sinking_rafts").size() == 4, "four reed rafts")
+	check(original.call("sinking_rafts") == 4, "four reed rafts on the original route")
 	check(t.get_nodes_in_group("fire_vents").is_empty() and t.get_nodes_in_group("sinking_stones").is_empty(), "no Emberwild hazards reused")
 	var boss := main.get_node("Level/Boss") as BossController
 	check(boss.definition.id == &"nami", "Nami waits in the arena")

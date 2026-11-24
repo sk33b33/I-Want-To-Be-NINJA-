@@ -118,3 +118,4 @@ func test_the_start_does_not_light_the_old_spawn_shrine() -> void:
 		main.free()
 		_nodes.erase(main)
 	_done()
+

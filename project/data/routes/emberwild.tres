@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RouteLayout" load_steps=42 format=3]
+[gd_resource type="Resource" script_class="RouteLayout" load_steps=44 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/route/route_piece.gd" id="1_h1oce"]
 [ext_resource type="Script" path="res://scripts/world/route/route_layout.gd" id="2_mgdcc"]
@@ -70,183 +70,197 @@ script = ExtResource("1_h1oce")
 kind = 3
 position = Vector3(-16, 0, 194)
 size = Vector3(1, 1, 1)
-phase = 99.75
+phase = 99.2
 
 [sub_resource type="Resource" id="Resource_07vrg"]
 script = ExtResource("1_h1oce")
 kind = 3
 position = Vector3(-16, 0, 188.5)
 size = Vector3(1, 1, 1)
-phase = 99.5
+phase = 98.4
 
 [sub_resource type="Resource" id="Resource_vee51"]
 script = ExtResource("1_h1oce")
 kind = 3
 position = Vector3(-16, 0, 183)
 size = Vector3(1, 1, 1)
-phase = 99.25
+phase = 97.6
 
 [sub_resource type="Resource" id="Resource_xmqj3"]
 script = ExtResource("1_h1oce")
 kind = 3
 position = Vector3(-16, 0, 177.5)
 size = Vector3(1, 1, 1)
-phase = 99.0
+phase = 96.8
 
 [sub_resource type="Resource" id="Resource_5m0tv"]
 script = ExtResource("1_h1oce")
 kind = 3
 position = Vector3(-16, 0, 172)
 size = Vector3(1, 1, 1)
-phase = 98.75
+phase = 96.0
 
 [sub_resource type="Resource" id="Resource_hubt8"]
+script = ExtResource("1_h1oce")
+kind = 3
+position = Vector3(-16, 0, 166.5)
+size = Vector3(1, 1, 1)
+phase = 95.2
+
+[sub_resource type="Resource" id="Resource_e2i0n"]
 script = ExtResource("1_h1oce")
 kind = 14
 position = Vector3(-20, 0, 162)
 size = Vector3(1, 1, 1)
 item = "ember_crystal"
 
-[sub_resource type="Resource" id="Resource_e2i0n"]
+[sub_resource type="Resource" id="Resource_7mw48"]
 script = ExtResource("1_h1oce")
 kind = 13
 position = Vector3(0, 0, 136)
 
-[sub_resource type="Resource" id="Resource_7mw48"]
+[sub_resource type="Resource" id="Resource_l50ev"]
 script = ExtResource("1_h1oce")
 kind = 6
 position = Vector3(0, -4, 112)
 size = Vector3(160, 6, 24)
 
-[sub_resource type="Resource" id="Resource_l50ev"]
+[sub_resource type="Resource" id="Resource_gtcqr"]
 script = ExtResource("1_h1oce")
 position = Vector3(6, -0.5, 122)
 size = Vector3(0.9, 1, 4)
 material = "wood"
 
-[sub_resource type="Resource" id="Resource_gtcqr"]
+[sub_resource type="Resource" id="Resource_2wo1y"]
 script = ExtResource("1_h1oce")
 position = Vector3(6, -0.5, 116)
 size = Vector3(0.9, 1, 4)
 material = "wood"
 
-[sub_resource type="Resource" id="Resource_2wo1y"]
+[sub_resource type="Resource" id="Resource_4w4av"]
 script = ExtResource("1_h1oce")
 position = Vector3(6, -0.5, 110)
 size = Vector3(0.9, 1, 4)
 material = "wood"
 
-[sub_resource type="Resource" id="Resource_4w4av"]
+[sub_resource type="Resource" id="Resource_fnddd"]
 script = ExtResource("1_h1oce")
 position = Vector3(6, -0.5, 104)
 size = Vector3(0.9, 1, 4)
 material = "wood"
 
-[sub_resource type="Resource" id="Resource_fnddd"]
-script = ExtResource("1_h1oce")
-kind = 3
-position = Vector3(-6, 0, 121)
-size = Vector3(1, 1, 1)
-phase = 100.0
-
 [sub_resource type="Resource" id="Resource_74jq3"]
 script = ExtResource("1_h1oce")
 kind = 3
-position = Vector3(-6, 0, 115.6)
+position = Vector3(-6, 0, 121.5)
 size = Vector3(1, 1, 1)
-phase = 99.75
+phase = 100.0
 
 [sub_resource type="Resource" id="Resource_xlti8"]
 script = ExtResource("1_h1oce")
 kind = 3
-position = Vector3(-6, 0, 110.2)
+position = Vector3(-6, 0, 116.5)
 size = Vector3(1, 1, 1)
-phase = 99.5
+phase = 99.2
 
 [sub_resource type="Resource" id="Resource_1cwyo"]
 script = ExtResource("1_h1oce")
 kind = 3
-position = Vector3(-6, 0, 104.8)
+position = Vector3(-6, 0, 111.5)
 size = Vector3(1, 1, 1)
-phase = 99.25
+phase = 98.4
 
 [sub_resource type="Resource" id="Resource_80arb"]
+script = ExtResource("1_h1oce")
+kind = 3
+position = Vector3(-6, 0, 106.5)
+size = Vector3(1, 1, 1)
+phase = 97.6
+
+[sub_resource type="Resource" id="Resource_plhcl"]
+script = ExtResource("1_h1oce")
+kind = 3
+position = Vector3(-6, 0, 101.5)
+size = Vector3(1, 1, 1)
+phase = 96.8
+
+[sub_resource type="Resource" id="Resource_0k5rh"]
 script = ExtResource("1_h1oce")
 position = Vector3(0, 2.5, 73)
 size = Vector3(26, 5, 34)
 
-[sub_resource type="Resource" id="Resource_plhcl"]
+[sub_resource type="Resource" id="Resource_104gi"]
 script = ExtResource("1_h1oce")
 kind = 1
 position = Vector3(0, 2.5, 90.5)
 size = Vector3(26, 5, 1)
 
-[sub_resource type="Resource" id="Resource_0k5rh"]
+[sub_resource type="Resource" id="Resource_sc0jm"]
 script = ExtResource("1_h1oce")
 kind = 12
 position = Vector3(2, 5.1, 66)
 size = Vector3(1, 1, 1)
 count = 3
 
-[sub_resource type="Resource" id="Resource_104gi"]
+[sub_resource type="Resource" id="Resource_xoyiw"]
 script = ExtResource("1_h1oce")
 kind = 5
 position = Vector3(-4, 5, 84)
 size = Vector3(1, 1, 1)
 
-[sub_resource type="Resource" id="Resource_sc0jm"]
+[sub_resource type="Resource" id="Resource_cnhfm"]
 script = ExtResource("1_h1oce")
 kind = 5
 position = Vector3(4, 5, 78)
 size = Vector3(1, 1, 1)
 phase = 0.7
 
-[sub_resource type="Resource" id="Resource_xoyiw"]
+[sub_resource type="Resource" id="Resource_8ysk6"]
 script = ExtResource("1_h1oce")
 kind = 5
 position = Vector3(-5, 5, 70)
 size = Vector3(1, 1, 1)
 phase = 1.4
 
-[sub_resource type="Resource" id="Resource_cnhfm"]
+[sub_resource type="Resource" id="Resource_yautm"]
 script = ExtResource("1_h1oce")
 kind = 5
 position = Vector3(5, 5, 62)
 size = Vector3(1, 1, 1)
 phase = 2.0999999999999996
 
-[sub_resource type="Resource" id="Resource_8ysk6"]
+[sub_resource type="Resource" id="Resource_08phn"]
 script = ExtResource("1_h1oce")
 kind = 5
 position = Vector3(0, 5, 74)
 size = Vector3(1, 1, 1)
 phase = 2.8
 
-[sub_resource type="Resource" id="Resource_yautm"]
+[sub_resource type="Resource" id="Resource_ny76j"]
 script = ExtResource("1_h1oce")
 position = Vector3(-18, 2.5, 72)
 size = Vector3(10, 5, 6)
 
-[sub_resource type="Resource" id="Resource_08phn"]
+[sub_resource type="Resource" id="Resource_ppk4o"]
 script = ExtResource("1_h1oce")
 kind = 14
 position = Vector3(-21, 5, 72)
 size = Vector3(1, 1, 1)
 item = "ember_crystal"
 
-[sub_resource type="Resource" id="Resource_ny76j"]
+[sub_resource type="Resource" id="Resource_7xrwg"]
 script = ExtResource("1_h1oce")
 kind = 15
 position = Vector3(8, 5, 58)
 
-[sub_resource type="Resource" id="Resource_ppk4o"]
+[sub_resource type="Resource" id="Resource_0qfti"]
 script = ExtResource("1_h1oce")
 kind = 12
 position = Vector3(0, 0, 36)
 size = Vector3(1, 1, 1)
 count = 2
 
-[sub_resource type="Resource" id="Resource_7xrwg"]
+[sub_resource type="Resource" id="Resource_mgp66"]
 script = ExtResource("1_h1oce")
 kind = 13
 position = Vector3(0, 0, 22)
@@ -254,8 +268,8 @@ position = Vector3(0, 0, 22)
 [resource]
 script = ExtResource("2_mgdcc")
 biome_id = &"emberwild"
-pieces = Array[ExtResource("1_h1oce")]([SubResource("Resource_7ntlk"), SubResource("Resource_746tt"), SubResource("Resource_4p5eu"), SubResource("Resource_0gjia"), SubResource("Resource_j2a5p"), SubResource("Resource_6kh0c"), SubResource("Resource_nve1s"), SubResource("Resource_7vr3h"), SubResource("Resource_qp2sc"), SubResource("Resource_syo03"), SubResource("Resource_50vsb"), SubResource("Resource_07vrg"), SubResource("Resource_vee51"), SubResource("Resource_xmqj3"), SubResource("Resource_5m0tv"), SubResource("Resource_hubt8"), SubResource("Resource_e2i0n"), SubResource("Resource_7mw48"), SubResource("Resource_l50ev"), SubResource("Resource_gtcqr"), SubResource("Resource_2wo1y"), SubResource("Resource_4w4av"), SubResource("Resource_fnddd"), SubResource("Resource_74jq3"), SubResource("Resource_xlti8"), SubResource("Resource_1cwyo"), SubResource("Resource_80arb"), SubResource("Resource_plhcl"), SubResource("Resource_0k5rh"), SubResource("Resource_104gi"), SubResource("Resource_sc0jm"), SubResource("Resource_xoyiw"), SubResource("Resource_cnhfm"), SubResource("Resource_8ysk6"), SubResource("Resource_yautm"), SubResource("Resource_08phn"), SubResource("Resource_ny76j"), SubResource("Resource_ppk4o"), SubResource("Resource_7xrwg")])
+pieces = Array[ExtResource("1_h1oce")]([SubResource("Resource_7ntlk"), SubResource("Resource_746tt"), SubResource("Resource_4p5eu"), SubResource("Resource_0gjia"), SubResource("Resource_j2a5p"), SubResource("Resource_6kh0c"), SubResource("Resource_nve1s"), SubResource("Resource_7vr3h"), SubResource("Resource_qp2sc"), SubResource("Resource_syo03"), SubResource("Resource_50vsb"), SubResource("Resource_07vrg"), SubResource("Resource_vee51"), SubResource("Resource_xmqj3"), SubResource("Resource_5m0tv"), SubResource("Resource_hubt8"), SubResource("Resource_e2i0n"), SubResource("Resource_7mw48"), SubResource("Resource_l50ev"), SubResource("Resource_gtcqr"), SubResource("Resource_2wo1y"), SubResource("Resource_4w4av"), SubResource("Resource_fnddd"), SubResource("Resource_74jq3"), SubResource("Resource_xlti8"), SubResource("Resource_1cwyo"), SubResource("Resource_80arb"), SubResource("Resource_plhcl"), SubResource("Resource_0k5rh"), SubResource("Resource_104gi"), SubResource("Resource_sc0jm"), SubResource("Resource_xoyiw"), SubResource("Resource_cnhfm"), SubResource("Resource_8ysk6"), SubResource("Resource_yautm"), SubResource("Resource_08phn"), SubResource("Resource_ny76j"), SubResource("Resource_ppk4o"), SubResource("Resource_7xrwg"), SubResource("Resource_0qfti"), SubResource("Resource_mgp66")])
 bot_paths = {
-"risky": [Vector4(0, 0, 232, 0), Vector4(-16, 0, 208, 0), Vector4(-16, 0, 202.6, 1), Vector4(-16, 0, 199.5, 0), Vector4(-16, 0, 198.6, 1), Vector4(-16, 0, 194, 0), Vector4(-16, 0, 193.1, 1), Vector4(-16, 0, 188.5, 0), Vector4(-16, 0, 187.6, 1), Vector4(-16, 0, 183, 0), Vector4(-16, 0, 182.1, 1), Vector4(-16, 0, 177.5, 0), Vector4(-16, 0, 176.6, 1), Vector4(-16, 0, 172, 0), Vector4(-16, 0, 171.1, 1), Vector4(-16, 0, 166.5, 0), Vector4(-16, 0, 165.6, 0), Vector4(-16, 0, 162, 0), Vector4(0, 0, 142, 0), Vector4(-6, 0, 126, 0), Vector4(-6, 0, 123.5, 1), Vector4(-6, 0, 121, 0), Vector4(-6, 0, 120.1, 1), Vector4(-6, 0, 115.6, 0), Vector4(-6, 0, 114.7, 1), Vector4(-6, 0, 110.2, 0), Vector4(-6, 0, 109.3, 1), Vector4(-6, 0, 104.8, 0), Vector4(-6, 0, 103.9, 1), Vector4(-6, 0, 97, 0), Vector4(3, 0, 93, 0), Vector4(3, 5, 87, 0), Vector4(10, 5, 82, 0), Vector4(10, 5, 60, 0), Vector4(2, 0, 52, 0), Vector4(0, 0, 8, 0)],
+"risky": [Vector4(0, 0, 232, 0), Vector4(-16, 0, 208, 0), Vector4(-16, 0, 203.9, 1), Vector4(-16, 0, 198.6, 1), Vector4(-16, 0, 193.1, 1), Vector4(-16, 0, 187.6, 1), Vector4(-16, 0, 182.1, 1), Vector4(-16, 0, 176.6, 1), Vector4(-16, 0, 171.1, 1), Vector4(-16, 0, 165.6, 1), Vector4(-16, 0, 162, 0), Vector4(0, 0, 142, 0), Vector4(-6, 0, 126, 0), Vector4(-6, 0, 125.2, 1), Vector4(-6, 0, 120.6, 1), Vector4(-6, 0, 115.6, 1), Vector4(-6, 0, 110.6, 1), Vector4(-6, 0, 105.6, 1), Vector4(-6, 0, 100.6, 1), Vector4(-6, 0, 97, 0), Vector4(3, 0, 93, 0), Vector4(3, 5, 87, 0), Vector4(10, 5, 82, 0), Vector4(10, 5, 60, 0), Vector4(2, 0, 52, 0), Vector4(0, 0, 8, 0)],
 "safe": [Vector4(0, 0, 232, 0), Vector4(12, 0, 216, 0), Vector4(24, 0, 204, 0), Vector4(24, 0, 158, 0), Vector4(0, 0, 142, 0), Vector4(6, 0, 126, 0), Vector4(6, 0, 123.5, 0), Vector4(6, 0, 120.3, 1), Vector4(6, 0, 117.5, 0), Vector4(6, 0, 114.3, 1), Vector4(6, 0, 111.5, 0), Vector4(6, 0, 108.3, 1), Vector4(6, 0, 105.5, 0), Vector4(6, 0, 102.3, 1), Vector4(6, 0, 97, 0), Vector4(3, 0, 93, 0), Vector4(3, 5, 87, 0), Vector4(10, 5, 82, 0), Vector4(10, 5, 60, 0), Vector4(2, 0, 52, 0), Vector4(0, 0, 8, 0)]
 }

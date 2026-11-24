@@ -297,6 +297,7 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			return false
 		if w.w > 0.5 and i + 1 < pts.size():
 			var nxt: Vector4 = pts[i + 1]
+			await _wait_until_safe_to_jump(tc, player, Vector3(nxt.x, nxt.y, nxt.z))
 			var to := Vector3(nxt.x, nxt.y, nxt.z) - player.global_position
 			to.y = 0.0
 			var local := player.get_camera_basis().inverse() * to.normalized()
@@ -309,4 +310,38 @@ static func follow_path(tc: TestCase, player: PlayerController, pts: Array, fram
 			tc.release("jump")
 	release_moves()
 	return true
+
+
+## Like a careful player at the edge: before jumping onto a sinking stone, wait until it has
+## plenty of up-time left (the stones run as a wave, so the next ones will be up in time); before
+## jumping into wind, wait for a fresh calm. Stands still while waiting (max ~10 s).
+static func _wait_until_safe_to_jump(tc: TestCase, player: PlayerController, target: Vector3) -> void:
+	release_moves()
+	for f in 600:
+		var ok := true
+		for s in tc.tree.get_nodes_in_group("sinking_stones"):
+			var stone := s as SinkingStone
+			var d := stone.global_position - target
+			if Vector2(d.x, d.z).length() < 2.5 and not (stone.is_safe() and stone.safe_time_left() > 2.0):
+				ok = false
+		for g in tc.tree.get_nodes_in_group("gust_zones"):
+			var gust := g as GustZone
+			# Only before ENTERING the wind; once in it, dash through (waiting there gets you blown off).
+			if _in_zone(gust, target) and not _in_zone(gust, player.global_position) \
+					and not (gust.phase == GustZone.Phase.CALM and gust.calm_time - gust.phase_time() > 2.6):
+				ok = false
+		if ok:
+			return
+		await tc.tree.physics_frame
+
+
+static func _in_zone(zone: Area3D, p: Vector3) -> bool:
+	for c in zone.get_children():
+		var cs := c as CollisionShape3D
+		if cs and cs.shape is BoxShape3D:
+			var local := cs.global_transform.affine_inverse() * p
+			var half := (cs.shape as BoxShape3D).size * 0.5
+			if absf(local.x) <= half.x and absf(local.z) <= half.z:
+				return true
+	return false
 

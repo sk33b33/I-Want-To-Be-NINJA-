@@ -17,13 +17,13 @@ const K := RoutePiece.Kind
 const MAT := "res://data/materials/"
 
 const THEMES := {
-	"verdant_canopy": {"mirror": false, "stone": "stone", "climb": "climb_stone", "step": K.CRUMBLE, "step_y": -0.2,
+	"verdant_canopy": {"mirror": false, "stone": "stone", "climb": "climb_stone", "step": K.CRUMBLE, "step2": K.CRUMBLE, "step_y": -0.2,
 		"floor": -1, "lane": K.BRAMBLE, "field": K.BRAMBLE, "pickup": "ruin_shard"},
-	"emberwild": {"mirror": true, "stone": "basalt", "climb": "basalt_climb", "step": K.SINK_STONE, "step_y": 0.0,
+	"emberwild": {"mirror": true, "stone": "basalt", "climb": "basalt_climb", "step": K.SINK_STONE, "step2": K.SINK_STONE, "step_y": 0.0,
 		"floor": K.LAVA, "lane": K.VENT, "field": K.VENT, "pickup": "ember_crystal"},
-	"moonfen": {"mirror": false, "stone": "stone", "climb": "climb_stone", "step": K.RAFT, "step_y": 0.0,
+	"moonfen": {"mirror": false, "stone": "stone", "climb": "climb_stone", "step": K.RAFT, "step2": K.RAFT, "step_y": 0.0,
 		"floor": K.BOG, "lane": K.POISON, "field": K.POISON, "pickup": "spirit_moss"},
-	"stormcrag": {"mirror": true, "stone": "crag_stone", "climb": "climb_stone", "step": K.CRUMBLE, "step_y": -0.2, "gusts": true,
+	"stormcrag": {"mirror": true, "stone": "crag_stone", "climb": "climb_stone", "step": K.BOX, "step2": K.CRUMBLE, "step_y": -0.2, "gusts": true,
 		"floor": -1, "lane": K.GUST, "field": K.STORM, "pickup": "storm_glass"},
 }
 
@@ -98,22 +98,25 @@ func _hazard_lane(kind: int, x: float, z0: float, z1: float) -> void:
 
 
 ## Stepping pieces across a chasm along z (from z_start down to z_end), in the jungle's style.
-func _steps(t: Dictionary, x: float, z_start: float, z_end: float, spacing: float) -> void:
-	var kind: int = t["step"]
+## Sinking stones rise and sink as a travelling WAVE (each 0.8 s behind the one before): start on
+## a fresh stone and every next one is up as you reach it — watch the wave, then ride it.
+## `gust`: wind over the middle stretch only (solid slabs either side to wait on for a calm).
+func _steps(kind: int, t: Dictionary, x: float, z_start: float, z_end: float, spacing: float, gust: bool) -> void:
 	var z := z_start
 	var i := 0
 	while z > z_end:
 		match kind:
 			K.BOX:  # Stormcrag: narrow, rain-slick stone slabs.
-				_add(K.BOX, _v(x, -0.5, z), Vector3(2.0, 1.0, 3.0), {"material": "stone"})
+				_add(K.BOX, _v(x, -0.5, z), Vector3(2.2, 1.0, 3.0), {"material": "stone"})
 			K.SINK_STONE:
-				_add(K.SINK_STONE, _v(x, float(t["step_y"]), z), Vector3.ONE, {"phase": -0.25 * i + 100.0})
+				_add(K.SINK_STONE, _v(x, float(t["step_y"]), z), Vector3.ONE, {"phase": 100.0 - 0.8 * i})
 			_:
 				_add(kind, _v(x, float(t["step_y"]), z))
 		z -= spacing
 		i += 1
-	if t.get("gusts", false):  # Stormcrag: gusts over the slick, crumbling slabs.
-		_add(K.GUST, _v(x, 2.0, (z_start + z_end) * 0.5), Vector3(8, 5, absf(z_start - z_end) + 4.0), {"phase": 0.7})
+	if gust:
+		var mid := (z_start + z_end) * 0.5
+		_add(K.GUST, _v(x, 2.0, mid), Vector3(8, 5, 11.0), {"phase": 0.7})
 
 
 func _section_one(t: Dictionary) -> void:
@@ -123,10 +126,12 @@ func _section_one(t: Dictionary) -> void:
 	# Safe path (west): an enemy pack, then the jungle's hazard lane.
 	_add(K.ENEMY, _v(SAFE_X, 0.0, 190), Vector3.ONE, {"count": 3})
 	_hazard_lane(t["lane"], SAFE_X, 180, 160)
+	if t.get("gusts", false):  # Stormcrag: lightning chases you down the windy lane too.
+		_hazard_lane(K.STORM, SAFE_X, 180, 160)
 	# Risky path (east): stepping pieces over a chasm (PIT1), a reward at the far side.
 	if t["floor"] != -1:
 		_add(t["floor"], _v(PIT1.x, -4.0, PIT1.y), Vector3(PIT1.z * 2.0, 6.0, PIT1.w * 2.0))
-	_steps(t, RISKY_X, 199.5, 167.0, 5.5)
+	_steps(t["step"], t, RISKY_X, 199.5, 165.0, 5.5, t.get("gusts", false))
 	_add(K.PICKUP, _v(RISKY_X + 4, 0.0, 162), Vector3.ONE, {"item": t["pickup"]})
 
 
@@ -137,7 +142,7 @@ func _section_two(t: Dictionary) -> void:
 		_add(t["floor"], _v(0, -4.0, PIT2.y), Vector3(PIT2.z * 2.0, 6.0, PIT2.w * 2.0))
 	for z in [122.0, 116.0, 110.0, 104.0]:
 		_add(K.BOX, _v(-6, -0.5, z), Vector3(0.9, 1.0, 4.0), {"material": "wood"})
-	_steps(t, 6.0, 121.0, 100.5, 5.4)
+	_steps(t["step2"], t, 6.0, 121.5, 100.0, 5.0, false)
 	# Climb to the plateau (top y = 5) and its hazard field.
 	var depth := PLATEAU_Z.y - PLATEAU_Z.x
 	_add(K.BOX, _v(0, PLATEAU_H * 0.5, (PLATEAU_Z.x + PLATEAU_Z.y) * 0.5), Vector3(26, PLATEAU_H, depth))
@@ -182,10 +187,11 @@ func _bot_path(safe: bool) -> Array:
 		add.call(SAFE_X, 158)
 	else:
 		add.call(RISKY_X, 208)
-		add.call(RISKY_X, 202.6, true)  # Edge of the chasm.
+		add.call(RISKY_X, 203.9, true)  # A stride before the edge: the first piece is close.
+		# Keep running: take off from each piece's far edge (a running jump carries ~4.7 m,
+		# landing near the middle of the next piece — like a player would cross).
 		for z in [199.5, 194.0, 188.5, 183.0, 177.5, 172.0, 166.5]:
-			add.call(RISKY_X, z)  # Land in the middle of the piece ...
-			add.call(RISKY_X, z - 0.9, z > 167.0)  # ... and take off from its far edge.
+			add.call(RISKY_X, z - 0.9, true)  # The last one jumps onto the bank.
 		add.call(RISKY_X, 162.0)
 	add.call(0, 142)
 	var x := -6.0 if safe else 6.0
@@ -195,9 +201,8 @@ func _bot_path(safe: bool) -> Array:
 			add.call(x, z + 1.5)
 			add.call(x, z - 1.7, true)
 	else:
-		add.call(x, 123.5, true)
-		for z in [121.0, 115.6, 110.2, 104.8]:
-			add.call(x, z)
+		add.call(x, 125.2, true)
+		for z in [121.5, 116.5, 111.5, 106.5, 101.5]:
 			add.call(x, z - 0.9, true)
 	add.call(x, 97)
 	add.call(-3, 93)

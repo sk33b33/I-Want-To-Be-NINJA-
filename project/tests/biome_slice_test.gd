@@ -90,7 +90,9 @@ func test_objective_hud_counts_down_distance_to_the_arena() -> void:
 	var player := main.get_node("Player") as PlayerController
 	var hud := main.get_node("UI/ExpeditionHud") as ExpeditionHud
 	await process_frames(5)
-	check(hud.objective_text() == "Arena  94 m", "94 m from spawn (got '%s')" % hud.objective_text())
+	# Phase 13 long routes: the spawn moved 250 m back (the arena marker is at z -94).
+	var expect := "Arena  %d m" % int(round(player.global_position.distance_to(Vector3(0, player.global_position.y, -94))))
+	check(hud.objective_text() == expect, "%s from spawn (got '%s')" % [expect, hud.objective_text()])
 	player.global_position = Vector3(0, 0.3, -50)
 	await process_frames(5)
 	check(hud.objective_text() == "Arena  44 m", "closer after moving (got '%s')" % hud.objective_text())

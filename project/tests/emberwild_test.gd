@@ -118,9 +118,12 @@ func test_emberwild_has_every_distinct_hazard_and_its_own_look() -> void:
 	var main := instantiate(SCENE)
 	await physics_frames(3)
 	var tree_ := main.get_tree()
-	check(tree_.get_nodes_in_group("fire_vents").size() == 4, "4 fire vents")
+	# The original route's hazards (the long route adds more of each, under RouteBuilder).
+	var original := func(group: String) -> int:
+		return tree_.get_nodes_in_group(group).filter(func(n: Node) -> bool: return main.get_node("Level/Hazards").is_ancestor_of(n)).size()
+	check(original.call("fire_vents") == 4, "4 fire vents on the original route")
 	check(tree_.get_nodes_in_group("heat_zones").size() == 1, "a heat zone")
-	check(tree_.get_nodes_in_group("sinking_stones").size() == 4, "4 sinking stones")
+	check(original.call("sinking_stones") == 4, "4 sinking stones on the original route")
 	check(tree_.get_nodes_in_group("crumble_platforms").size() == 3, "crumbling shortcut")
 	check(main.get_node_or_null("Level/Hazards/LavaRiver") is LavaZone, "lava river")
 	var boss := main.get_node("Level/Boss") as BossController

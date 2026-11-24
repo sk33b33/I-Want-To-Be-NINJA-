@@ -93,7 +93,7 @@ func test_gate_bot_walks_the_safe_and_risky_way_in_every_jungle() -> void:
 			player.combat.health.invulnerable = true
 			var falls := [0]
 			player.respawned.connect(func(_at: Vector3) -> void: falls[0] += 1)
-			var ok := await BotHelpers.run_long_route(self, player, way)
+			var ok := await BotHelpers.run_long_route(self, player, way, true)
 			check(ok and player.global_position.z < 12.0, "%s %s way: reached the original route (at %s)" % [biome, way, player.global_position.round()])
 			check(falls[0] == 0, "%s %s way: no falls (%d)" % [biome, way, falls[0]])
 			main.free()

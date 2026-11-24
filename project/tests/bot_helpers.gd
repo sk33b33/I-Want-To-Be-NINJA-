@@ -241,7 +241,7 @@ static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: N
 ## `from`: where this leg started (the previous waypoint) — after a fight pulls the bot off the
 ## path it first walks back to the nearest point of the leg, like a player finding the trail again.
 static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3, done: Callable,
-		max_frames: int = 1500, fight: bool = true, from: Vector3 = Vector3.INF, abort_on_respawn: bool = false) -> bool:
+		max_frames: int = 1500, fight: bool = false, from: Vector3 = Vector3.INF, abort_on_respawn: bool = false) -> bool:
 	var last := player.global_position
 	var stuck := 0
 	# A fall or death respawns the player elsewhere: end this leg so the caller can pick the trail
@@ -303,12 +303,23 @@ static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3,
 
 
 
+## Set true by a test that wants a hunt bot to walk the WHOLE long route (default: skip to the
+## original route's start). `run_long_route(..., force = true)` walks it for one call.
+static var walk_full_long_route: bool = false
+
+
 ## Phase 13 long routes: walk the new sections (RouteLayout.bot_paths, "safe" or "risky") from
 ## the spawn to the start of the original route. Does nothing if the player already stands on
 ## the original route (z < 20) or the jungle has no long route. Returns false if stuck.
-static func run_long_route(tc: TestCase, player: PlayerController, path_name: String = "safe") -> bool:
+static func run_long_route(tc: TestCase, player: PlayerController, path_name: String = "safe", force: bool = false) -> bool:
 	var builders := tc.tree.get_nodes_in_group("route_builder")
 	if builders.is_empty() or player.global_position.z < 20.0:
+		return true
+	if not (force or walk_full_long_route):
+		# Fast path (most tests): start where the original route starts, exactly as before the long
+		# routes existed. Walking the new sections is covered by routes_test (both ways, every jungle).
+		player.respawn(Vector3(0, 0.1, 0))
+		await tc.physics_frames(5)
 		return true
 	var layout := (builders[0] as RouteBuilder).layout
 	var ok := await follow_path(tc, player, layout.bot_paths.get(path_name, []))

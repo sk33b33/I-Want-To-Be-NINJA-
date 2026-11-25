@@ -366,6 +366,11 @@ func _dress() -> void:
 		xf.append([])
 	var terrain := _find_terrain()
 	# Pieces to keep clear of (their footprint plus a margin): props are visual but should never hide the route.
+	var all_paths: Array = []
+	for way: String in ["safe", "risky"]:
+		var wp: Array = layout.bot_paths.get(way, [])
+		for i in range(wp.size() - 1):
+			all_paths.append([Vector2((wp[i] as Vector4).x, (wp[i] as Vector4).z), Vector2((wp[i + 1] as Vector4).x, (wp[i + 1] as Vector4).z)])
 	var clear: Array[Rect2] = []
 	for p in layout.pieces:
 		var half := Vector2(p.size.x, p.size.z) * 0.5 + Vector2.ONE * 3.5
@@ -394,8 +399,13 @@ func _dress() -> void:
 					if not _spot_ok(pos, terrain, clear):
 						continue
 					var k := rng.randi_range(0, kinds.size() - 1)
-					var y := terrain.get_height(pos.x, pos.y) if terrain else 0.0
 					var s := rng.randf_range(dressing.scale_range.x, dressing.scale_range.y)
+					# Solid props must clear every bot/player path by their own footprint (a 14 m wall
+					# 8 m beside the line used to span it).
+					var foot := Vector2((kinds[k]["size"] as Vector3).x, (kinds[k]["size"] as Vector3).z).length() * 0.5 * s
+					if _path_distance(pos, all_paths) < foot + 3.0:
+						continue
+					var y := terrain.get_height(pos.x, pos.y) if terrain else 0.0
 					var basis := Basis(Vector3.UP, rng.randf() * TAU) * Basis(Vector3.RIGHT, deg_to_rad(rng.randf_range(-6.0, 6.0))).scaled(Vector3.ONE * s)
 					xf[k].append(Transform3D(basis, Vector3(pos.x, y - 0.15, pos.y)))
 	var root := Node3D.new()
@@ -412,7 +422,7 @@ func _dress() -> void:
 			for p in layout.pieces:
 				if p.kind == RoutePiece.Kind.CHECKPOINT:
 					for sgn in [-1.0, 1.0]:
-						pxf.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU), p.position + Vector3(2.6 * sgn, -0.5, 0.0)))
+						pxf.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU), p.position + Vector3(4.5 * sgn, -0.5, 0.0)))
 			_add_ruin_multimesh(root, "ShrinePillars", b["mesh"], pxf)
 			_add_ruin_collision(root, "ShrinePillarsSolid", b["size"], pxf)
 	if dressing.gate_arch:
@@ -440,6 +450,14 @@ func _add_ruin_collision(parent: Node3D, label: String, size: Vector3, xforms: A
 		col.transform = Transform3D(t.basis.orthonormalized(), t.origin + t.basis.orthonormalized() * Vector3(0, size.y * t.basis.get_scale().y * 0.5, 0))
 		body.add_child(col)
 	parent.add_child(body)
+
+
+func _path_distance(p: Vector2, segments: Array) -> float:
+	var best := INF
+	for seg in segments:
+		var closest := Geometry2D.get_closest_point_to_segment(p, seg[0], seg[1])
+		best = minf(best, p.distance_to(closest))
+	return best
 
 
 func _spot_ok(pos: Vector2, terrain: BiomeTerrain, clear: Array[Rect2]) -> bool:

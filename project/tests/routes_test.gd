@@ -194,3 +194,38 @@ func test_ruins_dress_every_route_lighter_on_low_and_never_solid() -> void:
 	QualityProfile.force_tier(&"")
 	_done()
 
+
+
+## Regression (found when trees, boulders, logs and ruin props became solid): nothing solid of the
+## scenery may stand on a bot/player path (a 14 m ruin wall and a boulder blocked the safe way).
+func test_no_solid_scenery_stands_on_the_walking_paths() -> void:
+	for biome: StringName in SCENES:
+		var main := _start(biome)
+		await physics_frames(4)
+		var layout := load("res://data/routes/%s.tres" % biome) as RouteLayout
+		var space := (main as Node3D).get_world_3d().direct_space_state
+		var blockers := {}
+		for way: String in ["safe", "risky"]:
+			var pts: Array = layout.bot_paths[way]
+			for i in range(pts.size() - 1):
+				var a := pts[i] as Vector4
+				var c := pts[i + 1] as Vector4
+				if a.w > 0.5 or c.w > 0.5:
+					continue  # A jump leg: the ground between is a gap.
+				var n := int(Vector2(a.x, a.z).distance_to(Vector2(c.x, c.z)))
+				for k in range(0, n + 1):
+					var t := float(k) / maxf(n, 1)
+					var q := PhysicsShapeQueryParameters3D.new()
+					var shape := SphereShape3D.new()
+					shape.radius = 0.4
+					q.shape = shape
+					q.transform = Transform3D(Basis.IDENTITY, Vector3(lerpf(a.x, c.x, t), lerpf(a.y, c.y, t) + 1.2, lerpf(a.z, c.z, t)))
+					q.collision_mask = 1
+					for r in space.intersect_shape(q, 4):
+						var o := r["collider"] as Node
+						if o is StaticBody3D and o.get_parent() is Node and (o.get_parent().name in [&"Flora", &"RuinDressing"]):
+							blockers["%s/%s" % [o.get_parent().name, o.name]] = way
+		check(blockers.is_empty(), "%s: solid scenery on the paths: %s" % [biome, blockers.keys()])
+		main.free()
+		_nodes.erase(main)
+	_done()

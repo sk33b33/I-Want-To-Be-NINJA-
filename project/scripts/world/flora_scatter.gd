@@ -39,6 +39,7 @@ func rebuild() -> void:
 	if not _terrain.is_built():
 		_terrain.rebuild()
 	_load_secret_points()
+	_load_path_segments()
 	_rng.seed = config.seed
 	_low = QualityProfile.is_low()
 	_preset = QualityProfile.current()
@@ -119,7 +120,7 @@ func _place_trees() -> void:
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
 		if d < cfg.tree_route_clearance or _terrain.is_in_gorge(p.y, 3.0) or _near_secret(p.x, p.y) \
-				or _terrain.is_in_pit(p.x, p.y, 3.0):
+				or _terrain.is_in_pit(p.x, p.y, 3.0) or _near_path(p.x, p.y, 3.5):
 			continue
 		if 1.0 - _terrain.get_normal(p.x, p.y).y > 0.5 or not _density_ok(d * 0.6):
 			continue
@@ -334,14 +335,18 @@ func _scatter(kind: String, count: int, min_route: float, min_scale: float, max_
 			continue
 		if 1.0 - _terrain.get_normal(p.x, p.y).y > config.max_ground_slope or not _density_ok(d):
 			continue
-		_add(kind, _ground_transform(p.x, p.y, _rng.randf_range(min_scale, max_scale), align))
+		var scale := _rng.randf_range(min_scale, max_scale)
+		# Boulders are solid: keep them off the walking paths and off the hidden shrines.
+		if kind == "Rock" and scale >= ROCK_SOLID_SCALE and (_near_path(p.x, p.y, 1.0 + 1.1 * scale + 1.0) or _near_secret(p.x, p.y)):
+			continue
+		_add(kind, _ground_transform(p.x, p.y, scale, align))
 
 
 func _place_logs() -> void:
 	for i in config.log_count:
 		var p := _random_point()
 		var d := _terrain.route_distance(p.x, p.y)
-		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0) or _near_secret(p.x, p.y) or _terrain.is_in_pit(p.x, p.y, 4.0):
+		if d < 7.0 or d > 35.0 or _terrain.is_in_gorge(p.y, 4.0) or _near_secret(p.x, p.y) or _terrain.is_in_pit(p.x, p.y, 4.0) or _near_path(p.x, p.y, 6.5):
 			continue
 		var mi := MeshInstance3D.new()
 		mi.mesh = ProceduralMeshes.log_mesh(_variant_rng(100 + i), bark_material)
@@ -416,6 +421,34 @@ func _load_secret_points() -> void:
 	if set_data:
 		for d in set_data.secrets:
 			_secret_points.append(d.position)
+
+
+## The long route's bot paths (safe/risky ways): solid trunks, boulders and logs keep clear of them,
+## so nothing solid is ever placed in the way of a walker.
+var _path_segments: Array = []
+
+
+func _load_path_segments() -> void:
+	_path_segments.clear()
+	if config == null or config.resource_path == "":
+		return
+	var path := "res://data/routes/%s.tres" % config.resource_path.get_file().get_basename().trim_suffix("_flora")
+	if not ResourceLoader.exists(path):
+		return
+	var layout := load(path) as RouteLayout
+	for way in layout.bot_paths.values():
+		for i in range((way as Array).size() - 1):
+			var a := (way as Array)[i] as Vector4
+			var b := (way as Array)[i + 1] as Vector4
+			_path_segments.append([Vector2(a.x, a.z), Vector2(b.x, b.z)])
+
+
+func _near_path(x: float, z: float, margin: float) -> bool:
+	var p := Vector2(x, z)
+	for seg in _path_segments:
+		if p.distance_to(Geometry2D.get_closest_point_to_segment(p, seg[0], seg[1])) < margin:
+			return true
+	return false
 
 
 func _near_secret(x: float, z: float) -> bool:

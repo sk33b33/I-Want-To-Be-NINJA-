@@ -414,7 +414,7 @@ func _dress() -> void:
 						pxf.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU), p.position + Vector3(2.6 * sgn, -0.5, 0.0)))
 			_add_ruin_multimesh(root, "ShrinePillars", b["mesh"], pxf)
 	if dressing.gate_arch:
-		var b := _bake_ruin(dressing.gate_arch, max_tris)
+		var b := _bake_ruin(dressing.gate_arch, maxi(max_tris, 3000))  # One instance: cheap even on Low.
 		if not b.is_empty():
 			var width := float((b["size"] as Vector3).x)
 			var s := 9.0 / maxf(width, 1.0)

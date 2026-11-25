@@ -23,3 +23,4 @@ particle_scale = 0.7
 effect_lights = true
 sky_reflections = true
 sky_flash = true
+tree_model_max_tris = 2500

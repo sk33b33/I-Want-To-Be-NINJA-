@@ -97,10 +97,16 @@ func _place_trees() -> void:
 		vr.seed = cfg.seed * 31 + v
 		jungle_meshes.append(ProceduralMeshes.jungle_tree(vr, bark_material, leaf_material, vine_material, cards))
 		dead_meshes.append(ProceduralMeshes.dead_tree(vr, bark_material, vine_material))
+	# Imported tree models (art pass) replace the code-built big trees where the jungle has them.
+	var models := _model_trees()
+	var use_models := not models.is_empty()
+	var jungle_kinds := models.size() if use_models else cfg.tree_variants
+	var spacing := cfg.tree_model_spacing if use_models else 5.5
 	var jungle_xf: Array = []
 	var dead_xf: Array = []
-	for v in cfg.tree_variants:
+	for v in jungle_kinds:
 		jungle_xf.append([])
+	for v in cfg.tree_variants:
 		dead_xf.append([])
 	var placed := 0
 	var attempts := 0
@@ -119,7 +125,7 @@ func _place_trees() -> void:
 			continue
 		var too_close := false
 		for other in _tree_positions:
-			if Vector2(other.x, other.z).distance_to(p) < 5.5:
+			if Vector2(other.x, other.z).distance_to(p) < spacing:
 				too_close = true
 				break
 		if too_close:
@@ -128,18 +134,105 @@ func _place_trees() -> void:
 		var scale := _rng.randf_range(0.8, 1.25)
 		var t := _ground_transform(p.x, p.y, scale, 0.0)
 		t.origin.y -= 0.3
-		var variant := _rng.randi_range(0, cfg.tree_variants - 1)
+		var variant := _rng.randi_range(0, (jungle_kinds if use_models and not is_dead else cfg.tree_variants) - 1)
 		if is_dead:
 			dead_xf[variant].append(t)
 		else:
 			jungle_xf[variant].append(t)
 		_tree_positions.append(t.origin)
 		if d < cfg.tree_collision_distance:
-			_add_trunk_collision(t.origin, (0.6 if is_dead else 1.0) * scale)
+			_add_trunk_collision(t.origin, (0.6 if is_dead else (float(models[variant]["radius"]) if use_models else 1.0)) * scale)
 		placed += 1
+	for v in jungle_kinds:
+		_spawn_multimesh("JungleTrees%d" % v, models[v]["mesh"] if use_models else jungle_meshes[v], jungle_xf[v], 0.0, true)
 	for v in cfg.tree_variants:
-		_spawn_multimesh("JungleTrees%d" % v, jungle_meshes[v], jungle_xf[v], 0.0, true)
 		_spawn_multimesh("DeadTrees%d" % v, dead_meshes[v], dead_xf[v], 0.0, true)
+
+
+## Imported tree models for this quality tier (<= QualityPreset.tree_model_max_tris), baked once per
+## expedition: the node transform applied, scaled to config.tree_model_height with the base at y = 0,
+## one shared material (the atlas), plus each trunk's radius (for collision). [] = use code trees.
+func _model_trees() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var cfg := config
+	if cfg.tree_models.is_empty() or cfg.tree_model_atlas == null:
+		return out
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://shaders/model_foliage.gdshader")
+	mat.set_shader_parameter("atlas", cfg.tree_model_atlas)
+	mat.set_shader_parameter("tint", cfg.tree_model_tint)
+	mat.set_shader_parameter("sway_height", cfg.tree_model_height)
+	for ps in cfg.tree_models:
+		var root := ps.instantiate() as Node3D
+		# A model can be several mesh nodes (trunk, canopy, ...): merge them all.
+		var parts: Array = []  # [{"arrays": Array, "basis": Basis}]
+		var tris := 0
+		var lo := Vector3(INF, INF, INF)
+		var hi := Vector3(-INF, -INF, -INF)
+		for node in root.find_children("*", "MeshInstance3D", true, false):
+			var mi := node as MeshInstance3D
+			var src := mi.mesh as ArrayMesh
+			if src == null:
+				continue
+			tris += src.get_faces().size() / 3
+			var xf := Transform3D.IDENTITY
+			var n: Node = mi
+			while n != null:
+				if n is Node3D:
+					xf = (n as Node3D).transform * xf
+				n = n.get_parent()
+			for i in src.get_surface_count():
+				var arr := src.surface_get_arrays(i)
+				var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+				for k in v.size():
+					v[k] = xf * v[k]
+					lo = lo.min(v[k])
+					hi = hi.max(v[k])
+				arr[Mesh.ARRAY_VERTEX] = v
+				parts.append({"arrays": arr, "basis": xf.basis})
+		root.free()
+		if parts.is_empty() or tris > _preset.tree_model_max_tris:
+			continue
+		var scale_to := cfg.tree_model_height / maxf(hi.y - lo.y, 0.01)
+		# The trunk axis: centroid of a thin slice just above the ground (models are not always
+		# centred on their trunk), and the trunk radius from that slice's spread.
+		var cx := 0.0
+		var cz := 0.0
+		var cn := 0
+		var low_y := lo.y + (hi.y - lo.y) * 0.04
+		var high_y := lo.y + (hi.y - lo.y) * 0.10
+		for part in parts:
+			for p3 in (part["arrays"][Mesh.ARRAY_VERTEX] as PackedVector3Array):
+				if p3.y >= low_y and p3.y <= high_y:
+					cx += p3.x
+					cz += p3.z
+					cn += 1
+		if cn > 0:
+			cx /= cn
+			cz /= cn
+		var dists: Array[float] = []
+		var baked := ArrayMesh.new()
+		for part in parts:
+			var arr: Array = part["arrays"]
+			var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL] if arr[Mesh.ARRAY_NORMAL] != null else PackedVector3Array()
+			for k in v.size():
+				var raw := v[k]
+				v[k] = Vector3((raw.x - cx) * scale_to, (raw.y - lo.y) * scale_to, (raw.z - cz) * scale_to)
+				if k < nrm.size():
+					nrm[k] = ((part["basis"] as Basis) * nrm[k]).normalized()
+				if raw.y >= low_y and raw.y <= high_y:
+					dists.append(Vector2(v[k].x, v[k].z).length())
+			arr[Mesh.ARRAY_VERTEX] = v
+			if nrm.size() > 0:
+				arr[Mesh.ARRAY_NORMAL] = nrm
+			arr[Mesh.ARRAY_TANGENT] = null
+			baked.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+			baked.surface_set_material(baked.get_surface_count() - 1, mat)
+		dists.sort()
+		var trunk := dists[int(dists.size() * 0.8)] if not dists.is_empty() else 1.0
+		out.append({"mesh": baked, "radius": clampf(trunk, 0.4, 1.8), "tris": baked.get_faces().size() / 3})
+	return out
 
 
 func _add_trunk_collision(at: Vector3, radius: float) -> void:

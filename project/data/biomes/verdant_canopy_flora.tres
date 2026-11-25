@@ -1,6 +1,17 @@
-[gd_resource type="Resource" script_class="FloraConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="FloraConfig" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/flora_config.gd" id="1_hak8w"]
+[ext_resource type="Texture2D" path="res://assets/models/cc0/amazon_trees/amazon_trees_atlas.png" id="2_nt78a"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/young_twisted.fbx" id="3_iaex6"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/young_thick.fbx" id="4_kvuv6"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/young_slim.fbx" id="5_ybdag"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/tree_bigbark.fbx" id="6_3gp5a"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/tree_emergent.fbx" id="7_f1e1k"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/tree_ancient.fbx" id="8_dewln"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/amazon_trees/tree_big.fbx" id="9_pb3co"]
 
 [resource]
 script = ExtResource("1_hak8w")
+tree_models = Array[PackedScene]([ExtResource("3_iaex6"), ExtResource("4_kvuv6"), ExtResource("5_ybdag"), ExtResource("6_3gp5a"), ExtResource("7_f1e1k"), ExtResource("8_dewln"), ExtResource("9_pb3co")])
+tree_model_atlas = ExtResource("2_nt78a")
+tree_model_tint = Color(0.7, 0.76, 0.66, 1)

@@ -27,3 +27,4 @@ detail_normals = false
 anti_tile = false
 leaf_cards = false
 color_grade_lut = false
+tree_model_max_tris = 1200

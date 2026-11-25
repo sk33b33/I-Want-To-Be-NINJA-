@@ -27,6 +27,18 @@ extends Resource
 ## Keep trunks at least this far from the route centre so the path is never blocked.
 @export var tree_route_clearance: float = 9.0
 
+@export_group("Tree models (art pass; CC0 models in assets/models/cc0)")
+## Imported tree models for the big jungle trees (empty = the code-built trees). Which ones are used
+## depends on the quality tier (QualityPreset.tree_model_max_tris).
+@export var tree_models: Array[PackedScene] = []
+## One atlas for every model (bark + leaf cards) and the jungle's colour for it.
+@export var tree_model_atlas: Texture2D
+@export var tree_model_tint: Color = Color(1, 1, 1)
+## Every model is scaled to this height (metres) before the per-tree random scale.
+@export var tree_model_height: float = 17.0
+## Minimum spacing between model trees (their canopies are wider than the code-built ones).
+@export var tree_model_spacing: float = 8.0
+
 @export_group("Debris and ruins")
 @export var log_count: int = 12
 @export var pillar_count: int = 16

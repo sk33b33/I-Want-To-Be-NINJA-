@@ -308,3 +308,7 @@ Owner: "the path to the bosses is too small, it goes too quick — extend it, lo
 - **Performance regression found by the benchmark and fixed** (see `docs/PERFORMANCE.md`): the bigger terrain pushed Low (Verdant 257k) and Medium/High over their triangle budgets. Trees are never culled, so Low/Medium keep the original tree count (`QualityPreset.tree_area_growth`), and Medium/High render the terrain on a 2 m grid. All tiers are back inside their budgets.
 - **Exploit found in the owner's play log and fixed:** the first chasm was only 20 m wide, so the hill beside it was walkable; the log shows the player running straight down the middle between the two branches (x 0..3, z 209 -> 155) and skipping the whole fork (enemy pack, hazard lane, chasm). The chasm now runs from the safe lane's edge to the map edge (`PIT1` in `tools/generate_routes.gd`), so the only ways on are the safe lane or the stepping pieces (`routes_test`: no walkable gap at any x; watched failing first). Also from that log: the phone at Low ran the long route at 40-58 fps, 134-141 MB (see `docs/PERFORMANCE.md`).
 
+
+## 2026-11-25 — Graphics update, stage 5A (Verdant trees)
+- Seven CC0 jungle tree models (OpenGameArt, ledger) replace the procedural jungle trees in the Verdant Canopy; lighter variants on Low (cap 1200 tris), more on Medium/High. Trunk collision measured from the model. Triangles after: Low 162k, Medium 513k, High 1.05M (budgets hold).
+- New `model_foliage.gdshader` (atlas, tint, height-weighted sway, storm wind). Art test added; leaf-card test now uses Moonfen.

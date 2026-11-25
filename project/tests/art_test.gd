@@ -92,7 +92,7 @@ func test_low_has_no_leaf_cards_high_does() -> void:
 	for tier in [&"low", &"high"]:
 		QualityProfile.force_tier(tier)
 		PlayerProfile.path = "user://test_profile_art.json"
-		var main := instantiate("res://scenes/main/main.tscn")
+		var main := instantiate("res://scenes/main/expedition_moonfen.tscn")
 		await process_frames(2)
 		var found := false
 		for mmi in main.find_children("*", "MultiMeshInstance3D", true, false):
@@ -161,3 +161,34 @@ func test_beast_meshes_are_smooth_and_flora_is_not() -> void:
 		var tris := (b.get_node("Visual/Body") as MeshInstance3D).mesh.get_faces().size() / 3
 		check(tris >= 1200 and tris <= 6000, "%s body is the smooth rebuild (%d triangles, budget 6000)" % [id, tris])
 		b.free()
+
+
+## Stage 5A (real jungle trees): the Verdant Canopy plants the imported (CC0) tree models on every
+## tier — lighter variants on Low — merged from all their mesh nodes (a first version kept only the
+## first node of tree_bigbark: 8 triangles), with believable trunk radii, within the tier's cap.
+func test_verdant_plants_the_imported_trees_lighter_on_low() -> void:
+	var seen := {}
+	for tier in [&"low", &"medium", &"high"]:
+		QualityProfile.force_tier(tier)
+		PlayerProfile.path = "user://test_profile_art.json"
+		var main := instantiate("res://scenes/main/main.tscn")
+		await process_frames(2)
+		var flora := main.find_children("*", "FloraScatter", true, false)[0] as FloraScatter
+		var cap := QualityProfile.current().tree_model_max_tris
+		var kinds := 0
+		for mmi in flora.find_children("JungleTrees*", "MultiMeshInstance3D", true, false):
+			kinds += 1
+			var mesh := (mmi as MultiMeshInstance3D).multimesh.mesh
+			var tris := mesh.get_faces().size() / 3
+			check(tris >= 1000 and tris <= cap, "%s: a tree model with %d triangles (1000..%d)" % [tier, tris, cap])
+			var mat := mesh.surface_get_material(0) as ShaderMaterial
+			check(mat != null and Cc0Surfaces.shader_name(mat) == "model_foliage", "%s: trees use the model-foliage shader" % tier)
+		seen[tier] = kinds
+		for m in flora._model_trees():
+			check(float(m["radius"]) >= 0.4 and float(m["radius"]) <= 1.8, "%s: trunk radius %.2f" % [tier, m["radius"]])
+		main.free()
+		_nodes.erase(main)
+	check(seen[&"low"] >= 3 and seen[&"low"] < seen[&"medium"] and seen[&"medium"] < seen[&"high"], "Low keeps fewer tree variants than Medium, Medium fewer than High (%s)" % seen)
+	PlayerProfile.path = PlayerProfile.DEFAULT_PATH
+	_done()
+

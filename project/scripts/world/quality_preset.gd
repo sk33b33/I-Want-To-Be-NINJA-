@@ -57,3 +57,7 @@ extends Resource
 ## Split-tone colour grade (JungleMood shadow/highlight tints) as an Environment colour-correction
 ## curve. Off on Low (saturation/contrast still apply).
 @export var color_grade_lut: bool = true
+## Imported tree models above this many triangles are not used on this tier (art pass: Low keeps
+## the lightest variants; Medium adds the mid ones; High everything).
+@export var tree_model_max_tris: int = 5000
+

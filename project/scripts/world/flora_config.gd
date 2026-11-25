@@ -23,7 +23,7 @@ extends Resource
 @export var dead_tree_count: int = 35
 @export var tree_variants: int = 3
 ## Trees closer than this to the route get trunk collision.
-@export var tree_collision_distance: float = 30.0
+@export var tree_collision_distance: float = 400.0  # Every trunk is solid (30 m left far trees walk-through).
 ## Keep trunks at least this far from the route centre so the path is never blocked.
 @export var tree_route_clearance: float = 9.0
 

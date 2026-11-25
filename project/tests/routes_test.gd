@@ -166,7 +166,7 @@ func test_the_first_chasm_cannot_be_walked_around() -> void:
 
 
 ## Art pass 5B: CC0 ruins dress every long route — an arch at the start, a pillar pair at each new
-## shrine, scattered ruins beside (never on) the route — lighter on Low, none of it solid.
+## shrine, scattered ruins beside (never on) the route — lighter on Low, all of it solid (but the start arch).
 func test_ruins_dress_every_route_lighter_on_low_and_never_solid() -> void:
 	var counts := {}
 	for tier in [&"low", &"high"]:
@@ -185,7 +185,8 @@ func test_ruins_dress_every_route_lighter_on_low_and_never_solid() -> void:
 				counts[[tier, biome]] = n
 				check(arch, "%s %s: the start arch stands" % [tier, biome])
 				check(n >= 6, "%s %s: %d ruin props" % [tier, biome, n])
-				check(dressing[0].find_children("*", "CollisionObject3D", true, false).is_empty(), "%s %s: ruins have no collision" % [tier, biome])
+				var solid := dressing[0].find_children("Ruins*Solid*", "StaticBody3D", true, false)
+				check(not solid.is_empty() and dressing[0].find_children("StartArch", "CollisionObject3D", true, false).is_empty(), "%s %s: ruin props are solid, the start arch stays open" % [tier, biome])
 			main.free()
 			_nodes.erase(main)
 	for biome: StringName in SCENES:

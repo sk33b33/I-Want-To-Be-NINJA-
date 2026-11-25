@@ -292,6 +292,38 @@ func _place_ground_cover() -> void:
 		var per_chunk: Dictionary = _buckets[kind]
 		for chunk: Vector2i in per_chunk.keys():
 			_spawn_multimesh("%s_%d_%d" % [kind, chunk.x, chunk.y], meshes[kind], per_chunk[chunk], draw, kind == "Rock")
+			if kind == "Rock":
+				_add_rock_collision(per_chunk[chunk])
+
+
+## Boulders are solid (the owner walked through them): one body per chunk with a cylinder per rock
+## at least `ROCK_SOLID_SCALE` big (smaller stones are stepped over). The rock mesh is an ellipsoid
+## about 1.1 x scale wide and 0.85 x scale tall.
+const ROCK_SOLID_SCALE := 1.0
+
+
+func _add_rock_collision(transforms: Array) -> void:
+	var body := StaticBody3D.new()
+	body.name = "RockCollision"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var n := 0
+	for t: Transform3D in transforms:
+		var s := t.basis.get_scale().x
+		if s < ROCK_SOLID_SCALE:
+			continue
+		var col := CollisionShape3D.new()
+		var shape := CylinderShape3D.new()
+		shape.radius = 0.95 * s
+		shape.height = 0.8 * s
+		col.shape = shape
+		col.position = t.origin + Vector3.UP * (0.4 * s)
+		body.add_child(col)
+		n += 1
+	if n > 0:
+		add_child(body)
+	else:
+		body.free()
 
 
 func _scatter(kind: String, count: int, min_route: float, min_scale: float, max_scale: float, align: float = 0.6) -> void:
@@ -316,6 +348,20 @@ func _place_logs() -> void:
 		mi.position = Vector3(p.x, _terrain.get_height_interpolated(p.x, p.y) - 0.15, p.y)
 		mi.rotation.y = _rng.randf() * TAU
 		add_child(mi)
+		# Fallen logs are solid too: a capsule along the log (mesh runs along x, 5-9 m long, 0.4-0.7 m radius).
+		var body := StaticBody3D.new()
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var col := CollisionShape3D.new()
+		var cap := CapsuleShape3D.new()
+		cap.radius = 0.55
+		cap.height = 6.0
+		col.shape = cap
+		col.rotation.z = PI * 0.5
+		body.add_child(col)
+		body.position = mi.position + Vector3.UP * 0.55
+		body.rotation.y = mi.rotation.y
+		add_child(body)
 
 
 func _place_pillars() -> void:

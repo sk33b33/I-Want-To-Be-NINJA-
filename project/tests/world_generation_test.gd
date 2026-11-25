@@ -123,3 +123,40 @@ func _make_flora(t: BiomeTerrain) -> FloraScatter:
 	f.terrain_path = f.get_path_to(t)
 	f.rebuild()
 	return f
+
+
+## Regression (owner, playing on the phone: "some boulders, walls and trees I could walk right
+## through"): trunks only had collision within 30 m of the route, boulders and fallen logs had none.
+## A ray walked at chest height towards a far tree, a big boulder and a log must hit them.
+func test_far_trees_boulders_and_logs_are_solid() -> void:
+	PlayerProfile.path = "user://test_profile_world.json"
+	var main := instantiate("res://scenes/main/main.tscn")
+	await physics_frames(3)
+	var flora := main.find_children("*", "FloraScatter", true, false)[0] as FloraScatter
+	var terrain := main.find_children("*", "BiomeTerrain", true, false)[0] as BiomeTerrain
+	var space := (main as Node3D).get_world_3d().direct_space_state
+	var far := flora.get_tree_positions().filter(func(t: Vector3) -> bool: return terrain.route_distance(t.x, t.z) > 40.0)
+	check(far.size() >= 20, "there are trees far from the route (%d)" % far.size())
+	var missed := 0
+	for i in mini(far.size(), 40):
+		var t: Vector3 = far[i]
+		var q := PhysicsRayQueryParameters3D.create(t + Vector3(4, 1.5, 0), t + Vector3(0, 1.5, 0), 1)
+		if space.intersect_ray(q).is_empty():
+			missed += 1
+	check(missed == 0, "every far trunk stops a walker (%d of %d walk-through)" % [missed, mini(far.size(), 40)])
+	var rocks := flora.find_children("RockCollision", "StaticBody3D", true, false)
+	check(not rocks.is_empty(), "big boulders have collision")
+	var rock_missed := 0
+	var tested := 0
+	for body in rocks:
+		for c in (body as Node).get_children().slice(0, 5):
+			var shape := (c as CollisionShape3D).shape as CylinderShape3D
+			var o := (c as CollisionShape3D).global_position
+			var q := PhysicsRayQueryParameters3D.create(o + Vector3(shape.radius + 1.5, 0, 0), o, 1)
+			tested += 1
+			if space.intersect_ray(q).is_empty():
+				rock_missed += 1
+	check(tested > 0 and rock_missed == 0, "boulders stop a walker (%d of %d missed)" % [rock_missed, tested])
+	main.free()
+	_nodes.erase(main)
+	PlayerProfile.path = PlayerProfile.DEFAULT_PATH

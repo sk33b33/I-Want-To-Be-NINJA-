@@ -403,6 +403,7 @@ func _dress() -> void:
 	add_child(root)
 	for k in kinds.size():
 		_add_ruin_multimesh(root, "Ruins%d" % k, kinds[k]["mesh"], xf[k])
+		_add_ruin_collision(root, "RuinsSolid%d" % k, kinds[k]["size"], xf[k])
 	# Shrine pillars and the start arch.
 	if dressing.shrine_pillar:
 		var b := _bake_ruin(dressing.shrine_pillar, max_tris)
@@ -413,6 +414,7 @@ func _dress() -> void:
 					for sgn in [-1.0, 1.0]:
 						pxf.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU), p.position + Vector3(2.6 * sgn, -0.5, 0.0)))
 			_add_ruin_multimesh(root, "ShrinePillars", b["mesh"], pxf)
+			_add_ruin_collision(root, "ShrinePillarsSolid", b["size"], pxf)
 	if dressing.gate_arch:
 		var b := _bake_ruin(dressing.gate_arch, maxi(max_tris, 3000))  # One instance: cheap even on Low.
 		if not b.is_empty():
@@ -420,6 +422,24 @@ func _dress() -> void:
 			var s := 9.0 / maxf(width, 1.0)
 			var at := layout.spawn + Vector3(0, -0.1, -9.0)
 			_add_ruin_multimesh(root, "StartArch", b["mesh"], [Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * s), at)])
+
+
+## Ruins are solid (the owner walked through walls): one box per prop, its footprint and height.
+func _add_ruin_collision(parent: Node3D, label: String, size: Vector3, xforms: Array) -> void:
+	if xforms.is_empty():
+		return
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.collision_mask = 0
+	for t: Transform3D in xforms:
+		var col := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = size * t.basis.get_scale()
+		col.shape = box
+		col.transform = Transform3D(t.basis.orthonormalized(), t.origin + t.basis.orthonormalized() * Vector3(0, size.y * t.basis.get_scale().y * 0.5, 0))
+		body.add_child(col)
+	parent.add_child(body)
 
 
 func _spot_ok(pos: Vector2, terrain: BiomeTerrain, clear: Array[Rect2]) -> bool:

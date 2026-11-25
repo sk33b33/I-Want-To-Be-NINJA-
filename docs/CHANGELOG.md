@@ -314,3 +314,8 @@ Owner: "the path to the bosses is too small, it goes too quick — extend it, lo
 - New `model_foliage.gdshader` (atlas, tint, height-weighted sway, storm wind). Art test added; leaf-card test now uses Moonfen.
 - Stage 5B groundwork: dev-only `tools/art/convert_dae.py` (needs `pip install trimesh pycollada numpy`; not a game dependency) converts the CC0 ruins pack (Godot can't import DAE) to Y-up GLB; 12 ruin models imported in `assets/models/cc0/ruins/`.
 - Stage 5B: every long route is dressed with CC0 ruins (start arch, pillars at each shrine, scattered walls/pillars/foundations beside the path; fewer and lighter on Low). Visual only. Triangles still in budget (Low ≤164k, Medium ≤498k, High ≤1.08M).
+
+## 2026-11-25 — Phone playtest fixes and controls
+- Solid world: every tree trunk (was: only within 30 m of the route), boulders ≥ 1.0 scale, fallen logs and the ruin props now have collision (owner walked through them).
+- Double jump: a second press in the air is a front flip (`air_jumps`, `air_jump_velocity` in the movement config); landing or a wall jump gives it back.
+- Life bar is green; red shows only the health just lost and drains after 0.6 s. New stamina bar: sprint drains it, empty = running until it recovers. Touch "DASH" button renamed SPRINT.

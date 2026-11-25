@@ -7,6 +7,9 @@ extends CharacterBody3D
 ## TouchControls all drive it the same way. All tuning lives in PlayerMovementConfig.
 
 signal jumped
+## The air jump (a front flip) was used.
+signal double_jumped
+signal stamina_changed(current: float, maximum: float)
 signal landed
 signal respawned(at: Vector3)
 signal checkpoint_reached(at: Transform3D)
@@ -19,6 +22,14 @@ signal checkpoint_reached(at: Transform3D)
 var _camera_rig: CameraRig
 var _coyote_timer: float = 0.0
 var _jump_buffer_timer: float = 0.0
+var _air_jumps_left: int = 0
+var _since_jump: float = 99.0
+## Current stamina (sprint drains it). Tests that run long distances set `stamina_drain_multiplier` to 0.
+var stamina: float = 0.0
+var stamina_drain_multiplier: float = 1.0
+var _stamina_idle: float = 0.0
+var _exhausted: bool = false
+var _sprinting: bool = false
 var _safe_timer: float = 0.0
 var _last_safe_position: Vector3
 var _was_on_floor: bool = false
@@ -40,6 +51,8 @@ func _ready() -> void:
 		combat.lock_target_changed.connect(func(t: Node3D) -> void:
 			_camera_rig.set_lock_target(t, combat.get_lock_point))
 	_last_safe_position = global_position
+	stamina = config.stamina_max
+	_air_jumps_left = config.air_jumps
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -94,6 +107,7 @@ func respawn(at: Variant = null) -> void:
 	velocity = Vector3.ZERO
 	_coyote_timer = 0.0
 	_jump_buffer_timer = 0.0
+	_air_jumps_left = config.air_jumps
 	_safe_timer = 0.0
 	if _camera_rig:
 		_camera_rig.snap_to_target()
@@ -160,6 +174,8 @@ func consume_jump() -> bool:
 ## Emit `jumped` for jumps started outside the controller (wall jumps).
 func notify_jumped() -> void:
 	_coyote_timer = 0.0
+	_since_jump = 0.0
+	_air_jumps_left = config.air_jumps  # A wall jump gives the air jump back.
 	jumped.emit()
 
 
@@ -222,7 +238,9 @@ func _input_to_world(input: Vector2) -> Vector3:
 
 func _update_horizontal(wish: Vector3, on_floor: bool, delta: float) -> void:
 	var has_input := wish.length_squared() > 0.0001
-	var top_speed := config.sprint_speed if Input.is_action_pressed("sprint") else config.run_speed
+	_sprinting = has_input and Input.is_action_pressed("sprint") and not _exhausted and stamina > 0.0
+	_update_stamina(_sprinting, delta)
+	var top_speed := config.sprint_speed if _sprinting else config.run_speed
 	top_speed *= surface_speed_multiplier()
 	var drift := surface_current()
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
@@ -245,9 +263,41 @@ func _update_horizontal(wish: Vector3, on_floor: bool, delta: float) -> void:
 		_visual.rotation.y = lerp_angle(_visual.rotation.y, target_yaw, weight)
 
 
+## Sprint is held with stamina left (UI, animator and tests ask this instead of the raw action).
+func is_sprinting() -> bool:
+	return _sprinting
+
+
+func is_exhausted() -> bool:
+	return _exhausted
+
+
+func get_stamina_fraction() -> float:
+	return stamina / maxf(config.stamina_max, 0.01)
+
+
+func _update_stamina(sprinting: bool, delta: float) -> void:
+	var before := stamina
+	if sprinting:
+		stamina = maxf(stamina - config.sprint_stamina_drain * stamina_drain_multiplier * delta, 0.0)
+		_stamina_idle = 0.0
+		if stamina <= 0.0:
+			_exhausted = true
+	else:
+		_stamina_idle += delta
+		if _stamina_idle >= config.stamina_regen_delay:
+			stamina = minf(stamina + config.stamina_regen * delta, config.stamina_max)
+		if _exhausted and stamina >= config.stamina_recover_threshold:
+			_exhausted = false
+	if stamina != before:
+		stamina_changed.emit(stamina, config.stamina_max)
+
+
 func _update_vertical(on_floor: bool, delta: float) -> void:
+	_since_jump += delta
 	if on_floor:
 		_coyote_timer = config.coyote_time
+		_air_jumps_left = config.air_jumps
 	else:
 		_coyote_timer -= delta
 	_jump_buffer_timer -= delta
@@ -255,8 +305,19 @@ func _update_vertical(on_floor: bool, delta: float) -> void:
 	if _jump_buffer_timer > 0.0 and _coyote_timer > 0.0 and not surface_blocks_jump():
 		velocity.y = config.jump_velocity
 		_jump_buffer_timer = 0.0
-		_coyote_timer = 0.0  # No double jump from coyote time.
+		_coyote_timer = 0.0  # Coyote time never gives a free air jump.
+		_since_jump = 0.0
 		jumped.emit()
+		return
+
+	# The air jump: a second press in the air (after a short delay), once per jump, front flip.
+	if _jump_buffer_timer > 0.0 and not on_floor and _coyote_timer <= 0.0 and _air_jumps_left > 0 \
+			and _since_jump >= config.air_jump_delay and not surface_blocks_jump():
+		velocity.y = config.air_jump_velocity
+		_jump_buffer_timer = 0.0
+		_air_jumps_left -= 1
+		_since_jump = 0.0
+		double_jumped.emit()
 		return
 
 	if on_floor:

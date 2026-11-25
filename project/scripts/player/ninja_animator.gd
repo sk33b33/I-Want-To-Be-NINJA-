@@ -30,6 +30,7 @@ func _ready() -> void:
 		return
 	_prepare_clips()
 	_player.jumped.connect(_on_jumped)
+	_player.double_jumped.connect(_on_double_jumped)
 	_player.landed.connect(_on_landed)
 	# Look the components up directly: this node's _ready runs before the player's, so the
 	# player's own @onready references (player.traversal / player.combat) are still null here.
@@ -115,7 +116,7 @@ func current_clip() -> StringName:
 func _enter_ground_state(speed: float) -> void:
 	if speed < config.idle_speed_threshold:
 		_set_state(State.IDLE, _idle_name, 1.0)
-	elif Input.is_action_pressed("sprint") and speed > config.run_reference_speed:
+	elif _player.is_sprinting() and speed > config.run_reference_speed:
 		_set_state(State.SPRINT, config.sprint_clip, clampf(speed / config.sprint_reference_speed, 0.7, 1.5))
 	else:
 		_set_state(State.RUN, config.run_clip, clampf(speed / config.run_reference_speed, 0.5, 1.6))
@@ -222,11 +223,20 @@ func _on_traversal_state(traversal_state: TraversalComponent.State) -> void:
 func _on_jumped() -> void:
 	state = State.AIR
 	_anim.speed_scale = 1.0
-	var flip := Input.is_action_pressed("sprint") and _player.get_horizontal_speed() > config.run_reference_speed \
+	var flip := _player.is_sprinting() and _player.get_horizontal_speed() > config.run_reference_speed \
 			and _anim.has_animation(config.sprint_jump_clip)
 	_air_clip = config.sprint_jump_clip if flip else config.jump_clip
 	_play(_air_clip, 0.08)
 	_anim.seek(config.flip_takeoff_time if flip else config.jump_takeoff_time, true)
+
+
+## The air jump is the front flip, whatever the speed.
+func _on_double_jumped() -> void:
+	state = State.AIR
+	_anim.speed_scale = 1.0
+	_air_clip = config.sprint_jump_clip
+	_play(_air_clip, 0.05)
+	_anim.seek(config.flip_takeoff_time, true)
 
 
 func _start_fall() -> void:

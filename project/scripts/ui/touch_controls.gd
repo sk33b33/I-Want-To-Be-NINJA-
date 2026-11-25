@@ -26,7 +26,7 @@ var _buttons: Array[Dictionary] = [
 	{"action": "attack_heavy", "label": "HVY", "anchor": Vector2(-4.9, -1.5), "scale": 1.0, "touch": -1},
 	{"action": "jump", "label": "JUMP", "anchor": Vector2(-1.7, -5.2), "scale": 1.05, "touch": -1},
 	{"action": "dodge", "label": "ROLL", "anchor": Vector2(-4.6, -4.2), "scale": 0.95, "touch": -1},
-	{"action": "sprint", "label": "DASH", "anchor": Vector2(-7.5, -2.7), "scale": 0.85, "touch": -1},
+	{"action": "sprint", "label": "SPRINT", "anchor": Vector2(-7.5, -2.7), "scale": 0.85, "touch": -1},
 	{"action": "lock_on", "label": "LOCK", "anchor": Vector2(-1.4, -7.9), "scale": 0.75, "touch": -1},
 	{"action": "skill", "label": "CHARM", "anchor": Vector2(-4.0, -6.9), "scale": 0.8, "touch": -1},
 	# Top-right system buttons.
@@ -153,7 +153,7 @@ func _draw() -> void:
 		draw_circle(center, radius, Color(0.85, 0.15, 0.15, 0.55) if held else Color(0, 0, 0, 0.35))
 		draw_arc(center, radius, 0.0, TAU, 48, Color(1, 1, 1, 0.7), 3.0)
 		var text: String = button["label"]
-		var font_size := int(radius * 0.45)
+		var font_size := int(radius * (0.45 if text.length() <= 5 else 0.36))  # SPRINT is long.
 		var text_size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, font_size)
 		draw_string(font, center + Vector2(-text_size.x * 0.5, font_size * 0.35), text,
 				HORIZONTAL_ALIGNMENT_CENTER, -1, font_size, Color.WHITE)

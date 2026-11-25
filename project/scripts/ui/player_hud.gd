@@ -1,7 +1,9 @@
 class_name PlayerHud
 extends Control
-## Player health bar (top left), red screen flash when hurt, and a "Defeated" message while
-## waiting to respawn. Listens to the player's HealthComponent / PlayerCombat only.
+## Player health bar (top left: green, with red showing only the health just lost, which drains
+## away after a moment), a stamina bar under it (sprint drains it), red screen flash when hurt, and
+## a "Defeated" message while waiting to respawn. Listens to the player's HealthComponent /
+## PlayerCombat / PlayerController only.
 
 @export var player_path: NodePath
 
@@ -9,6 +11,9 @@ var _combat: PlayerCombat
 var _health: HealthComponent
 var _bar: ProgressBar
 var _trail: ProgressBar
+var _trail_hold: float = 0.0
+var _stamina_bar: ProgressBar
+var _player: PlayerController
 var _flash: ColorRect
 var _lock: Label
 var _down: Label
@@ -23,6 +28,12 @@ func _ready() -> void:
 	var player := get_node_or_null(player_path) as PlayerController
 	if player == null or player.combat == null:
 		return
+	_player = player
+	_stamina_bar.max_value = player.config.stamina_max
+	_stamina_bar.value = player.stamina
+	player.stamina_changed.connect(func(cur: float, maximum: float) -> void:
+		_stamina_bar.max_value = maximum
+		_stamina_bar.value = cur)
 	_combat = player.combat
 	_health = _combat.health
 	_health.changed.connect(_on_health_changed)
@@ -51,14 +62,41 @@ func skill_text() -> String:
 
 func _process(delta: float) -> void:
 	_flash.color.a = maxf(_flash.color.a - delta * 1.2, 0.0)
-	# The pale "recent damage" trail catches up after a moment.
-	_trail.value = move_toward(_trail.value, _bar.value, delta * 40.0)
+	# The red "just lost" part waits a moment, then drains down to the green bar.
+	_trail_hold = maxf(_trail_hold - delta, 0.0)
+	if _trail_hold <= 0.0:
+		_trail.value = move_toward(_trail.value, _bar.value, delta * 40.0)
+	# Red only exists while there is lost health to show (no red fringe around a full green bar).
+	var fill := _trail.get_theme_stylebox("fill") as StyleBoxFlat
+	var want := 1.0 if _trail.value > _bar.value + 0.01 else 0.0
+	if fill and not is_equal_approx(fill.bg_color.a, want):
+		fill.bg_color.a = want
+	if _player:
+		# An empty stamina bar blinks pale until sprint is allowed again.
+		var tired := _player.is_exhausted()
+		_stamina_bar.modulate = Color(1, 1, 1, 0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.012)) if tired else Color.WHITE
 	if _combat and _skill.visible:
 		var left := _combat.skill_cooldown_left
 		var element := _combat.skill_element()
 		var title: String = TALISMAN_NAMES.get(element, "Talisman")
 		_skill.text = "%s: ready" % title if left <= 0.0 else "%s: %.1fs" % [title, left]
 		_skill.add_theme_color_override("font_color", TALISMAN_COLORS.get(element, Color(1.0, 0.6, 0.2)) if left <= 0.0 else UiStyle.MUTED)
+
+
+const TRAIL_HOLD := 0.6  # Seconds the red "lost health" stays before draining.
+
+
+## For tests: the health bar's colour, whether red (lost health) is on screen, the stamina shown.
+func health_colour() -> Color:
+	return (_bar.get_theme_stylebox("fill") as StyleBoxFlat).bg_color
+
+
+func red_showing() -> bool:
+	return (_trail.get_theme_stylebox("fill") as StyleBoxFlat).bg_color.a > 0.5 and _trail.value > _bar.value + 0.01
+
+
+func shown_stamina() -> float:
+	return _stamina_bar.value
 
 
 func shown_health() -> float:
@@ -68,6 +106,8 @@ func shown_health() -> float:
 func _on_health_changed(current: float, maximum: float) -> void:
 	_bar.max_value = maximum
 	_trail.max_value = maximum
+	if current < _bar.value:
+		_trail_hold = TRAIL_HOLD  # Damage: show the lost health in red for a moment.
 	_bar.value = current
 	if current > _trail.value:
 		_trail.value = current
@@ -86,10 +126,17 @@ func _build() -> void:
 	var stack := Control.new()
 	stack.custom_minimum_size = Vector2(300, 18)
 	box.add_child(stack)
-	_trail = _make_bar(Color(0.9, 0.85, 0.75, 0.6), true)
+	# Dark bar at the back, red "just lost" behind the green health: red only shows after damage.
+	_trail = _make_bar(Color(0.85, 0.1, 0.08), true)
 	stack.add_child(_trail)
-	_bar = _make_bar(Color(0.75, 0.12, 0.1), false)
+	_bar = _make_bar(Color(0.2, 0.75, 0.25), false)
 	stack.add_child(_bar)
+	var stamina_stack := Control.new()
+	stamina_stack.custom_minimum_size = Vector2(300, 10)
+	box.add_child(stamina_stack)
+	_stamina_bar = _make_bar(Color(0.95, 0.78, 0.25), true)
+	_stamina_bar.show_percentage = false
+	stamina_stack.add_child(_stamina_bar)
 	_lock = UiStyle.label("LOCKED ON", 16, Color(1.0, 0.45, 0.3))
 	_lock.visible = false
 	box.add_child(_lock)

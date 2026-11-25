@@ -32,5 +32,5 @@ func _on_mode_changed(mode: CameraRig.Mode) -> void:
 
 func _hint() -> String:
 	if DisplayServer.is_touchscreen_available() or Input.emulate_touch_from_mouse:
-		return "Left: move  ·  Right: drag to look  ·  JUMP / DASH / CAM  ·  II pause"
-	return "WASD move  ·  Mouse look (click)  ·  Space jump  ·  Shift dash  ·  V camera  ·  Esc pause"
+		return "Left: move  ·  Right: drag to look  ·  JUMP / SPRINT / CAM  ·  II pause"
+	return "WASD move  ·  Mouse look (click)  ·  Space jump  ·  Shift sprint  ·  V camera  ·  Esc pause"

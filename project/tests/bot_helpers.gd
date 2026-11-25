@@ -19,6 +19,7 @@ static func release_moves() -> void:
 ## line, jumps at the rampart and each gorge gap; climbing/ledge grabs happen automatically.
 ## Returns true when stop_z was reached.
 static func run_route(tc: TestCase, player: PlayerController, stop_z: float, max_frames: int = 2600) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	if not await run_long_route(tc, player):
 		return false
 	var jump_at: Array[float] = [-43.0, -49.0, -55.0, -61.5, -68.0]
@@ -48,6 +49,7 @@ static func run_route(tc: TestCase, player: PlayerController, stop_z: float, max
 ## openings in front of the lowered head;
 ## throw the Ember Talisman whenever it is ready. Returns when the boss is defeated or time runs out.
 static func fight_boss(tc: TestCase, player: PlayerController, boss: BossController, max_frames: int = 60 * 300) -> void:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	var reacted_to := -1
 	var attack_count := 0
 	for frame in max_frames:
@@ -119,6 +121,7 @@ static func _walk_to_z(tc: TestCase, player: PlayerController, stop_z: float, ta
 ## Emberwild route: waits for the vent wave and runs behind it, takes the cool lane past the heat
 ## zone, waits for the sinking stones to rise, then crosses the lava river and climbs the far bank.
 static func run_route_emberwild(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	if not await run_long_route(tc, player):
 		return false
 	var vents: Array = []
@@ -176,6 +179,7 @@ static func run_route_emberwild(tc: TestCase, player: PlayerController, level: N
 ## keeps moving raft to raft across the deep bog — rafts sink under you, so it never waits — and
 ## climbs the root wall of the far bank.
 static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: float) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	if not await run_long_route(tc, player):
 		return false
 	if not await _walk_to_z(tc, player, -24.0, -0.5, 1200):  # Mud flats (slow).
@@ -207,6 +211,7 @@ static func run_route_moonfen(tc: TestCase, player: PlayerController, stop_z: fl
 ## (lightning lands where you WERE), drops off the far edge, waits at the gale ridge until a gust
 ## has just blown past, then sprints the slick ridge in the calm.
 static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: Node, stop_z: float) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	if not await run_long_route(tc, player):
 		return false
 	if not await _walk_to_z(tc, player, -7.9, 0.0):
@@ -242,6 +247,7 @@ static func run_route_stormcrag(tc: TestCase, player: PlayerController, level: N
 ## path it first walks back to the nearest point of the leg, like a player finding the trail again.
 static func walk_toward(tc: TestCase, player: PlayerController, target: Vector3, done: Callable,
 		max_frames: int = 1500, fight: bool = false, from: Vector3 = Vector3.INF, abort_on_respawn: bool = false) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	var last := player.global_position
 	var stuck := 0
 	# A fall or death respawns the player elsewhere: end this leg so the caller can pick the trail
@@ -331,6 +337,7 @@ static var walk_full_long_route: bool = false
 ## the spawn to the start of the original route. Does nothing if the player already stands on
 ## the original route (z < 20) or the jungle has no long route. Returns false if stuck.
 static func run_long_route(tc: TestCase, player: PlayerController, path_name: String = "safe", force: bool = false) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	var builders := tc.tree.get_nodes_in_group("route_builder")
 	if builders.is_empty() or player.global_position.z < 20.0:
 		return true
@@ -365,6 +372,7 @@ static func run_long_route(tc: TestCase, player: PlayerController, path_name: St
 ## Walk through waypoints Vector4(x, y, z, jump); at a jump point, jump and keep heading for the
 ## next waypoint. A waypoint counts as reached within 0.9 m horizontally and 2 m vertically.
 static func follow_path(tc: TestCase, player: PlayerController, pts: Array, frames_per_leg: int = 900) -> bool:
+	player.stamina_drain_multiplier = 0.0  # Bots test navigation and fights, not stamina.
 	var respawns := [0]
 	var on_respawn := func(_at: Vector3) -> void: respawns[0] += 1
 	player.respawned.connect(on_respawn)

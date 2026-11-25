@@ -1,6 +1,6 @@
 # Controls (prototype defaults)
 
-Implemented in Phase 1: move, camera, jump, sprint (dash-run), switch camera, pause (frees the mouse).
+Implemented in Phase 1: move, camera, jump, sprint, switch camera, pause (frees the mouse).
 Implemented in Phase 2: climbing, ledge grab, mantle, wall jump — all automatic, no extra buttons (see "Traversal" below).
 Implemented in Phase 4: light attack (3-hit combo), heavy attack, dodge roll, lock-on.
 Implemented in Phase 5: Ember Talisman (fire skill).
@@ -11,8 +11,9 @@ Not yet implemented: interact.
 | Move | WASD | Left stick | Left side: floating joystick |
 | Camera | Mouse | Right stick | Right side: drag |
 | Jump | Space | A / Cross | JUMP button |
-| Sprint (dash-run, hold) | Shift (hold) | Left-stick click | DASH button |
-| Sprint-jump (front flip) | Shift + Space | L3 + A | DASH + JUMP |
+| Sprint (hold; drains the stamina bar) | Shift (hold) | Left-stick click | SPRINT button |
+| Double jump (second press in the air: front flip) | Space twice | A twice | JUMP twice |
+| Sprint-jump (front flip) | Shift + Space | L3 + A | SPRINT + JUMP |
 | Dodge roll (brief invulnerability) | Shift (quick tap) or C | B / Circle | ROLL button |
 | Light attack (press again for a 3-hit combo) | Left mouse | X / Square | ATK button |
 | Heavy attack (breaks enemy poise) | Right mouse | Y / Triangle | HVY button |
@@ -62,6 +63,6 @@ Notes:
 - Touch controls appear automatically on touchscreens. To test them on a PC, run with `-- --touch` (mouse emulates touch).
 - Shift: a quick tap (under 0.2 s) rolls, holding it sprints. C is a dedicated dodge key.
 - Attacks only start on the ground. While locked on, the ninja faces the target and movement strafes around it; rolling with no direction rolls away from the target.
-- Touch layout: ATK (big) bottom-right, HVY, JUMP, ROLL, DASH and LOCK around it; CAM and II (pause) top-right.
+- Touch layout: ATK (big) bottom-right, HVY, JUMP, ROLL, SPRINT and LOCK around it; CAM and II (pause) top-right.
 
 **Spirit shrines (exploration):** look for a thin beam of light above the canopy — a hidden shrine. Climb its pillar or find the gap in its ring of boulders and touch the relic. The pause menu counts them and gives a riddle for each one still missing. No new buttons: walking into a shrine pillar climbs it like any climbable wall.

@@ -323,6 +323,7 @@ func test_gate_bot_defeats_kurogale_and_breaks_antlers() -> void:
 	var nodes := _arena(Vector3(0, 0.05, 8))
 	var boss: Kurogale = nodes[0]
 	var p: PlayerController = nodes[1]
+	p.stamina_drain_multiplier = 0.0  # The bot tests the fight, not stamina.
 	var deaths := [0]
 	p.combat.player_died.connect(func() -> void: deaths[0] += 1)
 	await physics_frames(10)

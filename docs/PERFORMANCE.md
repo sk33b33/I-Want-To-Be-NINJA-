@@ -95,6 +95,12 @@ CPU: headless runs (`godot --headless ... benchmark.gd`) average **≤ 6.9 ms pe
 jungle and preset** (6.9 ms is Godot's headless frame-pacing floor, so the true cost is lower);
 worst single frames 8–13 ms (one-off spikes). Physics ticks measured 1–2.4 ms.
 
+### Owner's phone, real play (crash-report heartbeats, 2026-11-25)
+Low tier (sky flashes off), Verdant Canopy, the new ~370 m route, ~2 minutes of play: heartbeat
+**40-58 fps** (mostly 41-48; 58 right after a respawn), **134-141 MB** memory, stable (no growth),
+shader warm-up of all 35 visuals completed. That is above the 30 fps target in a real session.
+(Device and exact frame time per viewpoint still need the dojo's Run benchmark.)
+
 ## Gate status
 **Not passed yet:** the budgets are met, but the target is a frame rate on the owner's phone.
 To confirm: install the Android build, open the dojo → **Settings → Run benchmark** (about a

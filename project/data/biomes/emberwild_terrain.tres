@@ -12,5 +12,5 @@ hill_height = 7.0
 valley_wall_height = 20.0
 stream_z = -1000.0
 stream_depth = 0.0
-pits = Array[Vector4]([Vector4(-16, 184, 10, 18), Vector4(0, 112, 80, 12)])
+pits = Array[Vector4]([Vector4(-34, 184, 46, 18), Vector4(0, 112, 80, 12)])
 gorge_depth = -4.0

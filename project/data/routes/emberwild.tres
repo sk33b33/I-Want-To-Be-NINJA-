@@ -55,8 +55,8 @@ phase = 1.6500000000000001
 [sub_resource type="Resource" id="Resource_qp2sc"]
 script = ExtResource("1_h1oce")
 kind = 6
-position = Vector3(-16, -4, 184)
-size = Vector3(20, 6, 36)
+position = Vector3(-34, -4, 184)
+size = Vector3(92, 6, 36)
 
 [sub_resource type="Resource" id="Resource_syo03"]
 script = ExtResource("1_h1oce")

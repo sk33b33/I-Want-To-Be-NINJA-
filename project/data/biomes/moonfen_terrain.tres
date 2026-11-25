@@ -11,5 +11,5 @@ clearings = Array[Vector3]([Vector3(0, 0, 11), Vector3(-9, -8, 7), Vector3(10, -
 hill_height = 3.0
 valley_wall_height = 14.0
 stream_z = -33.0
-pits = Array[Vector4]([Vector4(16, 184, 10, 18), Vector4(0, 112, 80, 12)])
+pits = Array[Vector4]([Vector4(34, 184, 46, 18), Vector4(0, 112, 80, 12)])
 gorge_depth = -4.0

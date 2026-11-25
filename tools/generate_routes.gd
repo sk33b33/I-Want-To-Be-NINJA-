@@ -31,7 +31,10 @@ const THEMES := {
 const SPAWN_Z := 250.0
 const SAFE_X := -24.0
 const RISKY_X := 16.0
-const PIT1 := Vector4(16, 184, 10, 18)          # Risky-path chasm: x 6..26, z 166..202.
+# Risky-path chasm: from the safe lane's edge (x -12) to the map edge (x 80), z 166..202. It must be
+# this wide: a narrow one left the hill beside it walkable, and a play log showed a player running
+# straight down the middle between the two branches, skipping the whole fork.
+const PIT1 := Vector4(34, 184, 46, 18)
 const PIT2 := Vector4(0, 112, 80, 12)           # Full-width chasm: z 100..124.
 const PLATEAU_Z := Vector2(56, 90)              # Plateau top y = 5 between these z.
 const PLATEAU_H := 5.0

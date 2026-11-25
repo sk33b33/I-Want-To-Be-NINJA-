@@ -141,3 +141,25 @@ func test_low_and_medium_keep_the_original_tree_count() -> void:
 		_nodes.erase(main)
 	QualityProfile.force_tier(&"")
 	_done()
+
+
+## Regression (found in the owner's play log): the first chasm was only 20 m wide, so the hill
+## beside it was walkable and the player ran straight down the middle between the two branches
+## (x 0..3, z 209 -> 155) — skipping the whole fork (enemy pack, hazard lane, chasm). The chasm
+## must run from the safe lane's edge to the map edge: the only ways on are the safe lane or the
+## stepping pieces.
+func test_the_first_chasm_cannot_be_walked_around() -> void:
+	for biome: StringName in SCENES:
+		var main := _start(biome)
+		await physics_frames(2)
+		var terrain := main.find_children("*", "BiomeTerrain", true, false)[0] as BiomeTerrain
+		var mirror := -1.0 if biome in [&"emberwild", &"stormcrag"] else 1.0
+		var open: Array = []
+		for x in range(-10, 79, 2):
+			if not terrain.is_in_pit(x * mirror, 184.0):
+				open.append(x)
+		check(open.is_empty(), "%s: no way round the first chasm (walkable at x = %s)" % [biome, open])
+		check(not terrain.is_in_pit(-24.0 * mirror, 184.0), "%s: the safe lane stays clear of the chasm" % biome)
+		main.free()
+		_nodes.erase(main)
+	_done()

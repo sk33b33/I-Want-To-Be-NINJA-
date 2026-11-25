@@ -312,3 +312,4 @@ Owner: "the path to the bosses is too small, it goes too quick — extend it, lo
 ## 2026-11-25 — Graphics update, stage 5A (Verdant trees)
 - Seven CC0 jungle tree models (OpenGameArt, ledger) replace the procedural jungle trees in the Verdant Canopy; lighter variants on Low (cap 1200 tris), more on Medium/High. Trunk collision measured from the model. Triangles after: Low 162k, Medium 513k, High 1.05M (budgets hold).
 - New `model_foliage.gdshader` (atlas, tint, height-weighted sway, storm wind). Art test added; leaf-card test now uses Moonfen.
+- Stage 5B groundwork: dev-only `tools/art/convert_dae.py` (needs `pip install trimesh pycollada numpy`; not a game dependency) converts the CC0 ruins pack (Godot can't import DAE) to Y-up GLB; 12 ruin models imported in `assets/models/cc0/ruins/`.

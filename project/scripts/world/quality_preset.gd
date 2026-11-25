@@ -60,4 +60,7 @@ extends Resource
 ## Imported tree models above this many triangles are not used on this tier (art pass: Low keeps
 ## the lightest variants; Medium adds the mid ones; High everything).
 @export var tree_model_max_tris: int = 5000
-
+## Art pass 5B: ruin props along the long routes (RuinDressing). Models above the triangle cap are
+## skipped; `ruin_density` scales how many scatter spots are used.
+@export var ruin_prop_max_tris: int = 3000
+@export_range(0.0, 1.0) var ruin_density: float = 1.0

@@ -28,3 +28,5 @@ anti_tile = false
 leaf_cards = false
 color_grade_lut = false
 tree_model_max_tris = 1200
+ruin_prop_max_tris = 520
+ruin_density = 0.5

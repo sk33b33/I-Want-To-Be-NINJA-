@@ -163,3 +163,33 @@ func test_the_first_chasm_cannot_be_walked_around() -> void:
 		main.free()
 		_nodes.erase(main)
 	_done()
+
+
+## Art pass 5B: CC0 ruins dress every long route — an arch at the start, a pillar pair at each new
+## shrine, scattered ruins beside (never on) the route — lighter on Low, none of it solid.
+func test_ruins_dress_every_route_lighter_on_low_and_never_solid() -> void:
+	var counts := {}
+	for tier in [&"low", &"high"]:
+		QualityProfile.force_tier(tier)
+		for biome: StringName in SCENES:
+			var main := _start(biome)
+			await physics_frames(2)
+			var dressing := main.find_children("RuinDressing", "Node3D", true, false)
+			check(dressing.size() == 1, "%s %s: ruin dressing built" % [tier, biome])
+			if dressing.size() == 1:
+				var n := 0
+				var arch := false
+				for mmi in dressing[0].get_children():
+					n += (mmi as MultiMeshInstance3D).multimesh.instance_count if mmi is MultiMeshInstance3D else 0
+					arch = arch or mmi.name == "StartArch"
+				counts[[tier, biome]] = n
+				check(arch, "%s %s: the start arch stands" % [tier, biome])
+				check(n >= 6, "%s %s: %d ruin props" % [tier, biome, n])
+				check(dressing[0].find_children("*", "CollisionObject3D", true, false).is_empty(), "%s %s: ruins have no collision" % [tier, biome])
+			main.free()
+			_nodes.erase(main)
+	for biome: StringName in SCENES:
+		check(counts.get([&"low", biome], 0) < counts.get([&"high", biome], 0), "%s: Low has fewer ruins than High (%s vs %s)" % [biome, counts.get([&"low", biome]), counts.get([&"high", biome])])
+	QualityProfile.force_tier(&"")
+	_done()
+

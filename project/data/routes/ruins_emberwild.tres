@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RuinDressing" load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/ruinarch_01.glb" id="1_hbntx"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/ruinpillar_01.glb" id="2_ft3xo"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/pillarsegment_01.glb" id="3_i8f08"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/ruinwallsegment_02.glb" id="4_60jho"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/romantypecol_01.glb" id="5_61grk"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/romanrail_01.glb" id="6_15oeh"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/foundationruin_01.glb" id="7_g3ivw"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/ruinwallsegment_01.glb" id="8_mlrxj"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/templeruin_02.glb" id="9_vxm72"]
+[ext_resource type="PackedScene" path="res://assets/models/cc0/ruins/speakingstones_01.glb" id="10_iyvnv"]
+[ext_resource type="Script" path="res://scripts/world/route/ruin_dressing.gd" id="11_kxai5"]
+
+[resource]
+script = ExtResource("11_kxai5")
+scatter_models = Array[PackedScene]([ExtResource("2_ft3xo"), ExtResource("3_i8f08"), ExtResource("4_60jho"), ExtResource("5_61grk"), ExtResource("6_15oeh"), ExtResource("7_g3ivw"), ExtResource("8_mlrxj"), ExtResource("9_vxm72"), ExtResource("1_hbntx"), ExtResource("10_iyvnv")])
+shrine_pillar = ExtResource("2_ft3xo")
+gate_arch = ExtResource("1_hbntx")
+seed_value = 23

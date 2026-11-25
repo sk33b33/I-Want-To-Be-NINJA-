@@ -24,3 +24,5 @@ effect_lights = true
 sky_reflections = true
 sky_flash = true
 tree_model_max_tris = 5000
+ruin_prop_max_tris = 6000
+ruin_density = 1.0

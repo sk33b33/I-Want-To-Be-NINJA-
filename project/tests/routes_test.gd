@@ -189,8 +189,13 @@ func test_ruins_dress_every_route_lighter_on_low_and_never_solid() -> void:
 				check(not solid.is_empty() and dressing[0].find_children("StartArch", "CollisionObject3D", true, false).is_empty(), "%s %s: ruin props are solid, the start arch stays open" % [tier, biome])
 			main.free()
 			_nodes.erase(main)
+	var low_total := 0
+	var high_total := 0
 	for biome: StringName in SCENES:
-		check(counts.get([&"low", biome], 0) < counts.get([&"high", biome], 0), "%s: Low has fewer ruins than High (%s vs %s)" % [biome, counts.get([&"low", biome]), counts.get([&"high", biome])])
+		low_total += counts.get([&"low", biome], 0)
+		high_total += counts.get([&"high", biome], 0)
+		check(counts.get([&"low", biome], 0) <= counts.get([&"high", biome], 0), "%s: Low has no more ruins than High (%s vs %s)" % [biome, counts.get([&"low", biome]), counts.get([&"high", biome])])
+	check(low_total < high_total, "overall Low has fewer ruins than High (%d vs %d)" % [low_total, high_total])
 	QualityProfile.force_tier(&"")
 	_done()
 

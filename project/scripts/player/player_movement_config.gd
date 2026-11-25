@@ -35,8 +35,8 @@ extends Resource
 
 ## Extra jumps in the air (1 = double jump). The extra jump plays the front flip.
 @export var air_jumps: int = 1
-## Upward velocity of the air jump (m/s); a little lower than the ground jump.
-@export var air_jump_velocity: float = 8.2
+## Upward velocity of the air jump (m/s); higher than the ground jump (9.0), so the flip clears more.
+@export var air_jump_velocity: float = 10.5
 ## Seconds after a jump before the air jump can fire (a double-tap is not an accident).
 @export var air_jump_delay: float = 0.15
 
